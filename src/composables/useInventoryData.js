@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { byId, useCatalogueData, useDataPackage } from '@museumwnf/viewer-core'
+import { byId, useCatalogueData } from '@museumwnf/viewer-core'
 import { exhibitionAncestry, exhibitionTree } from './exhibitions.js'
 
 // The website's records, read the one way every website reads them: through
@@ -9,14 +9,11 @@ import { exhibitionAncestry, exhibitionTree } from './exhibitions.js'
 // Translations are viewer-core's cache, not a second one kept here. The
 // wrapper half — `tr`, `md`/`mdInline`/`mdStrip`, `loadEnglish`, `labelOf`,
 // the visible form of an entity — is `useCatalogueData`'s; what stays here is
-// this site's own: the manifest project-key mapping, the hand-written
-// exhibition list/theme lookup the catalogue facets and timeline pages still
-// read (the six exhibition pages themselves read the `useCollectionTree`
-// form in exhibitions.js instead), and the raw item lookup a page reads when
-// it deliberately shows an item the visible rule below hides.
-
-const dataPackage = useDataPackage()
-const manifestData = dataPackage.manifest
+// this site's own: the hand-written exhibition list/theme lookup the
+// catalogue facets and timeline pages still read (the six exhibition pages
+// themselves read the `useCollectionTree` form in exhibitions.js instead),
+// and the raw item lookup a page reads when it deliberately shows an item
+// the visible rule below hides.
 
 // Items legacy kept only to illustrate Historical Background / timeline
 // pages (display_status 'N') are excluded from database search and Permanent
@@ -62,18 +59,6 @@ const collections = catalogue.entity('collections')
 // dataset.config.js, by viewer-core's `offeredLanguages` over this site's
 // own declared list.
 const defaultLang = 'en'
-
-// Legacy project key (e.g. 'ISL', 'EPM') by project UUID — manifest.json's
-// projectIds/projectKeys are parallel arrays, one exported project per index.
-const projectKeyById = new Map(
-  (manifestData.projectIds ?? []).map((id, i) => [id, manifestData.projectKeys?.[i]])
-)
-
-// The Sharing History package exports a single project ('awe'); this helper
-// stays generic in case a companion project is ever exported alongside it.
-function itemProjectKey(item) {
-  return projectKeyById.get(item.project_id) ?? null
-}
 
 // ── Raw item lookup ──────────────────────────────────────────────────────
 //
@@ -219,7 +204,6 @@ export function useInventoryData() {
     tr,
     labelOf,
     itemVisible,
-    itemProjectKey,
     itemById,
     exhibitions,
     exhibitionThemes,
