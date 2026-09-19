@@ -2,11 +2,10 @@
  * Sharing History's own palette: the legacy oxblood/red colour names other
  * CSS (theme/tokens.css, the views' own scoped styles) reference. The
  * building blocks this file used to duplicate — the content box, section
- * heading, form table, buttons and back link — are now
- * @museumwnf/viewer-layout's shared content classes (.mwnf-panel,
- * .mwnf-heading, .mwnf-form-table, .mwnf-button, .mwnf-select,
- * .mwnf-back-bar), themed through theme/tokens.css instead of duplicated
- * here.
+ * heading, form table, buttons, selects and the back link — are now
+ * @museumwnf/viewer-layout's shared content classes (panel, heading,
+ * form-table, button, select, back-bar), themed through theme/tokens.css
+ * and theme/overrides.css instead of duplicated here.
  */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,400&display=swap');
 
