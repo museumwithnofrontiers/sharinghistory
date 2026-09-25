@@ -135,15 +135,19 @@ export const exhibitionChapterSpec = {
  * timeline and Further Reading only when the package has them. Not a
  * composed view's own concept — rendered through `AppHyperlinks` in each
  * page's template, from this plain link list.
+ *
+ * Each link speaks the query key of the page it opens: the timeline filters
+ * on its `collection` control (`pc` or an exhibition id, timeline.js), the
+ * Permanent Collection results on their `exhibition` key (catalogue.js).
  */
 export function relatedContentLinks({ exhibitionId, hasThematicTimeline, hasFurtherReading, t }) {
   const links = [
-    { label: t('sharinghistory.related.politicalContextTimeline'), href: '#/timeline/results?exhibition=pc' },
+    { label: t('sharinghistory.related.politicalContextTimeline'), href: '#/timeline/results?collection=pc' },
   ]
   if (hasThematicTimeline) {
     links.push({
       label: t('sharinghistory.related.thematicTimeline'),
-      href: `#/timeline/results?exhibition=${encodeURIComponent(exhibitionId)}`,
+      href: `#/timeline/results?collection=${encodeURIComponent(exhibitionId)}`,
     })
   }
   links.push({

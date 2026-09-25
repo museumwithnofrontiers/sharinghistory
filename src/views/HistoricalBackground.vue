@@ -102,7 +102,7 @@ const insightCountries = computed(() =>
             </td>
             <td>
               <RouterLink
-                :to="{ path: '/timeline/results', query: { country: c.record.country_id, exhibition: 'pc' } }"
+                :to="{ path: '/timeline/results', query: { country: c.record.country_id, collection: 'pc' } }"
               >
                 {{ t('sharinghistory.related.politicalContextTimeline') }}
               </RouterLink>

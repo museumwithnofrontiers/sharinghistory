@@ -16,6 +16,8 @@ import { exhibitionTree } from '../src/composables/exhibitions.js'
 import { historicalProfilesTree } from '../src/composables/history.js'
 import { OFFERED_LANGUAGES } from '../src/languages.js'
 import { useInventoryData } from '../src/composables/useInventoryData.js'
+import { relatedContentLinks } from '../src/composables/exhibitionSpecs.js'
+import { timelineResults } from '../src/composables/timeline.js'
 
 // The same two layers main.js assembles, in the same order: the shared bundle
 // first, this website's own file last. Mounting without them would prove
@@ -23,6 +25,21 @@ import { useInventoryData } from '../src/composables/useInventoryData.js'
 const messages = mergeMessages(sharedTexts, { en: ownTexts })
 
 describe('website smoke test', () => {
+  // The Related Content box sends each link with the query key of the page
+  // it opens. The timeline reads its controls' keys only, so a key it does
+  // not declare (it used to be `exhibition`) opened unfiltered results.
+  it('sends the related-content timeline links with the timeline\'s own control keys', () => {
+    const links = relatedContentLinks({ exhibitionId: 'x1', hasThematicTimeline: true, hasFurtherReading: false, t: (key) => key })
+    const timelineLinks = links.filter((link) => link.href.startsWith('#/timeline/results?'))
+    expect(timelineLinks.map((link) => link.href)).toEqual([
+      '#/timeline/results?collection=pc',
+      '#/timeline/results?collection=x1',
+    ])
+    const controlKeys = new Set(timelineResults.controls.map((control) => control.key))
+    for (const link of timelineLinks) {
+      for (const key of new URLSearchParams(link.href.split('?')[1]).keys()) expect(controlKeys.has(key)).toBe(true)
+    }
+  })
   it('mounts against the configured data package', async () => {
     const { app, host } = await mountSite(config, messages)
 
