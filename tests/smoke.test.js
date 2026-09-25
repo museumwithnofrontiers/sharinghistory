@@ -547,7 +547,9 @@ describe('website smoke test', () => {
 
     const groupHeadings = Array.from(host.querySelectorAll('.mwnf-partner-list__group-title')).map((el) => el.textContent)
     expect(groupHeadings.some((heading) => heading.includes(countryName))).toBe(true)
-    const rowNames = Array.from(host.querySelectorAll('.mwnf-partner-list__name')).map((el) => el.textContent)
+    // A row's name is `PartnerPanel`'s once the list renders its rows through
+    // it (museumwithnofrontiers/inventory-app#2033); this test holds on both.
+    const rowNames = Array.from(host.querySelectorAll('.mwnf-partner-list__name, .mwnf-partner-panel__name')).map((el) => el.textContent)
     expect(rowNames.some((name) => name.includes(partnerTexts[fixture.id].name) && name.includes(partnerTexts[fixture.id].city))).toBe(true)
 
     app.unmount()
