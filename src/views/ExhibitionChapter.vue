@@ -5,7 +5,7 @@ import { NotFoundView, useI18n } from '@museumwnf/viewer-core'
 import { EssayView } from '@museumwnf/viewer-layout/views'
 import { curatorJustification, exhibitionChapterSpec, partnerJustification } from '../composables/exhibitionSpecs.js'
 import { inExhibitionTree } from '../composables/exhibitions.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // The chapter page: the essay, the picture panel (with its detail
 // photographs) and previous/next crossing into the next theme all come from
@@ -17,7 +17,7 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 const route = useRoute()
 const chapterId = computed(() => decodeURIComponent(route.params.chapterId))
 const { t } = useI18n()
-const { md, mdInline } = useInventoryData()
+const { md, mdInline } = useData()
 </script>
 
 <template>

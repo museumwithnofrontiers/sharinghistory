@@ -1,6 +1,6 @@
 import { renderInline } from '@museumwnf/viewer-core'
 import { exhibitionNodeRoute, exhibitionTree } from './exhibitions.js'
-import { useInventoryData } from './useInventoryData.js'
+import { useData } from './data.js'
 
 // The introduction, theme and chapter pages as `EssayView` specs, over the
 // exhibition tree (exhibitions.js): what each declares is only what makes
@@ -10,7 +10,7 @@ import { useInventoryData } from './useInventoryData.js'
 // chapter list) are the six views' own slot templates, not this file: a
 // spec function only ever returns data, never markup.
 
-const { labelOf } = useInventoryData()
+const { labelOf } = useData()
 
 // SH's item grid is a node's `items[]` entries themselves, each pairing a
 // bare item id with a per-language caption/justification pair and, on a
@@ -185,7 +185,7 @@ export function furtherReadingSpec(exhibition) {
 // see the pull request description).
 function bibliographyLinks(exhibition) {
   if (!exhibition) return []
-  const { mdStrip, tr } = useInventoryData()
+  const { mdStrip, tr } = useData()
   const text = tr('collections', exhibition.id) ?? {}
   const bibliography = text.extra?.bibliography ?? {}
   const langs = Object.keys(bibliography).filter((lang) => bibliography[lang]?.length)

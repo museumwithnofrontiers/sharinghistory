@@ -6,7 +6,7 @@ import { AppHyperlinks } from '@museumwnf/viewer-layout'
 import { SourceCredit } from '@museumwnf/viewer-layout/content'
 import { EssayView } from '@museumwnf/viewer-layout/views'
 import { exhibitionIntroductionSpec, relatedContentLinks } from '../composables/exhibitionSpecs.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // "About the Exhibition" (legacy exh_introduction.php): an `EssayView` node
 // in its own right — the exhibition collection itself — so back link,
@@ -17,7 +17,7 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 
 const route = useRoute()
 const { t } = useI18n()
-const { timelines } = useInventoryData()
+const { timelines } = useData()
 
 const exhibitionId = computed(() => decodeURIComponent(route.params.exhibitionId))
 

@@ -3,16 +3,16 @@ import { useI18n } from '@museumwnf/viewer-core'
 import { BackLink } from '@museumwnf/viewer-layout/content'
 import { TimelineResultsView } from '@museumwnf/viewer-layout/views'
 import { timelineResults } from '../composables/timeline.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // The timeline results are the platform's composed `TimelineResultsView`,
 // rendering the spec in composables/timeline.js. What fills the `#before`
 // slot is this website's own: the heading, with the active country/period
 // filter as a suffix, the way every other results page on this site prints
-// it (DatabaseResults.vue, PcList.vue).
+// it (DatabaseResults.vue, PermanentCollectionResults.vue).
 
 const { t } = useI18n()
-const { labelOf } = useInventoryData()
+const { labelOf } = useData()
 
 function activeFilterLabel(filters) {
   const parts = []
@@ -26,7 +26,7 @@ function activeFilterLabel(filters) {
 <template>
   <TimelineResultsView :spec="timelineResults" class="mwnf-panel timeline-results">
     <template #before="{ filters }">
-      <BackLink label="timeline.nav.backLink" :to="{ name: 'timeline' }" />
+      <BackLink variant="bar" arrow="‹" label="timeline.nav.backLink" :to="{ name: 'timeline' }" />
       <h1 class="mwnf-heading">
         {{ $t('sharinghistory.nav.timeline') }}
         <span v-if="activeFilterLabel(filters)" class="heading-filter"> — {{ activeFilterLabel(filters) }}</span>

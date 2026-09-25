@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import { SectionCards } from '@museumwnf/viewer-layout/content'
 import { exhibitionList } from '../composables/exhibitions.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 const { t } = useI18n()
-const { mdStrip, tr } = useInventoryData()
+const { mdStrip, tr } = useData()
 
 // `SectionCards` interpolates a card's `title` as plain text, so the
 // exhibition title is stripped rather than rendered — the same trade-off

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { I18nText, useFacets } from '@museumwnf/viewer-core'
 import { SearchFormView } from '@museumwnf/viewer-layout/views'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 import { FACETS, exhibitionOptions } from '../composables/catalogue.js'
 
 // The Permanent Collection entrance: one filter at a time, chosen by a
@@ -15,12 +15,12 @@ import { FACETS, exhibitionOptions } from '../composables/catalogue.js'
 // `exhibition` key the results page's own scope reads (composables/catalogue.js).
 
 // `items` is already the visible set — display_status 'N' items excluded,
-// declared once as `visible.items` in useInventoryData.js — so the facet
-// options here already match what the results page will show.
-const { items } = useInventoryData()
+// declared once as `visible.items` in data.js — so the facet options here
+// already match what the results page will show.
+const { items } = useData()
 const options = useFacets(items, FACETS)
 
-const pcSearch = computed(() => ({
+const permanentCollectionSearch = computed(() => ({
   mode: 'radio',
   target: 'permanent-collection-results',
   facets: [
@@ -38,7 +38,7 @@ const pcSearch = computed(() => ({
     <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.permanentCollection') }}</h1>
 
     <div class="mwnf-panel">
-      <SearchFormView :spec="pcSearch">
+      <SearchFormView :spec="permanentCollectionSearch">
         <template #intro>
           <I18nText tag="p" class="intro-text" keypath="sharinghistory.pc.intro" />
         </template>

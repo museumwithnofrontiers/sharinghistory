@@ -10,12 +10,12 @@ import countryTexts from '@museumwnf/sharinghistory-data/translations/countries.
 import itemTexts from '@museumwnf/sharinghistory-data/translations/items.en.json'
 import partnerTexts from '@museumwnf/sharinghistory-data/translations/partners.en.json'
 import timelineEventTexts from '@museumwnf/sharinghistory-data/translations/timeline_events.en.json'
-import { collectionTitle, itemIdsUnder } from '../src/composables/catalogue.js'
+import { collectionTitle, inScope, itemIdsUnder } from '../src/composables/catalogue.js'
 import config from '../src/dataset.config.js'
 import { exhibitionTree } from '../src/composables/exhibitions.js'
 import { historicalProfilesTree } from '../src/composables/history.js'
 import { OFFERED_LANGUAGES } from '../src/languages.js'
-import { useInventoryData } from '../src/composables/useInventoryData.js'
+import { useData } from '../src/composables/data.js'
 import { relatedContentLinks } from '../src/composables/exhibitionSpecs.js'
 import { timelineResults } from '../src/composables/timeline.js'
 
@@ -54,9 +54,26 @@ describe('website smoke test', () => {
     expect(host.textContent).toContain(ownTexts['sharinghistory.identity.title'])
     expect(host.querySelector('.mwnf-page')).not.toBeNull()
 
-    // The website's own Home view (registered under the route name 'home')
-    // must replace viewer-core's generic home view.
+    // The home route renders viewer-layout's HomeView from `config.home`, in
+    // place of viewer-core's generic home view: the welcome and the seven
+    // sections, the welcome in the site's panel.
     expect(host.querySelector('.vc-home')).toBeNull()
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-home__welcome')).not.toBeNull(), { timeout: 15000 })
+    expect(host.querySelector('.mwnf-home__welcome').classList.contains('mwnf-panel')).toBe(true)
+    expect(host.querySelectorAll('.mwnf-cards__title')).toHaveLength(7)
+
+    // The featured record (`home.featured.filter: inScope`, dataset.config.js)
+    // is picked only from the records legacy shows at all — without that
+    // filter, a pick landing on a Historical-Background illustration makes
+    // the block vanish instead of falling back to another record.
+    const featuredLink = host.querySelector('.mwnf-featured__link')
+    if (featuredLink) {
+      const [items] = await loadEntities(['items'])
+      const featuredId = decodeURIComponent(featuredLink.getAttribute('href').split('/').pop())
+      const featuredItem = items.find((item) => item.id === featuredId)
+      expect(featuredItem).toBeTruthy()
+      expect(inScope(featuredItem)).toBe(true)
+    }
 
     app.unmount()
   }, 20000)
@@ -85,7 +102,7 @@ describe('website smoke test', () => {
   // The Permanent Collection list runs on the platform's composed results
   // view (metanull/viewer-core#50): the rows and the filter panel come from
   // the catalogue spec in composables/catalogue.js, the exhibition cascade
-  // and the heading from PcList.vue's slots.
+  // and the heading from PermanentCollectionResults.vue's slots.
   it('renders the Permanent Collection on the composed results view', async () => {
     const { app, host } = await mountSite(config, messages, '#/permanent-collection/results')
     await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
@@ -97,10 +114,10 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The exhibition cascade in PcList.vue's `filters` slot narrows the list
-  // the way the pre-adoption view did: an `exhibition` query narrows to that
-  // exhibition's subtree, which is `scope` in the spec rather than a facet
-  // (itemIdsUnder, composables/catalogue.js).
+  // The exhibition cascade in PermanentCollectionResults.vue's `filters` slot
+  // narrows the list the way the pre-adoption view did: an `exhibition` query
+  // narrows to that exhibition's subtree, which is `scope` in the spec rather
+  // than a facet (itemIdsUnder, composables/catalogue.js).
   it('narrows the Permanent Collection to one exhibition', async () => {
     const [collections] = await loadEntities(['collections'])
     const marker = collections.find((c) => c.purpose === 'exhibitions-root')
@@ -299,7 +316,7 @@ describe('website smoke test', () => {
     const exhibition = collections.find((c) => c.id === nc.parent_id)
     expect(exhibition, 'fixture: the National Context collection\'s exhibition').toBeDefined()
 
-    const { exhibitionLinksForItem } = useInventoryData()
+    const { exhibitionLinksForItem } = useData()
     const links = exhibitionLinksForItem(itemId)
     expect(links.some((l) => l.exhibitionId === nc.parent_id && l.themeId === null)).toBe(true)
     expect(links.every((l) => l.themeId !== nc.id)).toBe(true)
@@ -429,6 +446,32 @@ describe('website smoke test', () => {
     const expectedProjectName = projectLabel(manifest, object.project_id, 'en')
     expect(expectedProjectName).toBeTruthy()
     expect(host.querySelector('.mwnf-credits__citation').textContent).toContain(expectedProjectName)
+
+    app.unmount()
+  }, 60000)
+
+  // The blocks after the sheet are viewer-layout's item-page blocks. An item
+  // with a video and THG galleries shows both: the video as a link out, the
+  // galleries by name — the package carries no address for them, and a
+  // same-page anchor would lead the hash router to its not-found page. This
+  // package's own media entries carry no `language` of their own (unlike
+  // islamicart's), so `RelatedMedia` falls back to showing every entry —
+  // exactly `relatedMedia`'s own old fallback rule, before the refactor.
+  it('shows the related video and the THG galleries through the shared item-page blocks', async () => {
+    const [items] = await loadEntities(['items'])
+    const item = items.find((i) => i.media?.length && i.thg_galleries?.length)
+    expect(item, 'fixture: an item with media and THG galleries').toBeTruthy()
+    const { app, host } = await mountSite(config, messages, `#/item/${encodeURIComponent(item.id)}`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-related-media')).not.toBeNull(), { timeout: 20000 })
+
+    const video = host.querySelector('.mwnf-related-media__link')
+    expect(video.getAttribute('href')).toBe(item.media[0].url)
+    expect(video.getAttribute('target')).toBe('_blank')
+
+    const galleries = Array.from(host.querySelectorAll('.mwnf-on-display')).find((block) =>
+      item.thg_galleries.every((g) => block.textContent.includes(g.name)))
+    expect(galleries).toBeTruthy()
+    expect(galleries.querySelector('a[href*="ThematicGallery"]')).toBeNull()
 
     app.unmount()
   }, 60000)
@@ -753,7 +796,7 @@ describe('website smoke test', () => {
   // page would simply render nothing. This is where that shows.
   it('resolves a record through the shared index', async () => {
     const { loadEntities } = await import('@museumwnf/viewer-core')
-    const { itemById } = useInventoryData()
+    const { itemById } = useData()
     const [items] = await loadEntities(['items'])
     expect(itemById.value).toBeInstanceOf(Map)
     expect(itemById.value.get(items[0].id)).toBe(items[0])
