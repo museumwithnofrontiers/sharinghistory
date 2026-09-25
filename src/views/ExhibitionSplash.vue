@@ -1,12 +1,12 @@
 <script setup>
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
 import { AppHyperlinks } from '@museumwnf/viewer-layout'
-import { SectionCards } from '@museumwnf/viewer-layout/content'
+import { BackLink, SectionCards } from '@museumwnf/viewer-layout/content'
 import { exhibitionTree } from '../composables/exhibitions.js'
 import { relatedContentLinks } from '../composables/exhibitionSpecs.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // The exhibition homepage: not this site's shape for `EssayView` (there is
 // no tree node "above" an exhibition to navigate from), so a thin page of
@@ -15,9 +15,8 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 // introduction and theme pages all carried.
 
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
-const { md, mdInline, mdStrip, timelines, tr } = useInventoryData()
+const { md, mdInline, mdStrip, timelines, tr } = useData()
 
 const exhibitionId = computed(() => decodeURIComponent(route.params.exhibitionId))
 const exhibition = computed(() => exhibitionTree.byId.value.get(exhibitionId.value) ?? null)
@@ -84,14 +83,6 @@ const relatedLinks = computed(() =>
     t,
   }),
 )
-
-function back() {
-  if (window.history.length > 2) {
-    router.back()
-  } else {
-    router.push('/exhibitions')
-  }
-}
 </script>
 
 <template>
@@ -101,7 +92,7 @@ function back() {
   </div>
 
   <div v-else>
-    <a class="mwnf-back-bar" href="#" @click.prevent="back">← {{ t('exhibition.chapter.returnToExhibitions') }}</a>
+    <BackLink variant="bar" label="exhibition.chapter.returnToExhibitions" :to="{ name: 'exhibitions' }" />
 
     <h1 class="mwnf-heading" v-html="mdInline(text.title ?? exhibition.internal_name)" />
 

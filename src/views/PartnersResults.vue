@@ -18,7 +18,7 @@ function totalCount(groups) {
 <template>
   <PartnerListView :spec="partnersList" class="mwnf-panel partners-results">
     <template #before="{ groups }">
-      <BackLink label="partner.nav.back" :to="{ name: 'partners' }" />
+      <BackLink variant="bar" arrow="‹" label="partner.nav.back" :to="{ name: 'partners' }" />
       <h1 class="mwnf-heading">
         {{ $t('sharinghistory.nav.partners') }}
         <span class="heading-project"> — {{ $t('sharinghistory.identity.title') }}</span>

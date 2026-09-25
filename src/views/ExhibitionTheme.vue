@@ -5,7 +5,7 @@ import { NotFoundView, useI18n } from '@museumwnf/viewer-core'
 import { EssayView } from '@museumwnf/viewer-layout/views'
 import { exhibitionNodeRoute, inExhibitionTree } from '../composables/exhibitions.js'
 import { exhibitionThemeSpec } from '../composables/exhibitionSpecs.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // The theme page: the quote, prose and item panel come from `EssayView`'s
 // own rendering (composables/exhibitionSpecs.js); the chapter list is this
@@ -16,7 +16,7 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 const route = useRoute()
 const themeId = computed(() => decodeURIComponent(route.params.themeId))
 const { t } = useI18n()
-const { mdInline } = useInventoryData()
+const { mdInline } = useData()
 </script>
 
 <template>

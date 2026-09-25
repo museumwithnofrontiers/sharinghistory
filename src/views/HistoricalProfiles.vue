@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import { I18nText, useI18n } from '@museumwnf/viewer-core'
 import { SectionCards } from '@museumwnf/viewer-layout/content'
 import { historicalProfileCountries, historicalProfileNodeRoute, historicalProfilesTree } from '../composables/history.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 const { t } = useI18n()
-const { labelOf, mdStrip, tr } = useInventoryData()
+const { labelOf, mdStrip, tr } = useData()
 
 // A card links straight to the record's first page — the record's own bare
 // address needs the record loaded to resolve to one, which

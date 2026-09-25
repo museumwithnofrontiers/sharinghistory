@@ -1,6 +1,6 @@
 import { partnerView } from '@museumwnf/viewer-core'
 import { inScope, itemSummary } from './catalogue.js'
-import { useInventoryData } from './useInventoryData.js'
+import { useData } from './data.js'
 
 // The partner pages, as specs: what viewer-layout's `PartnerListView` renders
 // on `/partners/results` and `RecordView` on `/partner/:id`. The engine —
@@ -14,7 +14,7 @@ import { useInventoryData } from './useInventoryData.js'
 // pointing at its partner, so it is read the same way the original page
 // scanned for it).
 
-const { items, labelOf, md, mdInline, tr } = useInventoryData()
+const { items, labelOf, md, mdInline, tr } = useData()
 
 // Legacy pm_partner_list.php's INNER JOINs on sh_partner_names +
 // mwnf3.countrynames: only a partner with a name translation AND a country

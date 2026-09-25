@@ -1,6 +1,6 @@
-import { eventDateLabel, inDateRange } from '@museumwnf/viewer-core'
-import { collectionTitle, DATE_MODE, inScope, itemSummary, objectsAndMonumentsSummary } from './catalogue.js'
-import { useInventoryData } from './useInventoryData.js'
+import { CATALOGUE_DATE_MODE, eventDateLabel, inDateRange, objectsAndMonumentsSummary } from '@museumwnf/viewer-core'
+import { collectionTitle, inScope, itemSummary } from './catalogue.js'
+import { useData } from './data.js'
 
 // The timeline, as `TimelineResultsView` specs: what viewer-core's
 // `useTimelineEvents` engine (the merge, the overlap rule, the era label,
@@ -11,7 +11,7 @@ import { useInventoryData } from './useInventoryData.js'
 // gallery cross-link (`hcr_gallery.php`, Decision D1). One shared spec is
 // read by both the entrance (`entrance: true`) and the results page.
 
-const { timelines, exhibitions, itemById, items, labelOf, tr, mdInline, md } = useInventoryData()
+const { timelines, exhibitions, itemById, items, labelOf, tr, mdInline, md } = useData()
 
 function timelineOf(event) {
   return (timelines.value ?? []).find((row) => row.id === event.timeline_id) ?? null
@@ -120,7 +120,7 @@ function galleryCandidates(filters) {
   return (items.value ?? []).filter((item) => {
     if (!inScope(item)) return false
     if (filters.country && item.country_id !== filters.country) return false
-    return inDateRange(item, { begin: filters.begin, end: filters.end, mode: DATE_MODE })
+    return inDateRange(item, { begin: filters.begin, end: filters.end, mode: CATALOGUE_DATE_MODE })
   })
 }
 
@@ -128,7 +128,7 @@ export const timelineGallery = {
   entity: 'items',
   keys: ['country', 'begin', 'end'],
   scope: (item, filters) => inScope(item) && (!filters.country || item.country_id === filters.country),
-  dates: { mode: DATE_MODE },
+  dates: { mode: CATALOGUE_DATE_MODE },
   sort: 'chronological',
   pageSize: 20,
   variant: 'list',

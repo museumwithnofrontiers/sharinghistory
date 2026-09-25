@@ -3,7 +3,7 @@ import { useI18n } from '@museumwnf/viewer-core'
 import { BackLink } from '@museumwnf/viewer-layout/content'
 import { CatalogueResultsView } from '@museumwnf/viewer-layout/views'
 import { timelineGallery } from '../composables/timeline.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // Decision D1: the timeline gallery of objects legacy's hcr_gallery.php
 // offered, regained as the platform's composed `CatalogueResultsView` over
@@ -13,7 +13,7 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 // and period as a suffix.
 
 const { t } = useI18n()
-const { labelOf } = useInventoryData()
+const { labelOf } = useData()
 
 function activeFilterLabel(filters) {
   const parts = []
@@ -27,7 +27,7 @@ function activeFilterLabel(filters) {
 <template>
   <CatalogueResultsView :spec="timelineGallery" class="mwnf-panel">
     <template #before="{ filters }">
-      <BackLink label="timeline.nav.backToEvents" :to="{ name: 'timeline-results', query: filters }" />
+      <BackLink variant="bar" arrow="‹" label="timeline.nav.backToEvents" :to="{ name: 'timeline-results', query: filters }" />
       <h1 class="mwnf-heading">
         {{ $t('timeline.results.galleryHeading') }}
         <span v-if="activeFilterLabel(filters)" class="heading-filter"> — {{ activeFilterLabel(filters) }}</span>

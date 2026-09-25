@@ -6,7 +6,7 @@ import { SourceCredit } from '@museumwnf/viewer-layout/content'
 import { EssayView } from '@museumwnf/viewer-layout/views'
 import { historicalProfilesTree } from '../composables/history.js'
 import { historicalBackgroundCountrySpec } from '../composables/historySpecs.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // The essay is a page's own narrative (composables/historySpecs.js,
 // decision #39). What is the record's, not the page's — its own intro, the
@@ -24,7 +24,7 @@ const props = defineProps({
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const { labelOf, md } = useInventoryData()
+const { labelOf, md } = useData()
 
 const record = computed(() => historicalProfilesTree.byId.value.get(props.recordId) ?? null)
 const pages = computed(() => (record.value ? historicalProfilesTree.children(record.value.id) : []))
@@ -65,7 +65,7 @@ function bibliographyMarkdown(tr, language) {
   </div>
 
   <div v-else-if="activePageId" class="hb-wrap">
-    <router-link class="mwnf-back-bar" to="/historical-profiles">← {{ t('sharinghistory.nav.historicalProfiles') }}</router-link>
+    <router-link :to="{ name: 'historical-profiles' }" class="mwnf-back-bar mwnf-back-bar--link">← {{ t('sharinghistory.nav.historicalProfiles') }}</router-link>
 
     <EssayView :spec="historicalBackgroundCountrySpec" :id="activePageId">
       <template #before-body="{ tr }">

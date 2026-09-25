@@ -8,7 +8,7 @@ import {
   historicalProfilesTree,
   historicalTopics,
 } from '../composables/history.js'
-import { useInventoryData } from '../composables/useInventoryData.js'
+import { useData } from '../composables/data.js'
 
 // None of `TextPageView` (a single Markdown body, no slots of its own) or
 // `SectionCards` (one link per card) fits this page's three boxes: the
@@ -21,7 +21,7 @@ import { useInventoryData } from '../composables/useInventoryData.js'
 // description).
 
 const { t } = useI18n()
-const { labelOf, md, mdInline, tr } = useInventoryData()
+const { labelOf, md, mdInline, tr } = useData()
 
 const activePerspectiveIndex = ref(0)
 

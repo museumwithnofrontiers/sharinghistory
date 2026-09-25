@@ -4,8 +4,8 @@ import { useCollectionTree } from '@museumwnf/viewer-core'
 // The Historical Profiles subtree — a country's own record and its ordered
 // pages — and the Historical Background subtree — the general perspectives
 // plus the "Read more" topics — replace the hand-written parent_id walks
-// useInventoryData.js carried for them, the way exhibitions.js's own comment
-// already flagged as this story's (#39) work.
+// the data composable used to carry for them, the way exhibitions.js's own
+// walk moved here first (#39).
 
 // No `childType`: the "historical-profiles-root" marker parents nothing but
 // the country (and one project-level "general") records, and each record

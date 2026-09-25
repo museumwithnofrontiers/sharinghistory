@@ -1,49 +1,31 @@
 <script setup>
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { combineExpansions, countryExpansion, glossaryExpansion, useKeywordIndex } from '@museumwnf/viewer-core'
+import { useSearchFieldOptions } from '@museumwnf/viewer-core'
 import { CatalogueResultsView } from '@museumwnf/viewer-layout/views'
-import { useInventoryData } from '../composables/useInventoryData.js'
-import { SEARCH_FIELDS, databaseResults, searchRows, useSearchFields } from '../composables/catalogue.js'
+import { useData } from '../composables/data.js'
+import { SEARCH_FIELDS, databaseResults } from '../composables/catalogue.js'
 
 // The database results run on the platform's composed `CatalogueResultsView`
 // (composables/catalogue.js's `databaseResults`): the query in the URL, the
-// pages, the summary line and the rows are declared there. What stays this
-// wrapper's own is the keyword index itself — a live composable tied to the
-// results page's own search language (Decision D3: `rank: 'hits'`, the
-// glossary and country expansions), rather than a plain declaration — the
-// search-language watch legacy's `database_results.php` ran before it
-// searched a language's translations, and the refine row under the summary.
+// pages, the summary line, the rows and the index itself are declared there.
+// What stays this wrapper's own is the search-language translations watch —
+// a side effect the spec itself has no lifecycle to run, the same one
+// legacy's own `database_results.php` ran before it searched a language's
+// translations — and the refine row under the summary.
 
 const route = useRoute()
-const { loadTranslations } = useInventoryData()
-const fieldOptions = useSearchFields()
+const { loadTranslations } = useData()
+const fieldOptions = useSearchFieldOptions(SEARCH_FIELDS)
 
+// The search language is read straight off the URL, not the composed
+// view's own staged filters, so a language chosen on the entrance loads
+// before this page's first render rather than after an Apply click.
 watch(() => route.query.lang, (lang) => { if (lang) loadTranslations('items', lang) }, { immediate: true })
-
-const index = useKeywordIndex('items', {
-  grammar: 'fields',
-  fields: SEARCH_FIELDS,
-  language: () => route.query.lang || '',
-  rank: 'hits',
-  expand: combineExpansions(glossaryExpansion(), countryExpansion()),
-})
-
-// `index.search` reads the whole `items` entity; `list` already carries
-// `databaseResults`'s own `scope` (in-scope items only) by the time `narrow`
-// runs — narrowed to the keyword hits inside that set, in the index's own
-// ranked order, rather than the reverse (which would lose the rank once
-// `list` is filtered again).
-function narrow(list, filters) {
-  const ids = new Set(list.map((item) => item.id))
-  return index.search(searchRows(filters)).filter((item) => ids.has(item.id))
-}
-
-const spec = computed(() => ({ ...databaseResults, narrow }))
 </script>
 
 <template>
-  <CatalogueResultsView :spec="spec" class="mwnf-panel">
+  <CatalogueResultsView :spec="databaseResults" class="mwnf-panel">
     <template #before>
       <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.database') }} — {{ $t('catalogue.results.heading') }}</h1>
     </template>

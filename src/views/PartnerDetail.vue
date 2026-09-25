@@ -1,6 +1,5 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { PartnerPanel, RecordLanguages, RelatedRecords } from '@museumwnf/viewer-layout/content'
+import { BackLink, PartnerPanel, RecordLanguages, RelatedRecords } from '@museumwnf/viewer-layout/content'
 import { RecordView } from '@museumwnf/viewer-layout/views'
 import { heldItemRows, partnerObjectsLink, partnerSheet, partnerViewOf } from '../composables/partner.js'
 
@@ -15,20 +14,13 @@ import { heldItemRows, partnerObjectsLink, partnerSheet, partnerViewOf } from '.
 // so `related` — a record's own declared references — does not reach it).
 
 defineProps({ id: { type: String, required: true } })
-
-const router = useRouter()
-
-function back() {
-  if (window.history.length > 2) router.back()
-  else router.push('/partners')
-}
 </script>
 
 <template>
   <RecordView :spec="partnerSheet" :id="id" class="detail mwnf-panel">
     <template #header="{ language, languages, select }">
       <div class="detail-top">
-        <a class="mwnf-back-bar" href="#" @click.prevent="back">← {{ $t('partner.nav.back') }}</a>
+        <BackLink variant="bar" label="partner.nav.back" :to="{ name: 'partners' }" />
       </div>
       <RecordLanguages :languages="languages" :language="language" @select="select" />
     </template>

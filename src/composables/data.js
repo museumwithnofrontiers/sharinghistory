@@ -1,56 +1,32 @@
 import { computed } from 'vue'
-import { byId, useCatalogueData } from '@museumwnf/viewer-core'
+import { useCatalogue } from '@museumwnf/viewer-core'
 import { exhibitionAncestry, exhibitionTree } from './exhibitions.js'
 
 // The website's records, read the one way every website reads them: through
-// viewer-core, lazily. Each entity is a shared ref that stays `null` until a
-// route declaring it in `meta.entities` brings its chunk in, so importing
-// this module loads nothing, and a page pays only for what it reads.
-// Translations are viewer-core's cache, not a second one kept here. The
-// wrapper half — `tr`, `md`/`mdInline`/`mdStrip`, `loadEnglish`, `labelOf`,
-// the visible form of an entity — is `useCatalogueData`'s; what stays here is
-// this site's own: the hand-written exhibition list/theme lookup the
-// catalogue facets and timeline pages still read (the six exhibition pages
-// themselves read the `useCollectionTree` form in exhibitions.js instead),
-// and the raw item lookup a page reads when it deliberately shows an item
-// the visible rule below hides.
+// viewer-core's catalogue data layer, lazily. Each entity is a shared ref
+// that stays `null` until a route declaring it in `meta.entities` brings its
+// chunk in, so importing this module loads nothing, and a page pays only for
+// what it reads. The entity refs and lookups, the labels, the routes, the
+// result row, the translations and the Markdown pipeline are
+// `useCatalogue`'s. What is this website's own: the timeline and collection
+// entities it reads on top, the visible rule below, the hand-written
+// exhibition list/theme lookup the catalogue facets and timeline pages still
+// read (the six exhibition pages themselves read the `useCollectionTree`
+// form in exhibitions.js instead), and the reverse item→exhibition lookup.
 
 // Items legacy kept only to illustrate Historical Background / timeline
 // pages (display_status 'N') are excluded from database search and Permanent
 // Collection browsing, exactly like the legacy site
 // (modules/database_results.php AND o.display_status='A'). Declared once,
 // as `visible.items`, so `items`/`catalogue.entity('items')` read it
-// automatically. Exported too (as `itemVisible`, from `useInventoryData()`):
+// automatically. Exported too (as `itemVisible`, from `useData()`):
 // viewer-core's own generic entity access — the keyword index,
 // `useFeaturedRecord`, this site's own catalogue spec's `scope` — reads the
 // raw entity by name and applies no site rule of its own, so each of those
 // needs the rule directly, the way `catalogue.js`'s `inScope` re-exports it.
-//
-// The Historical Background/Profiles subtrees this file used to walk by
-// hand now live in composables/history.js, over `useCollectionTree` —
-// #39, following the exhibition tree's own move in #37/#38.
 function itemVisible(item) {
   return item.display_status !== 'N'
 }
-
-const catalogue = useCatalogueData({
-  eager: ['items', 'countries', 'partners', 'timeline_events', 'collections'],
-  visible: {
-    items: itemVisible,
-  },
-})
-catalogue.loadEnglish()
-
-const {
-  tr, md, mdInline, mdStrip, labelOf, availableLanguages, loadTranslations, translations,
-} = catalogue
-
-const items = catalogue.entity('items')
-const countries = catalogue.entity('countries')
-const partners = catalogue.entity('partners')
-const timelines = catalogue.entity('timelines')
-const timelineEvents = catalogue.entity('timeline_events')
-const collections = catalogue.entity('collections')
 
 // English is the base language of every catalogue in the platform: every
 // list, label and fallback reads it. A record the visitor reads in another
@@ -60,16 +36,22 @@ const collections = catalogue.entity('collections')
 // own declared list.
 const defaultLang = 'en'
 
-// ── Raw item lookup ──────────────────────────────────────────────────────
-//
-// Every item, regardless of display_status — unlike `items` above, which
-// `visible.items` narrows. A page reads this one when the item it shows is
-// exactly what display_status 'N' exists for: a timeline event's
-// illustration, a monument's special-feature sub-items on its own detail
-// page.
-const itemById = byId('items')
+const catalogue = useCatalogue({
+  eager: ['items', 'countries', 'partners', 'timeline_events', 'collections'],
+  defaultLanguage: defaultLang,
+  visible: {
+    items: itemVisible,
+  },
+})
+catalogue.loadEnglish()
 
-// ── Exhibitions ────────────────────────────────────────────────────────────
+const { tr } = catalogue
+
+const timelines = catalogue.entity('timelines')
+const timelineEvents = catalogue.entity('timeline_events')
+const collections = catalogue.entity('collections')
+
+// ── Exhibitions (the catalogue facets' and timeline pages' own lookup) ─────
 //
 // Imported as generic Collections, nested under a dedicated "Virtual
 // Exhibitions" marker collection (purpose "exhibitions-root", a child of the
@@ -85,14 +67,14 @@ const itemById = byId('items')
 // The data package is single-context (one SH project), so each `*-root`
 // purpose occurs at most once.
 function findByPurpose(purpose) {
-  return (collections.value ?? []).find(c => c.purpose === purpose) ?? null
+  return (collections.value ?? []).find((c) => c.purpose === purpose) ?? null
 }
 
 const exhibitions = computed(() => {
   const marker = findByPurpose('exhibitions-root')
   if (!marker) return []
   return (collections.value ?? [])
-    .filter(c => c.parent_id === marker.id)
+    .filter((c) => c.parent_id === marker.id)
     .sort((a, b) => (a.display_order ?? 9999) - (b.display_order ?? 9999))
 })
 
@@ -106,35 +88,26 @@ const exhibitions = computed(() => {
 
 function exhibitionThemes(exhibitionId) {
   return (collections.value ?? [])
-    .filter(c => c.parent_id === exhibitionId && c.type === 'theme')
+    .filter((c) => c.parent_id === exhibitionId && c.type === 'theme')
     .sort((a, b) => (a.display_order ?? 9999) - (b.display_order ?? 9999))
-    .map(theme => ({
+    .map((theme) => ({
       ...theme,
       chapters: (collections.value ?? [])
-        .filter(c => c.parent_id === theme.id)
+        .filter((c) => c.parent_id === theme.id)
         .sort((a, b) => (a.display_order ?? 9999) - (b.display_order ?? 9999)),
     }))
 }
 
-// ── Timelines ──────────────────────────────────────────────────────────────
-//
-// SH timelines are per (country × exhibition), each bound to its exhibition
-// collection. Timelines with collection_id null are the legacy "Permanent
-// Collection timeline" (hidden sentinel exhibition 2 — remapped by the
-// exporter). The legacy timeline page filters by period × country ×
-// exhibition, with a thematic-vs-Permanent-Collection toggle.
-
-// ── Item cross-links: Artistic Introduction pages / Exhibitions that
-// feature a given item ───────────────────────────────────────────────────
+// ── Item cross-links: which exhibitions/themes/chapters feature a given
+// item ─────────────────────────────────────────────────────────────────────
 //
 // No separate export is needed for this: collections.json already lists
-// each collection's items[] (used to render Artistic Introduction pages and
-// Exhibition theme/page grids), so "which collections reference this item"
-// is just a client-side reverse lookup over the same data. See Epic 12 in
-// the islamicart parity backlog.
-
+// each collection's items[] (used to render Exhibition theme/page grids), so
+// "which collections reference this item" is just a client-side reverse
+// lookup over the same data.
+//
 // The reverse lookup — which exhibitions/themes/chapters an item is
-// attached to — is now `exhibitionTree.containing(itemId)` (every collection
+// attached to — is `exhibitionTree.containing(itemId)` (every collection
 // that carries the item directly, exhibition tree or not) narrowed by
 // `exhibitionAncestry`, which is `null` for a hit outside the exhibitions
 // tree (a Historical Background page can carry the same item) and the
@@ -189,28 +162,17 @@ function chapterLinksForItem(itemId) {
   return links
 }
 
-export function useInventoryData() {
+export function useData() {
   return {
-    items,
-    countries,
-    partners,
+    ...catalogue,
     timelines,
     timelineEvents,
     collections,
     defaultLang,
-    availableLanguages,
-    loadTranslations,
-    translations,
-    tr,
-    labelOf,
     itemVisible,
-    itemById,
     exhibitions,
     exhibitionThemes,
     exhibitionLinksForItem,
     chapterLinksForItem,
-    md,
-    mdInline,
-    mdStrip,
   }
 }

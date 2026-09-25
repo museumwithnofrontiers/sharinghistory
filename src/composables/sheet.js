@@ -1,4 +1,4 @@
-import { useInventoryData } from './useInventoryData.js'
+import { useData } from './data.js'
 
 // The item sheet, as a spec: what viewer-layout's `RecordView` renders on
 // `/item/:id`. The mechanics — which language the record is read in, what is
@@ -9,7 +9,7 @@ import { useInventoryData } from './useInventoryData.js'
 // an object), and the prose sections under it. Every label is an entry
 // name, written out so the check that every name resolves can read it.
 
-const { labelOf } = useInventoryData()
+const { labelOf } = useData()
 
 // Legacy shows "City, Country", not the bare city the translation holds.
 function locationWithCountry(c) {

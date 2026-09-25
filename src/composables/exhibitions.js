@@ -2,9 +2,9 @@ import { computed } from 'vue'
 import { useCollectionTree } from '@museumwnf/viewer-core'
 
 // The exhibition tree — exhibitions → themes → chapters — replaces the
-// hand-written parent_id walk this file used to be part of
-// (useInventoryData.js keeps its own walk for the historical-background and
-// profiles subtrees, which the next story, #39, moves here in turn).
+// hand-written parent_id walk this file used to be part of (the
+// historical-background and profiles subtrees' own walk moved the same way,
+// into composables/history.js, #39).
 //
 // `childType` is depth-indexed against THIS tree's own root, the
 // exhibitions-root marker — not against "an exhibition" as viewer-core's own

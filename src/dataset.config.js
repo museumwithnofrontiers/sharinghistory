@@ -1,6 +1,7 @@
 import { languageLabels, offeredLanguages, sectionMeta, useDataPackage } from '@museumwnf/viewer-core'
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
+import { inScope } from './composables/catalogue.js'
 
 // The whole declaration of this website. Before it mounts, the website reads
 // nothing from its package but the manifest: the languages it offers, their
@@ -48,6 +49,37 @@ export default {
 
   shell: SiteShell,
 
+  // The landing page, viewer-layout's `HomeView`: the welcome, the seven
+  // sections as cards, and one item with an image on display, picked once
+  // per visit — every text an entry name, written out, that the view
+  // resolves. `filter: inScope` keeps the pick to the records legacy shows
+  // at all: without it, the pick can land on a record kept only to
+  // illustrate Historical Background, and the featured item silently
+  // disappears rather than falling back to another one.
+  home: {
+    title: 'sharinghistory.home.title',
+    intro: 'sharinghistory.home.intro',
+    cards: [
+      { title: 'sharinghistory.nav.permanentCollection', description: 'sharinghistory.home.permanentCollectionText', action: 'core.action.browse', to: { name: 'permanent-collection' } },
+      { title: 'sharinghistory.nav.database', description: 'sharinghistory.home.databaseText', action: 'core.action.search', to: { name: 'database' } },
+      { title: 'sharinghistory.nav.timeline', description: 'sharinghistory.home.timelineText', action: 'core.action.explore', to: { name: 'timeline' } },
+      { title: 'sharinghistory.nav.partners', description: 'sharinghistory.home.partnersText', action: 'core.action.browse', to: { name: 'partners' } },
+      { title: 'sharinghistory.nav.exhibitions', description: 'sharinghistory.home.exhibitionsText', action: 'core.action.explore', to: { name: 'exhibitions' } },
+      { title: 'sharinghistory.nav.historicalBackground', description: 'sharinghistory.home.historicalBackgroundText', action: 'core.action.read', to: { name: 'historical-background' } },
+      { title: 'sharinghistory.nav.historicalProfiles', description: 'sharinghistory.home.historicalProfilesText', action: 'core.action.browse', to: { name: 'historical-profiles' } },
+    ],
+    featured: {
+      entity: 'items',
+      heading: 'sharinghistory.home.itemOnDisplay',
+      action: 'core.action.viewDetails',
+      route: 'item',
+      eyebrow: (record) => record.type,
+      meta: ['location', 'dates'],
+      filter: inScope,
+    },
+    panels: true,
+  },
+
   // The menu SiteShell (@museumwnf/viewer-layout/components) reads directly:
   // legacy's own top-level sections, in its own order — this site leads with
   // the exhibitions and adds the two historical sections. Each `section`
@@ -82,25 +114,25 @@ export default {
     {
       path: '/',
       name: 'home',
-      component: () => import('./views/Home.vue'),
+      component: () => import('@museumwnf/viewer-layout/views').then((views) => views.HomeView),
       meta: meta('home', 'items'),
     },
     {
       path: '/permanent-collection',
       name: 'permanent-collection',
-      component: () => import('./views/PcEntrance.vue'),
+      component: () => import('./views/PermanentCollectionSearch.vue'),
       meta: meta('permanent-collection', 'items', 'countries', 'partners', 'collections'),
     },
     {
       path: '/permanent-collection/results',
       name: 'permanent-collection-results',
-      component: () => import('./views/PcList.vue'),
+      component: () => import('./views/PermanentCollectionResults.vue'),
       meta: meta('permanent-collection', 'items', 'countries', 'partners', 'collections'),
     },
     {
       path: '/database',
       name: 'database',
-      component: () => import('./views/Database.vue'),
+      component: () => import('./views/DatabaseSearch.vue'),
       meta: meta('database'),
     },
     {
