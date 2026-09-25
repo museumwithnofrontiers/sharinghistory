@@ -87,7 +87,7 @@ function bibliographyMarkdown(tr, language) {
           <ul class="hb-related-list">
             <li><router-link to="/historical-background">{{ t('sharinghistory.nav.historicalBackground') }}</router-link></li>
             <li v-if="record.country_id">
-              <router-link :to="{ path: '/timeline/results', query: { country: record.country_id, exhibition: 'pc' } }">
+              <router-link :to="{ path: '/timeline/results', query: { country: record.country_id, collection: 'pc' } }">
                 {{ t('sharinghistory.related.politicalContextTimeline') }} {{ labelOf('countries', record.country_id) }}
               </router-link>
             </li>
