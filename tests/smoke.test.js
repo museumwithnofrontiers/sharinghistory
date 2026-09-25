@@ -394,8 +394,8 @@ describe('website smoke test', () => {
   // The item sheet runs on the platform's composed record view
   // (metanull/viewer-core#50): the rows and their labels come from the sheet
   // spec in composables/sheet.js, and what only this website has — the
-  // header, the holder's partner link, the special features — fills the
-  // view's slots.
+  // header, the holder text and its partner's summary, the special features —
+  // fills the view's slots.
   it('renders the item sheet on the composed record view', async () => {
     const [items, partners] = await loadEntities(['items', 'partners'])
     const partnerIds = new Set(partners.map((p) => p.id))
@@ -405,7 +405,12 @@ describe('website smoke test', () => {
     expect(host.querySelector('.mwnf-record')).not.toBeNull()
     expect(host.querySelector('.detail-type-badge').textContent.trim()).toBe(object.type)
     expect(host.querySelector('.detail-title').textContent.trim()).not.toBe('')
-    expect(host.querySelector('.fact-link a')).not.toBeNull()
+    // The holder's partner, as viewer-layout's `PartnerPanel` summary — "About
+    // {name}, {city}, {country}" — linking to its page (inventory-app#2035).
+    const summary = host.querySelector('.mwnf-partner-panel--summary')
+    expect(summary).not.toBeNull()
+    expect(summary.textContent).toContain('About')
+    expect(summary.querySelector('a').getAttribute('href')).toBe(`#/partner/${object.partner_id}`)
 
     // The citation's permalink (viewer-core's sourceUrl, sharinghistory#52):
     // the declared site origin plus this record's own hash route.
@@ -574,15 +579,19 @@ describe('website smoke test', () => {
     expect(heldItems.length, 'fixture: the partner\'s held, visible items').toBeGreaterThan(0)
 
     const { app, host } = await mountSite(config, messages, `#/partner/${encodeURIComponent(fixture.id)}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-record')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-partner-panel--full')).not.toBeNull(), { timeout: 20000 })
 
-    expect(host.querySelector('.detail-title').textContent).toContain(text.name)
-    expect(host.textContent).toContain(text.description.slice(0, 30))
-    expect(host.querySelector('.contact-address').textContent).toBe(text.address)
-    expect(host.textContent).toContain(text.phone)
-    expect(host.querySelector('.logo-img')).not.toBeNull()
+    // The body is viewer-layout's `PartnerPanel` (inventory-app#2035): the
+    // About tab open, the Contact and Logo panels behind their tabs.
+    expect(host.querySelector('h1.mwnf-partner-panel__name').textContent).toContain(text.name)
+    expect(host.querySelector('.mwnf-partner-panel__description').textContent).toContain(text.description.replace(/[*_]/g, '').slice(0, 30))
+    const contact = host.querySelector('.mwnf-partner-panel__panel--contact')
+    // The address is rendered Markdown, its line breaks <br>: compared without whitespace.
+    expect(contact.querySelector('.mwnf-partner-panel__address').textContent.replace(/\s+/g, '')).toBe(text.address.replace(/\s+/g, ''))
+    expect(contact.textContent).toContain(text.phone)
+    expect(host.querySelector('.mwnf-partner-panel__logos img')).not.toBeNull()
 
-    const viewLink = host.querySelector('.view-items-row .mwnf-button')
+    const viewLink = host.querySelector('.mwnf-partner-panel__actions .mwnf-button')
     expect(viewLink, 'the "View Objects/Monuments" link, off item_count').not.toBeNull()
     expect(viewLink.textContent).toContain(String(fixture.item_count))
 

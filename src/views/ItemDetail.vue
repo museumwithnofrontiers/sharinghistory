@@ -2,22 +2,23 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { timelineLinkFor } from '@museumwnf/viewer-core'
-import { MediaGallery, RecordLanguages, SheetSection } from '@museumwnf/viewer-layout/content'
+import { MediaGallery, PartnerPanel, RecordLanguages, SheetSection } from '@museumwnf/viewer-layout/content'
 import { RecordView } from '@museumwnf/viewer-layout/views'
 import { useInventoryData } from '../composables/useInventoryData.js'
+import { partnerViewOf } from '../composables/partner.js'
 import { itemSheet } from '../composables/sheet.js'
 
 // The item sheet is the platform's composed record page, rendering the spec
 // in composables/sheet.js. What fills the page's slots is this website's own:
 // the header — the way back, the timeline link, the type badge — the holder
-// row's partner link, and, after the sheet, the blocks only Sharing History
+// text and its partner's summary, and, after the sheet, the blocks only Sharing History
 // has: a monument's special features, the related media, the exhibitions and
 // chapters the item is on display in.
 
 defineProps({ id: { type: String, required: true } })
 
 const router = useRouter()
-const { exhibitionLinksForItem, itemById, labelOf, md, mdInline, partners, tr } = useInventoryData()
+const { exhibitionLinksForItem, itemById, md, mdInline, partners, tr } = useInventoryData()
 
 function back() {
   if (window.history.length > 2) router.back()
@@ -26,11 +27,14 @@ function back() {
 
 const timelineLink = (record) => timelineLinkFor(record, { name: 'timeline-results' })
 
-// "About {partner}" under the holding institution, legacy's `pm_partner.php`
-// link — only when the partner is part of the exported set.
-function partnerRoute(record) {
-  const id = record?.partner_id
-  return id && (partners.value ?? []).some((p) => p.id === id) ? { name: 'partner', params: { id } } : null
+// The holding institution (decision D3, inventory-app#2035): the holder
+// text, then the partner it refers to as `PartnerPanel`'s summary — "About
+// {name}, {city}, {country}", legacy's `pm_partner.php` link — when the
+// partner is part of the exported set.
+const partnerById = computed(() => new Map((partners.value ?? []).map((p) => [p.id, p])))
+function holderPartner(record, language) {
+  const partner = partnerById.value.get(record?.partner_id)
+  return partner ? partnerViewOf(partner, tr('partners', partner.id, language)) : null
 }
 
 // A monument's sub-details are child items of type `detail`, read from the
@@ -86,11 +90,11 @@ const thgGalleryLinks = (record) =>
       <h1 class="detail-title" :dir="dir" v-html="mdInline(text.name ?? record.internal_name ?? record.id, { glossary })"></h1>
     </template>
 
-    <template #holder="{ row, record }">
-      <span v-html="row.html"></span>
-      <div v-if="partnerRoute(record)" class="fact-link">
-        <router-link :to="partnerRoute(record)">→ {{ $t('partner.info.about') }} {{ labelOf('partners', record.partner_id) }}</router-link>
-      </div>
+    <template #holder="{ row, record, language, dir, glossary }">
+      <span v-html="mdInline(row.value, { glossary })"></span>
+      <template v-for="partner in [holderPartner(record, language)]" :key="'holder-partner'">
+        <PartnerPanel v-if="partner" variant="summary" :partner="partner" label="partner.info.about" :dir="dir" />
+      </template>
     </template>
 
     <template #after-sheet="{ record, language, dir, glossary }">
@@ -154,8 +158,6 @@ const thgGalleryLinks = (record) =>
 
 .detail :deep(.mwnf-media) { margin-bottom: 20px; }
 .detail :deep(.mwnf-sheet) { margin-bottom: 20px; }
-.fact-link { margin-top: 4px; font-size: 12px; }
-.fact-link a { color: var(--nav-active); }
 
 /* Special features */
 .special-feature { margin-bottom: 16px; }

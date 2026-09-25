@@ -1,3 +1,4 @@
+import { partnerView } from '@museumwnf/viewer-core'
 import { inScope, itemSummary } from './catalogue.js'
 import { useInventoryData } from './useInventoryData.js'
 
@@ -7,13 +8,13 @@ import { useInventoryData } from './useInventoryData.js'
 // content language — is the platform's; what is declared here is only what
 // is this website's: which partners are listed at all (legacy's INNER JOINs
 // on a name translation and a country), the associated-under-parent nesting
-// legacy's own list carried, and the profile's own content — description,
-// contact, logo — plus the held items a partner's own record does not
+// legacy's own list carried, and the partner's view-model with this
+// website's routes, plus the held items a partner's own record does not
 // declare as a relation (the package models it the other way, an item
 // pointing at its partner, so it is read the same way the original page
 // scanned for it).
 
-const { items, labelOf, tr } = useInventoryData()
+const { items, labelOf, md, mdInline, tr } = useInventoryData()
 
 // Legacy pm_partner_list.php's INNER JOINs on sh_partner_names +
 // mwnf3.countrynames: only a partner with a name translation AND a country
@@ -38,33 +39,32 @@ export const partnersList = {
   empty: 'sharinghistory.partner.noPartners',
 }
 
-// ── The partner sheet ───────────────────────────────────────────────────────
+// ── The partner page ────────────────────────────────────────────────────────
+// `RecordView` carries the record's language, its load and the not-found
+// case; the page's body is viewer-layout's `PartnerPanel`
+// (inventory-app#2035), rendering the partner's view-model — the About/
+// Contact/Logo tabs, the homepage link, the pictures and the map. So the
+// sheet declares nothing of its own: no field, no media gallery (the
+// pictures are the panel's), no citation, no `related`.
 
-function contactPersons(partner) {
-  return [partner?.contact_person_1, partner?.contact_person_2].filter((cp) => cp && (cp.name || cp.title))
+// Where a partner's "View Objects"/"View Monuments" lands: the Permanent
+// Collection, filtered on the partner.
+export function partnerObjectsLink(partner) {
+  return { path: '/permanent-collection/results', query: { partner: partner.id } }
 }
 
-function hasContactInfo(ctx) {
-  const text = ctx.text
-  return !!(
-    text.address || text.phone || text.email || text.website ||
-    ctx.record.additional_urls?.length || contactPersons(ctx.record).length
-  )
+// The partner's view-model, which `PartnerPanel` renders on the partner page
+// and under an item's holder text: this website's country label, its
+// renderers (the glossary-bound ones) and its two routes.
+export function partnerViewOf(partner, text) {
+  return partnerView(partner, text, {
+    countryLabel: (id) => labelOf('countries', id),
+    md,
+    mdInline,
+    route: (p) => ({ name: 'partner', params: { id: p.id } }),
+    objectsRoute: partnerObjectsLink,
+  })
 }
-
-// A partner's own images, captioned from its own fields — unlike the
-// default (an item's `captions` map, which a partner record does not
-// carry).
-function partnerMedia(partner) {
-  return (partner.images ?? []).map((img) => ({
-    url: img.url,
-    alt: img.alt_text ?? '',
-    caption: img.alt_text ?? '',
-    photographer: img.photographer ?? '',
-    copyright: img.copyright ?? '',
-  }))
-}
-
 // The items a partner holds — `item.partner_id`, the package's own relation,
 // read in reverse; `related` (a record's own declared references) does not
 // apply here, so this feeds the `#related` slot directly rather than the
@@ -79,15 +79,8 @@ export function heldItemRows(partner) {
 
 export const partnerSheet = {
   entity: 'partners',
-  layout: 'list',
-  fields: [
-    { key: 'description', label: 'partner.info.about', value: 'description', render: 'block' },
-    // `value` only has to be present for the row to survive `sheetRows`'
-    // own filter — the slot renders the block itself, not `row.html`.
-    { key: 'contact', label: 'partner.info.contact', value: () => true, render: 'custom', when: hasContactInfo },
-    { key: 'logo', label: 'partner.info.logo', value: () => true, render: 'custom', when: (ctx) => (ctx.record.logos ?? []).length > 0 },
-  ],
-  media: (partner) => partnerMedia(partner),
+  fields: [],
+  media: () => [],
   citation: false,
   related: false,
 }
