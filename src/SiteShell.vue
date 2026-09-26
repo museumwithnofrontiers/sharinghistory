@@ -13,10 +13,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <SiteShell v-bind="$attrs" :footer-text="t('sharinghistory.identity.copyright')">
+  <SiteShell v-bind="$attrs" :footer-text="t('standalone.identity.copyright')">
     <template #brand>
       <a class="site-logo" href="#/">
-        <span class="site-logo-org">{{ t('sharinghistory.identity.organisation') }}</span>
+        <span class="site-logo-org">{{ t('standalone.identity.organisation') }}</span>
         <span class="site-logo-title">{{ t('sharinghistory.identity.title') }}</span>
         <span class="site-logo-sub">{{ t('sharinghistory.identity.strapline') }}</span>
       </a>

@@ -54,7 +54,7 @@ function ancestryWithin(id) {
  * `parents`/`breadcrumb` bounded to this tree's own root (see above), which
  * is what makes them safe to hand to `EssayView` as a pre-built `tree`.
  */
-export const exhibitionTree = {
+export const exhibitionsTree = {
   ...rawTree,
   parents: (id) => ancestryWithin(id) ?? [],
   breadcrumb: (id) => {
@@ -67,8 +67,8 @@ export const exhibitionTree = {
 
 /** The exhibitions themselves: the tree root's own children. */
 export const exhibitionList = computed(() => {
-  const root = exhibitionTree.root.value
-  return root ? exhibitionTree.children(root.id) : []
+  const root = exhibitionsTree.root.value
+  return root ? exhibitionsTree.children(root.id) : []
 })
 
 /**

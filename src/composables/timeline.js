@@ -27,7 +27,7 @@ function boundExhibitions() {
 /** The `collection` control's own options: the Permanent Collection sentinel, then the bound exhibitions. */
 export function timelineCollections(ctx) {
   return [
-    { value: 'pc', label: ctx.t('sharinghistory.nav.permanentCollection') },
+    { value: 'pc', label: ctx.t('standalone.nav.permanentCollection') },
     ...boundExhibitions().map((e) => ({ value: e.id, label: collectionTitle(e) })),
   ]
 }
@@ -58,7 +58,7 @@ function eventMedia(event, ctx) {
       image: item.images?.[0]?.url ?? '',
       alt: labelOf('items', item.id),
       to: { name: 'item', params: { id: item.id } },
-      caption: `${mdInline(labelOf('items', item.id))}<br><span class="sh-timeline-see">${ctx.t('sharinghistory.action.seeDatabaseEntry')} →</span>`,
+      caption: `${mdInline(labelOf('items', item.id))}<br><span class="sh-timeline-see">${ctx.t('catalogue.results.seeDatabaseEntry')} →</span>`,
     }))
   return [...images, ...linkedItems]
 }
@@ -78,12 +78,12 @@ const timelineResultsBase = {
   collections: timelineCollections,
   controls: [
     { key: 'country', label: 'catalogue.facet.country', placeholder: 'timeline.form.selectCountry' },
-    { key: 'collection', label: 'sharinghistory.nav.timeline', anyLabel: 'sharinghistory.filter.all' },
+    { key: 'collection', label: 'core.nav.timeline', anyLabel: 'sharinghistory.filter.all' },
     { key: 'begin', label: 'timeline.form.startDate', placeholder: 'timeline.form.fromYearHint' },
     { key: 'end', label: 'timeline.form.endDate', placeholder: 'timeline.form.toYearHint' },
   ],
   filterTitle: 'catalogue.filter.heading',
-  submitLabel: 'sharinghistory.action.go',
+  submitLabel: 'core.action.go',
   errorSelect: 'timeline.form.errorSelect',
   errorPeriod: 'timeline.form.errorPeriod',
   empty: 'timeline.results.noEvents',
@@ -104,10 +104,10 @@ const timelineResultsBase = {
 }
 
 /** `/timeline` — the form alone, legacy's hcr_home.php. */
-export const timelineEntrance = { ...timelineResultsBase, entrance: true }
+export const timelineEntranceSpec = { ...timelineResultsBase, entrance: true }
 
 /** `/timeline/results` — legacy's hcr_result.php. */
-export const timelineResults = { ...timelineResultsBase, entrance: false }
+export const timelineResultsSpec = { ...timelineResultsBase, entrance: false }
 
 // ── The timeline gallery (Decision D1: hcr_gallery.php regained) ───────────
 //
@@ -124,7 +124,7 @@ function galleryCandidates(filters) {
   })
 }
 
-export const timelineGallery = {
+export const timelineGallerySpec = {
   entity: 'items',
   keys: ['country', 'begin', 'end'],
   scope: (item, filters) => inScope(item) && (!filters.country || item.country_id === filters.country),

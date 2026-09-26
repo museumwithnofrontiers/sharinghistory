@@ -2,7 +2,7 @@
 import { useI18n } from '@museumwnf/viewer-core'
 import { BackLink } from '@museumwnf/viewer-layout/content'
 import { CatalogueResultsView } from '@museumwnf/viewer-layout/views'
-import { timelineGallery } from '../composables/timeline.js'
+import { timelineGallerySpec } from '../composables/timeline.js'
 import { useData } from '../composables/data.js'
 
 // Decision D1: the timeline gallery of objects legacy's hcr_gallery.php
@@ -25,7 +25,7 @@ function activeFilterLabel(filters) {
 </script>
 
 <template>
-  <CatalogueResultsView :spec="timelineGallery" class="mwnf-panel">
+  <CatalogueResultsView :spec="timelineGallerySpec" class="mwnf-panel">
     <template #before="{ filters }">
       <BackLink variant="bar" arrow="‹" label="timeline.nav.backToEvents" :to="{ name: 'timeline-results', query: filters }" />
       <h1 class="mwnf-heading">

@@ -11,7 +11,7 @@ function browse() {
 
 <template>
   <div>
-    <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.partners') }}</h1>
+    <h1 class="mwnf-heading">{{ $t('core.nav.partners') }}</h1>
 
     <div class="mwnf-panel">
       <I18nText tag="p" class="intro-text" keypath="sharinghistory.partner.introDiscover" />
@@ -19,7 +19,7 @@ function browse() {
       <table class="mwnf-form-table filter-table">
         <tbody>
           <tr>
-            <th><label>{{ $t('sharinghistory.nav.partners') }}</label></th>
+            <th><label>{{ $t('core.nav.partners') }}</label></th>
             <td>
               <button class="mwnf-button" @click="browse()">{{ $t('sharinghistory.action.browsePartners') }} →</button>
             </td>

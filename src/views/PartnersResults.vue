@@ -1,7 +1,7 @@
 <script setup>
 import { BackLink } from '@museumwnf/viewer-layout/content'
 import { PartnerListView } from '@museumwnf/viewer-layout/views'
-import { partnersList } from '../composables/partner.js'
+import { partnersResultsSpec } from '../composables/partner.js'
 
 // `PartnerListView`'s own count (`spec.count`) sums only `main`/`associated`
 // — with `nested: true` an associated partner moved under its parent is in
@@ -16,14 +16,14 @@ function totalCount(groups) {
 </script>
 
 <template>
-  <PartnerListView :spec="partnersList" class="mwnf-panel partners-results">
+  <PartnerListView :spec="partnersResultsSpec" class="mwnf-panel partners-results">
     <template #before="{ groups }">
       <BackLink variant="bar" arrow="‹" label="partner.nav.back" :to="{ name: 'partners' }" />
       <h1 class="mwnf-heading">
-        {{ $t('sharinghistory.nav.partners') }}
+        {{ $t('core.nav.partners') }}
         <span class="heading-project"> — {{ $t('sharinghistory.identity.title') }}</span>
       </h1>
-      <p class="result-count">{{ $t('sharinghistory.results.partnersFound') }}: {{ totalCount(groups) }}</p>
+      <p class="result-count">{{ $t('partner.list.partnersFound') }}: {{ totalCount(groups) }}</p>
     </template>
   </PartnerListView>
 </template>

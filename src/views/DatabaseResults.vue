@@ -4,10 +4,10 @@ import { useRoute } from 'vue-router'
 import { useSearchFieldOptions } from '@museumwnf/viewer-core'
 import { CatalogueResultsView } from '@museumwnf/viewer-layout/views'
 import { useData } from '../composables/data.js'
-import { SEARCH_FIELDS, databaseResults } from '../composables/catalogue.js'
+import { SEARCH_FIELDS, databaseResultsSpec } from '../composables/catalogue.js'
 
 // The database results run on the platform's composed `CatalogueResultsView`
-// (composables/catalogue.js's `databaseResults`): the query in the URL, the
+// (composables/catalogue.js's `databaseResultsSpec`): the query in the URL, the
 // pages, the summary line, the rows and the index itself are declared there.
 // What stays this wrapper's own is the search-language translations watch —
 // a side effect the spec itself has no lifecycle to run, the same one
@@ -25,9 +25,9 @@ watch(() => route.query.lang, (lang) => { if (lang) loadTranslations('items', la
 </script>
 
 <template>
-  <CatalogueResultsView :spec="databaseResults" class="mwnf-panel">
+  <CatalogueResultsView :spec="databaseResultsSpec" class="mwnf-panel">
     <template #before>
-      <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.database') }} — {{ $t('catalogue.results.heading') }}</h1>
+      <h1 class="mwnf-heading">{{ $t('standalone.nav.database') }} — {{ $t('catalogue.results.heading') }}</h1>
     </template>
 
     <template #actions>

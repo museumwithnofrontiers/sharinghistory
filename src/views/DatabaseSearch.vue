@@ -1,15 +1,15 @@
 <script setup>
 import { I18nText } from '@museumwnf/viewer-core'
 import { SearchFormView } from '@museumwnf/viewer-layout/views'
-import { databaseSearch } from '../composables/catalogue.js'
+import { databaseSearchSpec } from '../composables/catalogue.js'
 </script>
 
 <template>
   <div>
-    <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.database') }}</h1>
+    <h1 class="mwnf-heading">{{ $t('standalone.nav.database') }}</h1>
 
     <div class="mwnf-panel">
-      <SearchFormView :spec="databaseSearch">
+      <SearchFormView :spec="databaseSearchSpec">
         <template #intro>
           <I18nText tag="p" class="intro-text" keypath="catalogue.search.intro" />
         </template>

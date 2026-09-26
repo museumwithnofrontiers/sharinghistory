@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useCatalogue } from '@museumwnf/viewer-core'
-import { exhibitionAncestry, exhibitionTree } from './exhibitions.js'
+import { exhibitionAncestry, exhibitionsTree } from './exhibitions.js'
 
 // The website's records, read the one way every website reads them: through
 // viewer-core's catalogue data layer, lazily. Each entity is a shared ref
@@ -107,7 +107,7 @@ function exhibitionThemes(exhibitionId) {
 // lookup over the same data.
 //
 // The reverse lookup — which exhibitions/themes/chapters an item is
-// attached to — is `exhibitionTree.containing(itemId)` (every collection
+// attached to — is `exhibitionsTree.containing(itemId)` (every collection
 // that carries the item directly, exhibition tree or not) narrowed by
 // `exhibitionAncestry`, which is `null` for a hit outside the exhibitions
 // tree (a Historical Background page can carry the same item) and the
@@ -117,7 +117,7 @@ function exhibitionThemes(exhibitionId) {
 function exhibitionLinksForItem(itemId) {
   const links = []
   const seen = new Set()
-  for (const node of exhibitionTree.containing(itemId)) {
+  for (const node of exhibitionsTree.containing(itemId)) {
     // SH items can be attached at three depths: to the exhibition itself
     // (rel_*_exhibitions), to a theme (rel_*_themes), or to a chapter/
     // subtheme (rel_*_subthemes — handled with chapter granularity by
@@ -147,7 +147,7 @@ function exhibitionLinksForItem(itemId) {
 // (subtheme), which only a two-deep ancestry (exhibition, theme) reaches.
 function chapterLinksForItem(itemId) {
   const links = []
-  for (const node of exhibitionTree.containing(itemId)) {
+  for (const node of exhibitionsTree.containing(itemId)) {
     const ancestry = exhibitionAncestry(node)
     if (!ancestry || ancestry.length !== 2) continue
     const [exhibition, theme] = ancestry

@@ -6,7 +6,7 @@ import {
 import { RecordView } from '@museumwnf/viewer-layout/views'
 import { useData } from '../composables/data.js'
 import { partnerViewOf } from '../composables/partner.js'
-import { itemSheet } from '../composables/sheet.js'
+import { itemSheetSpec } from '../composables/sheet.js'
 
 // The item sheet is the platform's composed record page, rendering the spec
 // in composables/sheet.js. What fills the page's slots is this website's own:
@@ -48,7 +48,7 @@ const thgGalleryGroups = (record) => [{
 </script>
 
 <template>
-  <RecordView :spec="itemSheet" :id="id" class="detail mwnf-panel">
+  <RecordView :spec="itemSheetSpec" :id="id" class="detail mwnf-panel">
     <template #header="{ record, text, language, languages, select, dir, glossary }">
       <!-- Two links sharing a header row is this page's own layout; only the
            tokens (colour, hover) come from the shared bar class. -->

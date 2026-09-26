@@ -83,7 +83,7 @@ function bibliographyMarkdown(tr, language) {
         <SourceCredit />
 
         <div class="hb-related">
-          <h3 class="hb-item-heading">{{ t('sharinghistory.related.title') }}</h3>
+          <h3 class="hb-item-heading">{{ t('record.related.title') }}</h3>
           <ul class="hb-related-list">
             <li><router-link to="/historical-background">{{ t('sharinghistory.nav.historicalBackground') }}</router-link></li>
             <li v-if="record.country_id">

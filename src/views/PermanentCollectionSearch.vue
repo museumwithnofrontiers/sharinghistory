@@ -20,7 +20,7 @@ import { FACETS, exhibitionOptions } from '../composables/catalogue.js'
 const { items } = useData()
 const options = useFacets(items, FACETS)
 
-const permanentCollectionSearch = computed(() => ({
+const permanentCollectionSearchSpec = computed(() => ({
   mode: 'radio',
   target: 'permanent-collection-results',
   facets: [
@@ -35,12 +35,12 @@ const permanentCollectionSearch = computed(() => ({
 
 <template>
   <div>
-    <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.permanentCollection') }}</h1>
+    <h1 class="mwnf-heading">{{ $t('standalone.nav.permanentCollection') }}</h1>
 
     <div class="mwnf-panel">
-      <SearchFormView :spec="permanentCollectionSearch">
+      <SearchFormView :spec="permanentCollectionSearchSpec">
         <template #intro>
-          <I18nText tag="p" class="intro-text" keypath="sharinghistory.pc.intro" />
+          <I18nText tag="p" class="intro-text" keypath="standalone.permanentCollection.intro" />
         </template>
       </SearchFormView>
     </div>

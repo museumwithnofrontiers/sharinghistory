@@ -32,7 +32,7 @@ function relatedLinks(node, text) {
 <template>
   <EssayView :spec="exhibitionIntroductionSpec" :id="exhibitionId">
     <template #after="{ node, text }">
-      <AppHyperlinks :title="t('sharinghistory.related.title')" :links="relatedLinks(node, text)" />
+      <AppHyperlinks :title="t('record.related.title')" :links="relatedLinks(node, text)" />
       <SourceCredit />
     </template>
   </EssayView>
