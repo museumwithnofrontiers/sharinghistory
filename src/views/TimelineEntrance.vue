@@ -12,7 +12,7 @@ import { timelineEntrance } from '../composables/timeline.js'
 <template>
   <TimelineResultsView :spec="timelineEntrance" class="mwnf-panel">
     <template #before>
-      <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.timeline') }}</h1>
+      <h1 class="mwnf-heading">{{ $t('core.nav.timeline') }}</h1>
       <I18nText tag="p" class="intro-text" keypath="sharinghistory.timeline.intro" />
     </template>
   </TimelineResultsView>

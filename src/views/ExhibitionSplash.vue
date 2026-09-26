@@ -103,9 +103,9 @@ const relatedLinks = computed(() =>
     </div>
 
     <SectionCards :cards="cards" variant="rows" />
-    <p v-if="!cards.length" class="no-results">{{ t('sharinghistory.exhibition.empty') }}</p>
+    <p v-if="!cards.length" class="no-results">{{ t('standalone.exhibition.empty') }}</p>
 
-    <AppHyperlinks :title="t('sharinghistory.related.title')" :links="relatedLinks" />
+    <AppHyperlinks :title="t('record.related.title')" :links="relatedLinks" />
   </div>
 </template>
 

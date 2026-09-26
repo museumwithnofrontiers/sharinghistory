@@ -22,12 +22,12 @@ const cards = computed(() =>
 
 <template>
   <div v-if="!cards.length" class="mwnf-panel not-found">
-    <p>{{ t('sharinghistory.notFound.exhibitions') }}</p>
+    <p>{{ t('standalone.notFound.exhibitions') }}</p>
   </div>
 
   <div v-else>
-    <h1 class="mwnf-heading">{{ t('sharinghistory.nav.exhibitions') }}</h1>
-    <p class="intro-text">{{ t('sharinghistory.exhibition.selectPrompt') }}</p>
+    <h1 class="mwnf-heading">{{ t('standalone.nav.exhibitions') }}</h1>
+    <p class="intro-text">{{ t('standalone.exhibition.selectPrompt') }}</p>
     <SectionCards :cards="cards" variant="rows" />
   </div>
 </template>

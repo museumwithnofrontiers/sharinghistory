@@ -27,7 +27,7 @@ watch(() => route.query.lang, (lang) => { if (lang) loadTranslations('items', la
 <template>
   <CatalogueResultsView :spec="databaseResults" class="mwnf-panel">
     <template #before>
-      <h1 class="mwnf-heading">{{ $t('sharinghistory.nav.database') }} — {{ $t('catalogue.results.heading') }}</h1>
+      <h1 class="mwnf-heading">{{ $t('standalone.nav.database') }} — {{ $t('catalogue.results.heading') }}</h1>
     </template>
 
     <template #actions>

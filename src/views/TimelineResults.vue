@@ -28,7 +28,7 @@ function activeFilterLabel(filters) {
     <template #before="{ filters }">
       <BackLink variant="bar" arrow="‹" label="timeline.nav.backLink" :to="{ name: 'timeline' }" />
       <h1 class="mwnf-heading">
-        {{ $t('sharinghistory.nav.timeline') }}
+        {{ $t('core.nav.timeline') }}
         <span v-if="activeFilterLabel(filters)" class="heading-filter"> — {{ activeFilterLabel(filters) }}</span>
       </h1>
     </template>

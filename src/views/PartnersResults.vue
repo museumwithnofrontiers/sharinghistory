@@ -20,10 +20,10 @@ function totalCount(groups) {
     <template #before="{ groups }">
       <BackLink variant="bar" arrow="‹" label="partner.nav.back" :to="{ name: 'partners' }" />
       <h1 class="mwnf-heading">
-        {{ $t('sharinghistory.nav.partners') }}
+        {{ $t('core.nav.partners') }}
         <span class="heading-project"> — {{ $t('sharinghistory.identity.title') }}</span>
       </h1>
-      <p class="result-count">{{ $t('sharinghistory.results.partnersFound') }}: {{ totalCount(groups) }}</p>
+      <p class="result-count">{{ $t('partner.list.partnersFound') }}: {{ totalCount(groups) }}</p>
     </template>
   </PartnerListView>
 </template>
