@@ -77,10 +77,10 @@ const timelineResultsBase = {
   route: 'timeline-results',
   collections: timelineCollections,
   controls: [
-    { key: 'country', label: 'catalogue.facet.country', placeholder: 'timeline.form.selectCountry' },
+    { key: 'country', label: 'catalogue.facet.country', placeholder: 'catalogue.facet.selectCountry' },
     { key: 'collection', label: 'core.nav.timeline', anyLabel: 'sharinghistory.filter.all' },
-    { key: 'begin', label: 'timeline.form.startDate', placeholder: 'timeline.form.fromYearHint' },
-    { key: 'end', label: 'timeline.form.endDate', placeholder: 'timeline.form.toYearHint' },
+    { key: 'begin', label: 'catalogue.facet.startDate', placeholder: 'timeline.form.fromYearHint' },
+    { key: 'end', label: 'catalogue.facet.endDate', placeholder: 'timeline.form.toYearHint' },
   ],
   filterTitle: 'catalogue.filter.heading',
   submitLabel: 'core.action.go',
