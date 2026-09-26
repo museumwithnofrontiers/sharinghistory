@@ -25,7 +25,7 @@ function listed(partner) {
   return !!tr('partners', partner.id)?.name && !!partner.country_id
 }
 
-export const partnersList = {
+export const partnersResultsSpec = {
   scope: (partner) => listed(partner),
   group: { tier: 'level' },
   // Legacy nested an associated partner under the main partner it belongs
@@ -77,7 +77,7 @@ export function heldItemRows(partner) {
   return heldItems(partner).map(itemSummary)
 }
 
-export const partnerSheet = {
+export const partnerSheetSpec = {
   entity: 'partners',
   fields: [],
   media: () => [],

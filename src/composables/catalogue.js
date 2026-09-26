@@ -2,7 +2,7 @@ import {
   CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, centuryPresets, objectsAndMonumentsSummary, searchFieldOptions,
   searchFields, searchRowKeys, searchSummary, useFieldSearch,
 } from '@museumwnf/viewer-core'
-import { exhibitionTree } from './exhibitions.js'
+import { exhibitionsTree } from './exhibitions.js'
 import { useData } from './data.js'
 
 // The catalogue spec: what this website's lists filter and search on. The
@@ -12,7 +12,7 @@ import { useData } from './data.js'
 // and viewer-layout's views; what is declared here is only what is this
 // website's: the scope rule, the two record facets of the Permanent
 // Collection, and the exhibition scope legacy's pclist_all.php offered as
-// "Theme / Subtheme / Chapter", folded into the `permanentCollection` spec
+// "Theme / Subtheme / Chapter", folded into the `permanentCollectionResultsSpec`
 // below that viewer-layout's `CatalogueResultsView` renders directly. Two
 // entrances and one results page read this one declaration.
 
@@ -98,7 +98,7 @@ export function chapterOptions(exhibitionId, themeId) {
 
 /**
  * Every item id attached to `collectionId` or any descendant, national
- * context excluded — `exhibitionTree.itemsUnder` (exhibitions.js), which
+ * context excluded — `exhibitionsTree.itemsUnder` (exhibitions.js), which
  * already stops at the same National Context boundary (`childType` keeps
  * only `theme`/`subtheme` children, so a National Context sibling, type
  * `collection`, is never walked into). Wrapped in a `Set` here only because
@@ -106,7 +106,7 @@ export function chapterOptions(exhibitionId, themeId) {
  * itself needs one.
  */
 export function itemIdsUnder(collectionId) {
-  return new Set(exhibitionTree.itemsUnder(collectionId))
+  return new Set(exhibitionsTree.itemsUnder(collectionId))
 }
 
 export function collectionById(id) {
@@ -146,7 +146,7 @@ function scopedItemIds(id) {
 // the timeline gallery and the partner sheet's held-items grid.
 export const itemSummary = (item) => itemRow(item, ['country', 'dates'])
 
-export const permanentCollection = {
+export const permanentCollectionResultsSpec = {
   entity: 'items',
   keys: ['country', 'exhibition', 'theme', 'chapter', 'partner', 'begin', 'end'],
   facets: FACETS,
@@ -190,7 +190,7 @@ export const permanentCollection = {
 // country expansions — is `useFieldSearch`'s, kept here so the module holds
 // one instance for the site's life rather than one per mount.
 
-export const databaseSearch = {
+export const databaseSearchSpec = {
   mode: 'rows',
   entity: 'items',
   fields: searchFieldOptions(SEARCH_FIELDS),
@@ -201,7 +201,7 @@ export const databaseSearch = {
 
 const { narrow } = useFieldSearch({ fields: SEARCH_FIELDS })
 
-export const databaseResults = {
+export const databaseResultsSpec = {
   entity: 'items',
   keys: [...searchRowKeys(), 'from', 'to', 'lang'],
   scope: (item) => inScope(item),

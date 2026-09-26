@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import { FacetSelect } from '@museumwnf/viewer-layout/content'
 import { CatalogueResultsView } from '@museumwnf/viewer-layout/views'
-import { chapterOptions, collectionById, collectionTitle, exhibitionOptions, permanentCollection, themeOptions } from '../composables/catalogue.js'
+import { chapterOptions, collectionById, collectionTitle, exhibitionOptions, permanentCollectionResultsSpec, themeOptions } from '../composables/catalogue.js'
 import { useData } from '../composables/data.js'
 
 // The Permanent Collection list is the platform's composed results page,
@@ -51,7 +51,7 @@ function activeFilterLabel(filters) {
 </script>
 
 <template>
-  <CatalogueResultsView :spec="permanentCollection" class="permanent-collection">
+  <CatalogueResultsView :spec="permanentCollectionResultsSpec" class="permanent-collection">
     <template #before="{ filters }">
       <h1 class="mwnf-heading">
         {{ $t('standalone.nav.permanentCollection') }}

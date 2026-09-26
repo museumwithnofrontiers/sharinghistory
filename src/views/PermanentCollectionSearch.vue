@@ -20,7 +20,7 @@ import { FACETS, exhibitionOptions } from '../composables/catalogue.js'
 const { items } = useData()
 const options = useFacets(items, FACETS)
 
-const permanentCollectionSearch = computed(() => ({
+const permanentCollectionSearchSpec = computed(() => ({
   mode: 'radio',
   target: 'permanent-collection-results',
   facets: [
@@ -38,7 +38,7 @@ const permanentCollectionSearch = computed(() => ({
     <h1 class="mwnf-heading">{{ $t('standalone.nav.permanentCollection') }}</h1>
 
     <div class="mwnf-panel">
-      <SearchFormView :spec="permanentCollectionSearch">
+      <SearchFormView :spec="permanentCollectionSearchSpec">
         <template #intro>
           <I18nText tag="p" class="intro-text" keypath="standalone.permanentCollection.intro" />
         </template>

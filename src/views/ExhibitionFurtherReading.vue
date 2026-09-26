@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { LinkListView } from '@museumwnf/viewer-layout/views'
-import { exhibitionTree } from '../composables/exhibitions.js'
+import { exhibitionsTree } from '../composables/exhibitions.js'
 import { furtherReadingSpec } from '../composables/exhibitionSpecs.js'
 
 // Legacy exhibitions/AWE/bibliography.php — the per-exhibition "Further
@@ -13,7 +13,7 @@ import { furtherReadingSpec } from '../composables/exhibitionSpecs.js'
 
 const route = useRoute()
 const exhibitionId = computed(() => decodeURIComponent(route.params.exhibitionId))
-const exhibition = computed(() => exhibitionTree.byId.value.get(exhibitionId.value) ?? null)
+const exhibition = computed(() => exhibitionsTree.byId.value.get(exhibitionId.value) ?? null)
 const spec = computed(() => furtherReadingSpec(exhibition.value))
 </script>
 

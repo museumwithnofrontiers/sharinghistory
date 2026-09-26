@@ -104,10 +104,10 @@ const timelineResultsBase = {
 }
 
 /** `/timeline` — the form alone, legacy's hcr_home.php. */
-export const timelineEntrance = { ...timelineResultsBase, entrance: true }
+export const timelineEntranceSpec = { ...timelineResultsBase, entrance: true }
 
 /** `/timeline/results` — legacy's hcr_result.php. */
-export const timelineResults = { ...timelineResultsBase, entrance: false }
+export const timelineResultsSpec = { ...timelineResultsBase, entrance: false }
 
 // ── The timeline gallery (Decision D1: hcr_gallery.php regained) ───────────
 //
@@ -124,7 +124,7 @@ function galleryCandidates(filters) {
   })
 }
 
-export const timelineGallery = {
+export const timelineGallerySpec = {
   entity: 'items',
   keys: ['country', 'begin', 'end'],
   scope: (item, filters) => inScope(item) && (!filters.country || item.country_id === filters.country),

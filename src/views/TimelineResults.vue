@@ -2,7 +2,7 @@
 import { useI18n } from '@museumwnf/viewer-core'
 import { BackLink } from '@museumwnf/viewer-layout/content'
 import { TimelineResultsView } from '@museumwnf/viewer-layout/views'
-import { timelineResults } from '../composables/timeline.js'
+import { timelineResultsSpec } from '../composables/timeline.js'
 import { useData } from '../composables/data.js'
 
 // The timeline results are the platform's composed `TimelineResultsView`,
@@ -24,7 +24,7 @@ function activeFilterLabel(filters) {
 </script>
 
 <template>
-  <TimelineResultsView :spec="timelineResults" class="mwnf-panel timeline-results">
+  <TimelineResultsView :spec="timelineResultsSpec" class="mwnf-panel timeline-results">
     <template #before="{ filters }">
       <BackLink variant="bar" arrow="‹" label="timeline.nav.backLink" :to="{ name: 'timeline' }" />
       <h1 class="mwnf-heading">

@@ -1,7 +1,7 @@
 <script setup>
 import { BackLink, PartnerPanel, RecordLanguages, RelatedRecords } from '@museumwnf/viewer-layout/content'
 import { RecordView } from '@museumwnf/viewer-layout/views'
-import { heldItemRows, partnerObjectsLink, partnerSheet, partnerViewOf } from '../composables/partner.js'
+import { heldItemRows, partnerObjectsLink, partnerSheetSpec, partnerViewOf } from '../composables/partner.js'
 
 // The partner profile: the platform's composed record page (the record's
 // language, its load, the not-found case), with viewer-layout's
@@ -17,7 +17,7 @@ defineProps({ id: { type: String, required: true } })
 </script>
 
 <template>
-  <RecordView :spec="partnerSheet" :id="id" class="detail mwnf-panel">
+  <RecordView :spec="partnerSheetSpec" :id="id" class="detail mwnf-panel">
     <template #header="{ language, languages, select }">
       <div class="detail-top">
         <BackLink variant="bar" label="partner.nav.back" :to="{ name: 'partners' }" />

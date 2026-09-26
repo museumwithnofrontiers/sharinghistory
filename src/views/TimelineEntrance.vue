@@ -1,7 +1,7 @@
 <script setup>
 import { I18nText } from '@museumwnf/viewer-core'
 import { TimelineResultsView } from '@museumwnf/viewer-layout/views'
-import { timelineEntrance } from '../composables/timeline.js'
+import { timelineEntranceSpec } from '../composables/timeline.js'
 
 // The timeline entrance is the platform's composed `TimelineResultsView`,
 // `entrance: true`, rendering the spec in composables/timeline.js. What
@@ -10,7 +10,7 @@ import { timelineEntrance } from '../composables/timeline.js'
 </script>
 
 <template>
-  <TimelineResultsView :spec="timelineEntrance" class="mwnf-panel">
+  <TimelineResultsView :spec="timelineEntranceSpec" class="mwnf-panel">
     <template #before>
       <h1 class="mwnf-heading">{{ $t('core.nav.timeline') }}</h1>
       <I18nText tag="p" class="intro-text" keypath="sharinghistory.timeline.intro" />

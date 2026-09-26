@@ -12,12 +12,12 @@ import partnerTexts from '@museumwnf/sharinghistory-data/translations/partners.e
 import timelineEventTexts from '@museumwnf/sharinghistory-data/translations/timeline_events.en.json'
 import { collectionTitle, inScope, itemIdsUnder } from '../src/composables/catalogue.js'
 import config from '../src/dataset.config.js'
-import { exhibitionTree } from '../src/composables/exhibitions.js'
+import { exhibitionsTree } from '../src/composables/exhibitions.js'
 import { historicalProfilesTree } from '../src/composables/history.js'
 import { OFFERED_LANGUAGES } from '../src/languages.js'
 import { useData } from '../src/composables/data.js'
 import { relatedContentLinks } from '../src/composables/exhibitionSpecs.js'
-import { timelineResults } from '../src/composables/timeline.js'
+import { timelineResultsSpec } from '../src/composables/timeline.js'
 
 // The same two layers main.js assembles, in the same order: the shared bundle
 // first, this website's own file last. Mounting without them would prove
@@ -35,7 +35,7 @@ describe('website smoke test', () => {
       '#/timeline/results?collection=pc',
       '#/timeline/results?collection=x1',
     ])
-    const controlKeys = new Set(timelineResults.controls.map((control) => control.key))
+    const controlKeys = new Set(timelineResultsSpec.controls.map((control) => control.key))
     for (const link of timelineLinks) {
       for (const key of new URLSearchParams(link.href.split('?')[1]).keys()) expect(controlKeys.has(key)).toBe(true)
     }
@@ -145,9 +145,9 @@ describe('website smoke test', () => {
   // theme with a following sibling theme, to prove the crossing navigation.
   // A theme whose own item grid (not a chapter's) carries at least one item.
   function findThemeWithItems() {
-    const root = exhibitionTree.root.value
-    for (const exhibition of exhibitionTree.children(root.id)) {
-      const theme = exhibitionTree.children(exhibition.id).find((candidate) => candidate.items?.length)
+    const root = exhibitionsTree.root.value
+    for (const exhibition of exhibitionsTree.children(root.id)) {
+      const theme = exhibitionsTree.children(exhibition.id).find((candidate) => candidate.items?.length)
       if (theme) return { exhibition, theme }
     }
     return null
@@ -193,10 +193,10 @@ describe('website smoke test', () => {
 
   // A chapter whose item grid carries a curator/partner justification pair.
   function findJustifiedChapter() {
-    const root = exhibitionTree.root.value
-    for (const exhibition of exhibitionTree.children(root.id)) {
-      for (const theme of exhibitionTree.children(exhibition.id)) {
-        for (const chapter of exhibitionTree.children(theme.id)) {
+    const root = exhibitionsTree.root.value
+    for (const exhibition of exhibitionsTree.children(root.id)) {
+      for (const theme of exhibitionsTree.children(exhibition.id)) {
+        for (const chapter of exhibitionsTree.children(theme.id)) {
           const justified = (chapter.items ?? []).some(
             (entry) => entry.justifications && Object.keys(entry.justifications).length,
           )
@@ -240,12 +240,12 @@ describe('website smoke test', () => {
 
   it('crosses from a theme\'s last chapter into the next theme', async () => {
     await loadEntities(['collections'])
-    const root = exhibitionTree.root.value
+    const root = exhibitionsTree.root.value
     let fixture = null
-    for (const exhibition of exhibitionTree.children(root.id)) {
-      const themes = exhibitionTree.children(exhibition.id)
+    for (const exhibition of exhibitionsTree.children(root.id)) {
+      const themes = exhibitionsTree.children(exhibition.id)
       for (let i = 0; i < themes.length - 1; i++) {
-        const chapters = exhibitionTree.children(themes[i].id)
+        const chapters = exhibitionsTree.children(themes[i].id)
         if (chapters.length > 1) {
           fixture = { exhibition, theme: themes[i], nextTheme: themes[i + 1], lastChapter: chapters[chapters.length - 1] }
           break
@@ -270,7 +270,7 @@ describe('website smoke test', () => {
   // title of their own and sit next to a theme under an exhibition, so a
   // theme address built from one must not fall through to `EssayView`'s
   // own not-found (a missing id) or to an essay headed by the internal name
-  // — it is caught earlier, by exhibitionTree membership (exhibitions.js).
+  // — it is caught earlier, by exhibitionsTree membership (exhibitions.js).
   it('renders not-found for a National Context id on the theme route, not an essay page', async () => {
     const [collections] = await loadEntities(['collections'])
     const nc = collections.find((c) => c.purpose === 'national-context')
@@ -395,8 +395,8 @@ describe('website smoke test', () => {
 
   it('renders the exhibition further-reading page on LinkListView', async () => {
     await loadEntities(['collections'])
-    const root = exhibitionTree.root.value
-    const exhibition = exhibitionTree.children(root.id)[0]
+    const root = exhibitionsTree.root.value
+    const exhibition = exhibitionsTree.children(root.id)[0]
     expect(exhibition, 'fixture: an exhibition').toBeDefined()
 
     const { app, host } = await mountSite(config, messages, `#/exhibitions/${encodeURIComponent(exhibition.id)}/further-reading`)
@@ -437,7 +437,7 @@ describe('website smoke test', () => {
     expect(decodeURIComponent(creditLink.getAttribute('href'))).toContain(`/item/${object.id}`)
     expect(creditLink.textContent).toBe(creditLink.getAttribute('href'))
 
-    // #1727 cleanup: `itemSheet` no longer names a project for the citation
+    // #1727 cleanup: `itemSheetSpec` no longer names a project for the citation
     // (composables/sheet.js), so `RecordView` resolves it from the record's
     // own `project_id` against the manifest — read here off the installed
     // data package rather than hardcoded, so the assertion tracks the
@@ -652,7 +652,7 @@ describe('website smoke test', () => {
   }, 60000)
 
   // The search entrance runs on the platform's composed `SearchFormView`
-  // (composables/catalogue.js's `databaseSearch`): the three keyword rows,
+  // (composables/catalogue.js's `databaseSearchSpec`): the three keyword rows,
   // the search-language select and the AND/OR fold are the shared
   // component's; asserted here is this website's own field grammar and
   // legacy database.php's fixed century boundaries (Decision D2).
@@ -674,7 +674,7 @@ describe('website smoke test', () => {
   }, 20000)
 
   // The database results run on the platform's composed `CatalogueResultsView`
-  // (composables/catalogue.js's `databaseResults`); this website's own is the
+  // (composables/catalogue.js's `databaseResultsSpec`); this website's own is the
   // keyword index itself (DatabaseResults.vue) — Decision D3's `rank: 'hits'`
   // and the country expansion, which lets a country's own name (not just its
   // id) match the "Location" field (`SEARCH_FIELDS.location` carries

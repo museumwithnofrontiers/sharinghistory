@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
 import { AppHyperlinks } from '@museumwnf/viewer-layout'
 import { BackLink, SectionCards } from '@museumwnf/viewer-layout/content'
-import { exhibitionTree } from '../composables/exhibitions.js'
+import { exhibitionsTree } from '../composables/exhibitions.js'
 import { relatedContentLinks } from '../composables/exhibitionSpecs.js'
 import { useData } from '../composables/data.js'
 
@@ -19,7 +19,7 @@ const { t } = useI18n()
 const { md, mdInline, mdStrip, timelines, tr } = useData()
 
 const exhibitionId = computed(() => decodeURIComponent(route.params.exhibitionId))
-const exhibition = computed(() => exhibitionTree.byId.value.get(exhibitionId.value) ?? null)
+const exhibition = computed(() => exhibitionsTree.byId.value.get(exhibitionId.value) ?? null)
 const text = computed(() => (exhibition.value ? (tr('collections', exhibition.value.id) ?? {}) : {}))
 
 // "Introduction" is not a theme — it's the exhibition's own "About the
@@ -43,7 +43,7 @@ const hasIntroduction = computed(() => {
 // exh_introduction.php.
 const teaser = computed(() => (text.value.description ?? '').split('\n\n')[0] ?? '')
 
-const themes = computed(() => (exhibition.value ? exhibitionTree.children(exhibition.value.id) : []))
+const themes = computed(() => (exhibition.value ? exhibitionsTree.children(exhibition.value.id) : []))
 
 const cards = computed(() => {
   const list = []

@@ -1,5 +1,5 @@
 import { renderInline } from '@museumwnf/viewer-core'
-import { exhibitionNodeRoute, exhibitionTree } from './exhibitions.js'
+import { exhibitionNodeRoute, exhibitionsTree } from './exhibitions.js'
 import { useData } from './data.js'
 
 // The introduction, theme and chapter pages as `EssayView` specs, over the
@@ -81,7 +81,7 @@ const itemRoute = (item) => ({ name: 'item', params: { id: item.id } })
 // original page's own item cards did, and no `navigation`: legacy never
 // moved between exhibitions from here.
 export const exhibitionIntroductionSpec = {
-  tree: exhibitionTree,
+  tree: exhibitionsTree,
   entity: 'items',
   route: exhibitionNodeRoute,
   heading: ({ text, t }) => (text.extra?.intro_header ? renderInline(String(text.extra.intro_header)) : t('exhibition.nav.introduction')),
@@ -99,7 +99,7 @@ export const exhibitionIntroductionSpec = {
 // exhibition's other themes — not its children, so it cannot express "this
 // theme's chapters"; see the pull request description).
 export const exhibitionThemeSpec = {
-  tree: exhibitionTree,
+  tree: exhibitionsTree,
   entity: 'items',
   route: exhibitionNodeRoute,
   quote: 'quote',
@@ -118,7 +118,7 @@ export const exhibitionThemeSpec = {
 // into its next sibling theme for free — legacy's own behaviour
 // (theme_items.php, subtheme_items.php).
 export const exhibitionChapterSpec = {
-  tree: exhibitionTree,
+  tree: exhibitionsTree,
   entity: 'items',
   route: exhibitionNodeRoute,
   quote: 'quote',
