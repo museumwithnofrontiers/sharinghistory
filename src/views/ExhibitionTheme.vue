@@ -49,8 +49,8 @@ const { mdInline } = useData()
 .theme-chapters__heading {
   font-size: 16px;
   font-weight: 500;
-  color: var(--heading);
-  border-bottom: 2px solid var(--accent-soft);
+  color: var(--mwnf-heading-color);
+  border-bottom: 2px solid var(--site-soft-red);
   padding-bottom: 4px;
   margin-bottom: 8px;
   font-family: 'Roboto', sans-serif;
@@ -60,15 +60,15 @@ const { mdInline } = useData()
   align-items: baseline;
   gap: 10px;
   padding: 8px 4px;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--site-light-rule);
   text-decoration: none !important;
 }
-.theme-chapters__link:hover .theme-chapters__name { color: var(--nav-active); }
+.theme-chapters__link:hover .theme-chapters__name { color: var(--mwnf-link-hover-text); }
 .theme-chapters__num {
   font-family: 'Roboto Condensed', 'Roboto', sans-serif;
   font-size: 13px;
   font-weight: 700;
-  color: var(--accent-soft);
+  color: var(--site-soft-red);
   min-width: 20px;
 }
 .theme-chapters__name {
@@ -76,11 +76,11 @@ const { mdInline } = useData()
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--mwnf-color-text);
 }
 .theme-chapters__count {
   font-family: 'Roboto', sans-serif;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
 }
 </style>

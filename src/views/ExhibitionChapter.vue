@@ -55,10 +55,10 @@ const { md, mdInline } = useData()
 .chapter-justification {
   font-size: 13px;
   line-height: 1.6;
-  color: var(--text);
+  color: var(--mwnf-color-text);
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--mwnf-color-border);
   font-family: 'Roboto', sans-serif;
 }
 .chapter-justification__label {
@@ -67,7 +67,7 @@ const { md, mdInline } = useData()
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--accent-soft);
+  color: var(--site-soft-red);
   margin-bottom: 2px;
 }
 
@@ -75,8 +75,8 @@ const { md, mdInline } = useData()
 .chapter-extra__heading {
   font-size: 14px;
   font-weight: 500;
-  color: var(--heading);
-  border-bottom: 1px solid var(--accent-soft);
+  color: var(--mwnf-heading-color);
+  border-bottom: 1px solid var(--site-soft-red);
   padding-bottom: 3px;
   margin-bottom: 6px;
   font-family: 'Roboto', sans-serif;

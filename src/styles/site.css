@@ -1,57 +1,22 @@
 /*
- * Sharing History's own palette: the legacy oxblood/red colour names other
- * CSS (theme/tokens.css, the views' own scoped styles) reference. The
- * building blocks this file used to duplicate — the content box, section
- * heading, form table, buttons, selects and the back link — are now
- * @museumwnf/viewer-layout's shared content classes (panel, heading,
- * form-table, button, select, back-bar), themed through theme/tokens.css
- * and theme/overrides.css instead of duplicated here.
+ * Global styles shared by every Sharing History view: the font, the body's
+ * text size, and the look of a link outside the shared components. Every
+ * colour is theme/tokens.css's: the platform's tokens, and the site's own few
+ * its pages read.
  */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,400&display=swap');
-
-:root {
-  /* Hover / active emphasis on light surfaces (buttons, result counts,
-     content links) — the header/nav chrome itself is themed via
-     theme/tokens.css. */
-  --nav-active: #990000;
-
-  /* Heading & body text */
-  --heading: #750101;
-  --text: #222222;
-  --muted: #5a5a5a;
-  --link: #222222;
-  --link-hover: #990000;
-
-  /* Red/gold accent palette */
-  --accent: #990000; /* primary dark red */
-  --accent-soft: #af2626; /* lighter red — legacy underline rules */
-  --accent-dark: #500101; /* deepest red — legacy separators */
-  --accent-pale: #c46a6a; /* washed red for subtle emphasis */
-  --gold: #ffc000; /* legacy banner-heading gold */
-  --gold-band: #febe40; /* legacy timeline ruler gold */
-  --field-bg: #faf6f0; /* warm off-white for inputs / subtle fills */
-  --tile-bg: #f0ede4; /* warm ivory — legacy timeline zebra rows */
-
-  /* Surfaces */
-  --page-bg: #ffffff;
-  --content-bg: #ffffff;
-  --section-bg: #f0ede4; /* warm ivory for info sections */
-
-  /* Borders */
-  --border: #b08c8c; /* muted warm red-gray */
-  --border-light: #e5dada; /* light separator lines */
-}
 
 body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
 
+/* In the text colour, turning the links' red under the pointer, as legacy's. */
 a {
-  color: var(--link);
+  color: var(--mwnf-color-text);
   text-decoration: none;
 }
 a:hover {
-  color: var(--link-hover);
+  color: var(--mwnf-link-hover-text);
   text-decoration: underline;
 }
