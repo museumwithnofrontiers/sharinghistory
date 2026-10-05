@@ -36,7 +36,7 @@ function activeFilterLabel(filters) {
 </template>
 
 <style scoped>
-.heading-filter { font-weight: normal; font-size: 14px; color: var(--muted); }
+.heading-filter { font-weight: normal; font-size: 14px; color: var(--mwnf-color-muted); }
 
 /* .timeline-results carries no styles of its own now (mwnf-panel supplies
    the box) — kept only as the :deep() scoping hook below. */
@@ -46,7 +46,7 @@ function activeFilterLabel(filters) {
 .timeline-results :deep(.sh-timeline-see) {
   font-size: 11px;
   font-weight: 500;
-  color: var(--nav-active);
+  color: var(--mwnf-link-text);
   display: block;
 }
 </style>

@@ -38,7 +38,7 @@ const cards = computed(() =>
 .hb-intro-note {
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   margin-bottom: 14px;
 }
 </style>

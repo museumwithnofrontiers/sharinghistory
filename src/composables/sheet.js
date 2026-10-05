@@ -99,4 +99,6 @@ export const itemSheetSpec = {
   shortDescriptionAfter: 'description',
   related: { variant: 'list', heading: 'record.related.items' },
   route: 'item',
+  // Legacy's gap under the pictures and under the sheet.
+  spaced: true,
 }

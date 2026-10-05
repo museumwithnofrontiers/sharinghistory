@@ -178,6 +178,9 @@ export const permanentCollectionResultsSpec = {
   record: (item) => itemRow(item, ['country', 'dates', 'holder']),
 
   summary: objectsAndMonumentsSummary,
+
+  // In the site's content box, as every section's page is.
+  boxed: true,
 }
 
 // ── The search entrance and the keyword results ────────────────────────────

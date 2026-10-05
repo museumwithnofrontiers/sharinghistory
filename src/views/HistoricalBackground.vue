@@ -120,7 +120,7 @@ const insightCountries = computed(() =>
 .hb-intro-note {
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   margin-bottom: 14px;
 }
 
@@ -129,7 +129,7 @@ const insightCountries = computed(() =>
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--mwnf-color-border);
   padding-bottom: 10px;
 }
 .perspective-tab {
@@ -138,21 +138,21 @@ const insightCountries = computed(() =>
   font-weight: 500;
   padding: 6px 14px;
   background: none;
-  border: 1px solid var(--border);
-  color: var(--heading);
+  border: 1px solid var(--mwnf-color-border);
+  color: var(--mwnf-heading-color);
   cursor: pointer;
 }
-.perspective-tab:hover { color: var(--nav-active); border-color: var(--accent); }
+.perspective-tab:hover { color: var(--mwnf-link-hover-text); border-color: var(--mwnf-color-accent); }
 .perspective-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--mwnf-color-accent);
+  border-color: var(--mwnf-color-accent);
   color: #fff;
 }
 
 .perspective-title {
   font-size: 17px;
   font-weight: 500;
-  color: var(--heading);
+  color: var(--mwnf-heading-color);
   margin-bottom: 10px;
   font-family: 'Roboto', sans-serif;
 }
@@ -160,27 +160,27 @@ const insightCountries = computed(() =>
 .topic-list { list-style: none; }
 .topic-row {
   padding: 8px 4px;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--site-light-rule);
 }
 .topic-row:last-child { border-bottom: none; }
 .topic-name {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  color: var(--heading);
+  color: var(--mwnf-heading-color);
 }
 
 .insight-table { border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; font-size: 13px; }
 .insight-table th {
   text-align: left;
   font-weight: 500;
-  color: var(--heading);
+  color: var(--mwnf-heading-color);
   padding: 7px 16px 7px 4px;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--site-light-rule);
   white-space: nowrap;
 }
 .insight-table td {
   padding: 7px 16px 7px 0;
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--site-light-rule);
 }
-.insight-table a { color: var(--nav-active); }
+.insight-table a { color: var(--mwnf-link-text); }
 </style>

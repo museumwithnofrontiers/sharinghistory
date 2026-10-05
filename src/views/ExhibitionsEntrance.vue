@@ -33,12 +33,12 @@ const cards = computed(() =>
 </template>
 
 <style scoped>
-.not-found { color: var(--muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
+.not-found { color: var(--mwnf-color-muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
 
 .intro-text {
   font-size: 13px;
   line-height: 1.65;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   margin-bottom: 16px;
   font-family: 'Roboto', sans-serif;
 }

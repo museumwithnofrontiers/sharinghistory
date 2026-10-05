@@ -115,7 +115,7 @@ function bibliographyMarkdown(tr, language) {
 </template>
 
 <style scoped>
-.not-found { color: var(--muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
+.not-found { color: var(--mwnf-color-muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
 
 .hb-wrap { display: flex; flex-direction: column; gap: 10px; }
 
@@ -127,7 +127,7 @@ function bibliographyMarkdown(tr, language) {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #fff;
-  background: var(--accent);
+  background: var(--mwnf-color-accent);
   padding: 2px 8px;
   margin-bottom: 8px;
 }
@@ -140,15 +140,15 @@ function bibliographyMarkdown(tr, language) {
 }
 .hb-image-strip img {
   height: 120px;
-  border: 1px solid var(--border);
-  background: var(--tile-bg);
+  border: 1px solid var(--mwnf-color-border);
+  background: var(--site-ivory);
 }
 
 .hb-item-heading {
   font-size: 14px;
   font-weight: 500;
-  color: var(--heading);
-  border-bottom: 1px solid var(--accent-soft);
+  color: var(--mwnf-heading-color);
+  border-bottom: 1px solid var(--site-soft-red);
   padding-bottom: 3px;
   margin-bottom: 8px;
   font-family: 'Roboto', sans-serif;
@@ -163,5 +163,5 @@ function bibliographyMarkdown(tr, language) {
   font-size: 13px;
 }
 .hb-related-list li { padding: 3px 0; }
-.hb-related-list a { color: var(--nav-active); }
+.hb-related-list a { color: var(--mwnf-link-text); }
 </style>

@@ -29,7 +29,7 @@ function totalCount(groups) {
 </template>
 
 <style scoped>
-.heading-project { font-weight: normal; font-size: 14px; color: var(--muted); }
+.heading-project { font-weight: normal; font-size: 14px; color: var(--mwnf-color-muted); }
 
 /* .partners-results carries no styles of its own now (mwnf-panel supplies
    the box) — kept only as the :deep() scoping hook below. */
@@ -37,16 +37,16 @@ function totalCount(groups) {
 .result-count {
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--mwnf-color-border);
 }
 
-.partners-results :deep(.mwnf-partner-list__empty) { color: var(--muted); font-family: 'Roboto', sans-serif; font-size: 13px; padding: 20px 0; }
+.partners-results :deep(.mwnf-partner-list__empty) { color: var(--mwnf-color-muted); font-family: 'Roboto', sans-serif; font-size: 13px; padding: 20px 0; }
 
 .partners-results :deep(.mwnf-partner-list__group) {
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--site-light-rule);
   padding: 10px 0;
 }
 .partners-results :deep(.mwnf-partner-list__group:last-child) { border-bottom: none; }
@@ -57,10 +57,10 @@ function totalCount(groups) {
   display: inline-block;
   font-size: 15px;
   font-weight: 500;
-  color: var(--heading);
+  color: var(--mwnf-heading-color);
   font-family: 'Roboto', sans-serif;
 }
-.partners-results :deep(.mwnf-partner-list__group-title)::before { content: '▸ '; color: var(--accent); }
+.partners-results :deep(.mwnf-partner-list__group-title)::before { content: '▸ '; color: var(--mwnf-color-accent); }
 .partners-results :deep(details[open] > .mwnf-partner-list__group-heading .mwnf-partner-list__group-title)::before { content: '▾ '; }
 
 .partners-results :deep(.mwnf-partner-list__tier) {
@@ -80,14 +80,14 @@ function totalCount(groups) {
 }
 .partners-results :deep(.mwnf-partner-list__children) { padding-left: 16px; }
 .partners-results :deep(.mwnf-partner-list__logo) { width: 28px; height: 28px; object-fit: contain; }
-.partners-results :deep(.mwnf-partner-list__meta) { color: var(--muted); font-size: 11px; }
+.partners-results :deep(.mwnf-partner-list__meta) { color: var(--mwnf-color-muted); font-size: 11px; }
 
 .partners-results :deep(.mwnf-partner-list__tier--associated) { flex: 1 0 100%; }
 .partners-results :deep(.mwnf-partner-list__tier-label) {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   font-weight: bold;
   margin-bottom: 4px;
 }

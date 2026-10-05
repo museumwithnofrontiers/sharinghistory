@@ -110,26 +110,26 @@ const relatedLinks = computed(() =>
 </template>
 
 <style scoped>
-.not-found { color: var(--muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
+.not-found { color: var(--mwnf-color-muted); font-family: 'Roboto', sans-serif; font-size: 13px; }
 
-.intro-box { border-top: 3px solid var(--accent); }
+.intro-box { border-top: 3px solid var(--site-rule-color); }
 .intro-subtitle {
   font-size: 16px;
   font-weight: 400;
-  color: var(--heading);
+  color: var(--mwnf-heading-color);
   margin-bottom: 12px;
   font-family: 'Roboto', sans-serif;
 }
 .intro-credits {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--mwnf-color-border);
   font-size: 12px;
   font-style: italic;
-  color: var(--muted);
+  color: var(--mwnf-color-muted);
   font-family: 'Roboto', sans-serif;
   white-space: pre-line;
 }
 
-.no-results { color: var(--muted); font-family: 'Roboto', sans-serif; font-size: 13px; padding: 20px 0; }
+.no-results { color: var(--mwnf-color-muted); font-family: 'Roboto', sans-serif; font-size: 13px; padding: 20px 0; }
 </style>
