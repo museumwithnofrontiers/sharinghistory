@@ -1,3 +1,4 @@
+import { artistLine, removeEndingPoint } from '@museumwnf/viewer-core'
 import { useData } from './data.js'
 
 // The item sheet, as a spec: what viewer-layout's `RecordView` renders on
@@ -16,19 +17,20 @@ function locationWithCountry(c) {
   return [c.text.location, labelOf('countries', c.record.country_id)].filter(Boolean).join(', ')
 }
 
-// The "Author" line is the artwork's creator with life dates ("Wolffgang
-// Andreas Matthäus (1660, Chemnitz–1736, Augsbourg)"), which the export
-// carries as `artist` and its `artist_*` details, with the structured artist
-// names behind it as a fallback. "Author" is this website's own word — no
-// shared entry names it.
+// The "Author" line is the artwork's creator with life dates, joined as
+// legacy joined them ("Wolffgang Andreas Matthäus (1660, Chemnitz-1736,
+// Augsbourg)"), which the export carries as `artist` and its `artist_*`
+// details, with the structured artist names behind it as a fallback.
+// "Author" is this website's own word — no shared entry names it.
 function authorWithDates(c) {
   const text = c.text
   if (!text.artist) return c.record.artist_names?.length ? c.record.artist_names.join(', ') : ''
-  const birth = [text.artist_birthdate, text.artist_birthplace].filter(Boolean).join(', ')
-  const death = [text.artist_deathdate, text.artist_deathplace].filter(Boolean).join(', ')
-  const dates = birth || death ? ` (${birth}${birth && death ? '–' : ''}${death})` : ''
-  return `${text.artist}${dates}`
+  return artistLine(text.artist, text)
 }
+
+// Legacy's free-text Period / Dynasty line, without its ending period as
+// legacy printed it (decision D5, inventory-app#2233).
+const periodDynasty = (c) => removeEndingPoint(c.text.dynasty)
 
 const monumentFacts = [
   { key: 'alsoKnownAs', label: 'sheet.field.alsoKnownAs', value: 'alternate_name' },
@@ -51,6 +53,7 @@ const objectFacts = [
   { key: 'inventoryNumber', label: 'sheet.field.inventoryNumber', value: (c) => c.record.owner_reference },
   { key: 'materials', label: 'sheet.field.materials', value: 'materials' },
   { key: 'dimensions', label: 'sheet.field.dimensions', value: 'dimensions' },
+  { key: 'dynasty', label: 'sheet.field.periodDynasty', value: periodDynasty },
   { key: 'provenance', label: 'sheet.field.provenance', value: 'provenance' },
   { key: 'workshop', label: 'sheet.field.workshop', value: 'workshop' },
   { key: 'binding', label: 'sheet.field.binding', value: 'binding_desc' },
@@ -60,14 +63,20 @@ const objectFacts = [
 ]
 
 // The prose under the facts, in legacy's order and under its headings: after
-// the description, "Type of Object", then the archival reference.
+// the description, "Type of Object", then the archival reference. A
+// monument's Period / Dynasty comes after its description, and the item's
+// rights line (`notice_b`, the package's `copyright`) closes both.
+const copyright = { key: 'copyright', label: 'sheet.field.copyrightInformation', value: 'copyright' }
+
 const monumentSections = [
   { key: 'history', label: 'sheet.field.history', value: 'history' },
   { key: 'description', label: 'sheet.field.description', value: 'description' },
+  { key: 'dynasty', label: 'sheet.field.periodDynasty', value: periodDynasty },
   { key: 'datation', label: 'sheet.field.monumentDatationMethod', value: 'method_for_datation' },
   { key: 'provenanceMethod', label: 'sheet.field.provenanceMethod', value: 'method_for_provenance' },
   { key: 'archival', label: 'sheet.field.archivalReference', value: 'archival' },
   { key: 'bibliography', label: 'sheet.field.bibliography', value: 'bibliography' },
+  copyright,
 ]
 
 const objectSections = [
@@ -83,6 +92,7 @@ const objectSections = [
     label: 'sheet.field.catalogue',
     value: (c) => (c.text.catalogue_holding_link ? `[${c.text.catalogue_holding_link}](${c.text.catalogue_holding_link})` : ''),
   },
+  copyright,
 ]
 
 const isMonument = (ctx) => ctx.record?.type === 'monument'
