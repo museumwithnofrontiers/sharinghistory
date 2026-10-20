@@ -3,9 +3,11 @@
 // The chrome assets this website took from the legacy Sharing History site
 // (decision D7 of inventory-app#2233: logos, banners, sponsor marks and
 // favicons belong to the website's own repository, not to the inventory's
-// image management). `theme/assets/SOURCES.json` lists each file with the
-// legacy address it came from; this script downloads every file the list
-// names and records its size and SHA-256, byte for byte as legacy serves it.
+// image management). `theme/assets/SOURCES.json` lists each file, by its path
+// in the repository (`theme/assets/…`, and `public/favicon.ico`, which the
+// layout leaves to each site), with the legacy address it came from; this
+// script downloads every file the list names and records its size and
+// SHA-256, byte for byte as legacy serves it.
 //
 // --check downloads every file again, writes nothing, and fails when legacy
 // now serves something other than what the repository holds.
@@ -16,8 +18,8 @@ import { createHash } from 'node:crypto'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
-const ROOT = join(import.meta.dirname, '..', 'theme', 'assets')
-const MANIFEST = join(ROOT, 'SOURCES.json')
+const ROOT = join(import.meta.dirname, '..')
+const MANIFEST = join(ROOT, 'theme', 'assets', 'SOURCES.json')
 // The legacy servers are shared: a few requests at a time, and named.
 const CONCURRENCY = 3
 const HEADERS = { 'user-agent': 'mwnf-sharinghistory-assets/1.0 (read-only)' }

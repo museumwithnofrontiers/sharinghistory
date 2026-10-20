@@ -3,12 +3,13 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// theme/assets holds files taken byte for byte from the legacy site (D7);
-// SOURCES.json says where each one came from. scripts/legacy-assets.js
-// compares them with what legacy serves today; this keeps the list and the
-// folder in step, offline.
-const ROOT = join(import.meta.dirname, '..', 'theme', 'assets')
-const entries = JSON.parse(readFileSync(join(ROOT, 'SOURCES.json'), 'utf8'))
+// theme/assets (and public/favicon.ico) hold files taken byte for byte from
+// the legacy site (D7); theme/assets/SOURCES.json says where each one came
+// from. scripts/legacy-assets.js compares them with what legacy serves
+// today; this keeps the list and the folders in step, offline.
+const ROOT = join(import.meta.dirname, '..')
+const MANIFEST = 'theme/assets/SOURCES.json'
+const entries = JSON.parse(readFileSync(join(ROOT, MANIFEST), 'utf8'))
 
 function filesUnder(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => (
@@ -27,9 +28,9 @@ describe('legacy chrome assets', () => {
 
   it('holds no file the list does not name', () => {
     const listed = new Set(entries.map((entry) => entry.path))
-    const unlisted = filesUnder(ROOT)
+    const unlisted = [...filesUnder(join(ROOT, 'theme', 'assets')), ...filesUnder(join(ROOT, 'public'))]
       .map((file) => relative(ROOT, file).split(sep).join('/'))
-      .filter((path) => path !== 'SOURCES.json' && !listed.has(path))
+      .filter((path) => path !== MANIFEST && !listed.has(path))
     expect(unlisted).toEqual([])
   })
 

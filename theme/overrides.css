@@ -39,6 +39,12 @@
   text-align: center;
 }
 
+/* Legacy's cooperation band sits above the footer on some pages only
+ * (SiteShell.vue); on the others the strip that would hold it stays hidden. */
+.mwnf-sponsors:not(:has(.sh-band)) {
+  display: none;
+}
+
 /*
  * The home page (viewer-layout's HomeView, `panels: true`): the welcome in
  * the site's panel under the accent rule, its title in the heading colour

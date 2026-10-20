@@ -81,20 +81,17 @@ describe('website smoke test', () => {
   // The footer's attribution and terms link (sharinghistory#52): SiteShell
   // reads them off the package's own `manifest.rights` through viewer-core's
   // `useSiteRights()` — nothing this site declares itself.
-  it('renders the footer attribution and terms link from the package rights', async () => {
+  // The footer is legacy's (SiteFooter.vue): its links and copyright only.
+  // Legacy has no rights-holder line, so the one the shell would draw from
+  // the package's rights block is not there (Pascal, 2026-10-20).
+  it('renders legacy\'s footer, without a rights-holder line', async () => {
     const { app, host } = await mountSite(config, messages)
     const { manifest } = useDataPackage()
     expect(manifest.rights?.attribution, 'fixture: the package declares an attribution').toBeTruthy()
 
-    const attribution = host.querySelector('.mwnf-footer__attribution')
-    expect(attribution).not.toBeNull()
-    expect(attribution.textContent).toContain(sharedTexts.en['record.source.rightsHolder'])
-    expect(attribution.textContent).toContain(manifest.rights.attribution)
-
-    const termsLink = attribution.querySelector('.mwnf-footer__terms')
-    expect(termsLink).not.toBeNull()
-    expect(termsLink.textContent.trim()).toBe(sharedTexts.en['record.source.termsOfUse'])
-    expect(termsLink.getAttribute('href')).toBe(manifest.rights.terms_url)
+    await vi.waitFor(() => expect(host.querySelector('.sh-footer')).not.toBeNull(), { timeout: 15000 })
+    expect(host.querySelector('.mwnf-footer__attribution')).toBeNull()
+    expect(host.querySelector('.mwnf-footer').textContent).not.toContain(manifest.rights.attribution)
 
     app.unmount()
   }, 20000)
@@ -751,7 +748,7 @@ describe('website smoke test', () => {
   it('declares every route by name, and leaves the catch-all to the router', () => {
     expect(checkRoutes(config, {
       names: [
-        'home', 'about', 'permanent-collection', 'permanent-collection-results', 'database',
+        'home', 'about', 'about-team', 'sponsors', 'sponsors-local', 'permanent-collection', 'permanent-collection-results', 'database',
         'database-results', 'timeline', 'timeline-results', 'timeline-gallery', 'partners', 'partners-results',
         'partner', 'exhibitions', 'exhibition', 'exhibition-introduction',
         'exhibition-further-reading', 'exhibition-theme', 'exhibition-chapter',

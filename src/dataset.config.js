@@ -106,25 +106,21 @@ export default {
       { section: 'historical-profiles', label: 'sharinghistory.nav.historicalProfiles', to: { name: 'historical-profiles' } },
       { section: 'partners', label: 'core.nav.partners', to: { name: 'partners' } },
     ],
-    // Legacy's portal links (`includes/footer.php`), in its order, each in
-    // the same window.
-    footerLinks: [
-      { label: 'sharinghistory.footer.aboutMwnf', href: 'https://www.museumwnf.org/about' },
-      { label: 'sharinghistory.footer.contact', href: 'https://www.museumwnf.org/about/contact' },
-      { label: 'sharinghistory.footer.legalNotice', href: 'https://www.museumwnf.org/about/legal-notice' },
-      { label: 'sharinghistory.footer.credits', href: 'https://www.museumwnf.org/about/credits' },
-      { label: 'sharinghistory.footer.languagePolicy', href: 'https://www.museumwnf.org/about/language-policy' },
-      { label: 'sharinghistory.footer.cookies', href: 'https://www.museumwnf.org/about/cookies' },
-    ],
+    // The footer is legacy's own (SiteFooter.vue, in SiteShell's footer slot).
   },
 
   // Legacy's inner-page banner (`images/banner_inside.jpg` under the page's
-  // title), on the About pages so far; the other pages keep theirs until the
-  // standalone layout (inventory-app#2233 S1) gives every page its banner.
+  // title), on the About and Sponsors pages so far; the other pages keep
+  // theirs until the standalone layout (inventory-app#2233 S1) gives every
+  // page its banner.
   banner: {
-    variant: ({ section }) => (section === 'about' ? 'section' : ''),
-    image: ({ section }) => (section === 'about' ? bannerInside : ''),
-    title: ({ section, t }) => (section === 'about' ? t('sharinghistory.about.bannerTitle') : ''),
+    variant: ({ section }) => (['about', 'sponsors'].includes(section) ? 'section' : ''),
+    image: ({ section }) => (['about', 'sponsors'].includes(section) ? bannerInside : ''),
+    title: ({ section, t }) => {
+      if (section === 'about') return t('sharinghistory.about.bannerTitle')
+      if (section === 'sponsors') return t('sharinghistory.sponsors.bannerTitle')
+      return ''
+    },
   },
 
   // The route map: every route named, kebab-case sections, and the page and
@@ -144,13 +140,36 @@ export default {
       meta: meta('home', 'items'),
     },
     {
-      // Legacy's about.php. The Team and Chronology pages beside it wait on
-      // the decision whether their content is inventory data
-      // (inventory-app#2233 T5).
+      // Legacy's about.php and about_team.php. The Chronology beside them
+      // (about_chronology_list.php) is inventory data, a timeline the
+      // inventory imports (Pascal, 2026-10-20): its page follows once the
+      // data package carries it.
       path: '/about',
       name: 'about',
       component: () => import('./views/AboutProject.vue'),
       meta: meta('about', 'items'),
+    },
+    {
+      path: '/about/team',
+      name: 'about-team',
+      component: () => import('./views/AboutTeam.vue'),
+      meta: meta('about'),
+    },
+    {
+      // Legacy's sponsor_detail.php and sponsor_detail_local.php, reached
+      // from the cooperation band's "Other sponsors".
+      path: '/sponsors',
+      name: 'sponsors',
+      component: () => import('./views/SponsorsPage.vue'),
+      props: { kind: 'international' },
+      meta: meta('sponsors', 'partners'),
+    },
+    {
+      path: '/sponsors/local',
+      name: 'sponsors-local',
+      component: () => import('./views/SponsorsPage.vue'),
+      props: { kind: 'local' },
+      meta: meta('sponsors', 'partners', 'countries'),
     },
     {
       path: '/permanent-collection',

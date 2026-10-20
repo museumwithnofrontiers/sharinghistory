@@ -13,10 +13,7 @@ import yasar from '../../theme/assets/sponsors/yasar.png'
 const { t } = useI18n()
 const router = useRouter()
 
-// The sponsors pages aren't built yet (inventory-app#2233 T5, pending the
-// decision whether their content is inventory data); the link appears with
-// the route.
-const sponsorsHref = router.hasRoute('sponsors') ? router.resolve({ name: 'sponsors' }).href : ''
+const sponsorsHref = router.resolve({ name: 'sponsors' }).href
 const partnersHref = router.resolve({ name: 'partners' }).href
 </script>
 
@@ -48,7 +45,7 @@ const partnersHref = router.resolve({ name: 'partners' }).href
     </div>
     <div class="sh-band__column sh-band__column--links">
       <div class="sh-band__boxes">
-        <a v-if="sponsorsHref" class="sh-band__link" :href="sponsorsHref"><span>{{ t('sharinghistory.band.otherSponsors') }}</span></a>
+        <a class="sh-band__link" :href="sponsorsHref"><span>{{ t('sharinghistory.band.otherSponsors') }}</span></a>
         <a class="sh-band__link" href="https://www.museumwnf.org/about/support"><span>{{ t('sharinghistory.band.support') }}</span></a>
         <a
           class="sh-band__link"

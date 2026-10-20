@@ -2,8 +2,8 @@
 // The strip under the About pages' banner, as legacy prints it on each of
 // them (`about.php`, `about_team.php`, `about_chronology_list.php`): the
 // three pages on the left, "See also Historical Background" on the right.
-// The Team and Chronology pages wait on the decision whether their content
-// is inventory data (inventory-app#2233 T5); a tab appears with its route.
+// The Chronology is inventory data, a timeline the inventory imports
+// (Pascal, 2026-10-20); its tab appears with its route.
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
