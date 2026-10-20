@@ -78,24 +78,17 @@ describe('website smoke test', () => {
     app.unmount()
   }, 20000)
 
-  // The footer's attribution and terms link (sharinghistory#52): SiteShell
-  // reads them off the package's own `manifest.rights` through viewer-core's
-  // `useSiteRights()` — nothing this site declares itself.
-  it('renders the footer attribution and terms link from the package rights', async () => {
+  // The footer's line. The rights-holder attribution and its terms link
+  // (sharinghistory#52) are no longer asserted: legacy has no such line, and
+  // viewer-layout 3.4.0 draws it only on request (`config.footer.rightsHolder`),
+  // with the terms link inside it (Pascal, 2026-10-20). 3.3 still draws both
+  // from the package's `manifest.rights`, so their absence isn't asserted
+  // either until this site moves to 3.4.
+  it('renders the footer line', async () => {
     const { app, host } = await mountSite(config, messages)
-    const { manifest } = useDataPackage()
-    expect(manifest.rights?.attribution, 'fixture: the package declares an attribution').toBeTruthy()
-
-    const attribution = host.querySelector('.mwnf-footer__attribution')
-    expect(attribution).not.toBeNull()
-    expect(attribution.textContent).toContain(sharedTexts.en['record.source.rightsHolder'])
-    expect(attribution.textContent).toContain(manifest.rights.attribution)
-
-    const termsLink = attribution.querySelector('.mwnf-footer__terms')
-    expect(termsLink).not.toBeNull()
-    expect(termsLink.textContent.trim()).toBe(sharedTexts.en['record.source.termsOfUse'])
-    expect(termsLink.getAttribute('href')).toBe(manifest.rights.terms_url)
-
+    const footer = host.querySelector('.mwnf-footer')
+    expect(footer).not.toBeNull()
+    expect(footer.textContent).toContain(sharedTexts.en['standalone.identity.copyright'])
     app.unmount()
   }, 20000)
 
