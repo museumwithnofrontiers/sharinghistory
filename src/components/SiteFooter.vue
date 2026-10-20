@@ -18,7 +18,7 @@ const year = new Date().getFullYear()
     <a class="sh-footer__link" href="https://www.museumwnf.org/about/credits">{{ t('sharinghistory.footer.credits') }}</a><span class="sh-footer__sep" aria-hidden="true"></span>
     <a class="sh-footer__link" href="https://www.museumwnf.org/about/language-policy">{{ t('sharinghistory.footer.languagePolicy') }}</a><span class="sh-footer__sep" aria-hidden="true"></span>
     <a class="sh-footer__link" href="https://www.museumwnf.org/about/cookies">{{ t('sharinghistory.footer.cookies') }}</a><span class="sh-footer__sep" aria-hidden="true"></span>
-    <span class="sh-footer__copyright">{{ t('sharinghistory.footer.copyright') }}{{ year }}</span>
+    <span class="sh-footer__copyright">{{ t('sharinghistory.footer.copyright') }} {{ year }}</span>
   </p>
 </template>
 

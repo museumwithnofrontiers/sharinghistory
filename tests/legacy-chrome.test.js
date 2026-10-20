@@ -59,7 +59,7 @@ describe('legacy chrome', () => {
     expect(links.map((a) => a.getAttribute('href'))).toEqual(FOOTER_LINKS)
     expect(links.every((a) => !a.hasAttribute('target'))).toBe(true)
     expect(host.querySelector('.sh-footer__copyright').textContent)
-      .toBe(`${text('sharinghistory.footer.copyright')}${new Date().getFullYear()}`)
+      .toBe(`${text('sharinghistory.footer.copyright')} ${new Date().getFullYear()}`)
     app.unmount()
   }, 60000)
 

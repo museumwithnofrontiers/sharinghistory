@@ -83,6 +83,7 @@ const pictures = computed(() => {
   grid-auto-rows: 83px;
   gap: 10px;
   align-content: start;
+  align-self: start;
   justify-self: start;
   padding: 10px;
   background: #750101;

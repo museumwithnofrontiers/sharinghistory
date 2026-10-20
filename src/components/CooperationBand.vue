@@ -5,7 +5,7 @@
 // partner-meetings video. The addresses and logos are legacy's; every text
 // comes from legacy through site-i18n.
 import { useRouter } from 'vue-router'
-import { useI18n } from '@museumwnf/viewer-core'
+import { mdInline, useI18n } from '@museumwnf/viewer-core'
 import leagueOfArabStates from '../../theme/assets/logos/headerCoop.png'
 import sharjah from '../../theme/assets/sponsors/Economy_Travelling_Sharjah.png'
 import yasar from '../../theme/assets/sponsors/yasar.png'
@@ -53,7 +53,7 @@ const partnersHref = router.resolve({ name: 'partners' }).href
           target="_blank"
           rel="noopener"
           :title="t('sharinghistory.band.partnerMeetingsVideoTooltip')"
-        ><span>{{ t('sharinghistory.band.partnerMeetingsVideo') }}</span></a>
+        ><span v-html="mdInline(t('sharinghistory.band.partnerMeetingsVideo'))" /></a>
       </div>
     </div>
   </div>
