@@ -2,6 +2,8 @@ import { languageLabels, offeredLanguages, sectionMeta, useDataPackage } from '@
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
 import { inScope } from './composables/catalogue.js'
+import { hasText } from './composables/texts.js'
+import bannerInside from '../theme/assets/banners/banner_inside.jpg'
 
 // The whole declaration of this website. Before it mounts, the website reads
 // nothing from its package but the manifest: the languages it offers, their
@@ -87,10 +89,17 @@ export default {
   // rather than the path; `label` is an entry name, resolved by the shell
   // itself (only there is the installed catalogue available). The language
   // names come from the data package, not from a translator.
+  //
+  // Legacy's menu opens on "About", a drop-down whose one page is "The
+  // Project" (the drop-down also repeats Historical Background, which has its
+  // own entry here). The shared menu has no drop-downs, so "About" leads to
+  // that page directly. A menu or footer entry whose text legacy hasn't given
+  // yet is left out (SiteShell.vue).
   navigation: {
     languages: languageLabels(languages),
     links: [
       { section: 'home', label: 'core.nav.home', to: { name: 'home' } },
+      { section: 'about', label: 'core.nav.about', to: { name: 'about' } },
       { section: 'exhibitions', label: 'standalone.nav.exhibitions', to: { name: 'exhibitions' } },
       { section: 'permanent-collection', label: 'standalone.nav.permanentCollection', to: { name: 'permanent-collection' } },
       { section: 'database', label: 'standalone.nav.database', to: { name: 'database' } },
@@ -99,6 +108,25 @@ export default {
       { section: 'historical-profiles', label: 'sharinghistory.nav.historicalProfiles', to: { name: 'historical-profiles' } },
       { section: 'partners', label: 'core.nav.partners', to: { name: 'partners' } },
     ],
+    // Legacy's portal links (`includes/footer.php`), in its order, each in
+    // the same window.
+    footerLinks: [
+      { label: 'sharinghistory.footer.aboutMwnf', href: 'https://www.museumwnf.org/about' },
+      { label: 'sharinghistory.footer.contact', href: 'https://www.museumwnf.org/about/contact' },
+      { label: 'sharinghistory.footer.legalNotice', href: 'https://www.museumwnf.org/about/legal-notice' },
+      { label: 'sharinghistory.footer.credits', href: 'https://www.museumwnf.org/about/credits' },
+      { label: 'sharinghistory.footer.languagePolicy', href: 'https://www.museumwnf.org/about/language-policy' },
+      { label: 'sharinghistory.footer.cookies', href: 'https://www.museumwnf.org/about/cookies' },
+    ],
+  },
+
+  // Legacy's inner-page banner (`images/banner_inside.jpg` under the page's
+  // title), on the About pages so far; the other pages keep theirs until the
+  // standalone layout (inventory-app#2233 S1) gives every page its banner.
+  banner: {
+    variant: ({ section }) => (section === 'about' ? 'section' : ''),
+    image: ({ section }) => (section === 'about' ? bannerInside : ''),
+    title: ({ section, t }) => (section === 'about' && hasText(t, 'sharinghistory.about.bannerTitle') ? t('sharinghistory.about.bannerTitle') : ''),
   },
 
   // The route map: every route named, kebab-case sections, and the page and
@@ -116,6 +144,15 @@ export default {
       name: 'home',
       component: () => import('@museumwnf/viewer-layout/views').then((views) => views.HomeView),
       meta: meta('home', 'items'),
+    },
+    {
+      // Legacy's about.php. The Team and Chronology pages beside it wait on
+      // the decision whether their content is inventory data
+      // (inventory-app#2233 T5).
+      path: '/about',
+      name: 'about',
+      component: () => import('./views/AboutProject.vue'),
+      meta: meta('about', 'items'),
     },
     {
       path: '/permanent-collection',

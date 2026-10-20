@@ -1,19 +1,45 @@
 <script setup>
 // A thin mount of @museumwnf/viewer-layout's own SiteShell: the menu, the
-// active entry and the footer text all come from `dataset.config.js`'s
+// active entry and the footer links all come from `dataset.config.js`'s
 // `navigation` (SiteShell reads it through viewer-core's `useSiteConfig()`)
 // plus the footer text passed here; `$attrs` carries the language state
 // PageShell needs (`language`, `languages`, `update:language`) straight
 // through, the same as before. All this file still supplies is what a
-// config cannot — the header lockup markup — in the #brand slot.
-import { useI18n } from '@museumwnf/viewer-core'
+// config cannot: the header lockup markup in the #brand slot, legacy's
+// cooperation band in the #sponsors slot, and leaving out of the menu and
+// the footer links the entries whose text legacy hasn't given yet.
+import { computed } from 'vue'
+import { useI18n, useSiteConfig } from '@museumwnf/viewer-core'
 import { SiteShell } from '@museumwnf/viewer-layout/components'
+import CooperationBand from './components/CooperationBand.vue'
+import { hasText, withTexts } from './composables/texts.js'
 
 const { t } = useI18n()
+const siteConfig = useSiteConfig()
+
+const config = computed(() => ({
+  navigation: {
+    ...siteConfig.navigation,
+    links: withTexts(t, siteConfig.navigation?.links),
+    footerLinks: withTexts(t, siteConfig.navigation?.footerLinks),
+  },
+}))
+
+// Legacy prints its copyright entry followed by the current year
+// (`includes/footer.php`). Until that entry arrives, the shared one stands.
+const footerText = computed(() => (hasText(t, 'sharinghistory.footer.copyright')
+  ? `${t('sharinghistory.footer.copyright')}${new Date().getFullYear()}`
+  : t('standalone.identity.copyright')))
+
+// An empty slot would still draw the band's strip.
+const hasBand = computed(() => [
+  'sharinghistory.band.cooperation', 'sharinghistory.band.strategicSponsors',
+  'sharinghistory.band.support', 'sharinghistory.band.partnerMeetingsVideo',
+].some((key) => hasText(t, key)))
 </script>
 
 <template>
-  <SiteShell v-bind="$attrs" :footer-text="t('standalone.identity.copyright')">
+  <SiteShell v-bind="$attrs" :config="config" :footer-text="footerText">
     <template #brand>
       <a class="site-logo" href="#/">
         <span class="site-logo-org">{{ t('standalone.identity.organisation') }}</span>
@@ -22,6 +48,9 @@ const { t } = useI18n()
       </a>
     </template>
     <slot />
+    <template v-if="hasBand" #sponsors>
+      <CooperationBand />
+    </template>
   </SiteShell>
 </template>
 

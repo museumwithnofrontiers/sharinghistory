@@ -751,7 +751,7 @@ describe('website smoke test', () => {
   it('declares every route by name, and leaves the catch-all to the router', () => {
     expect(checkRoutes(config, {
       names: [
-        'home', 'permanent-collection', 'permanent-collection-results', 'database',
+        'home', 'about', 'permanent-collection', 'permanent-collection-results', 'database',
         'database-results', 'timeline', 'timeline-results', 'timeline-gallery', 'partners', 'partners-results',
         'partner', 'exhibitions', 'exhibition', 'exhibition-introduction',
         'exhibition-further-reading', 'exhibition-theme', 'exhibition-chapter',
