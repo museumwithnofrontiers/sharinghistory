@@ -78,17 +78,15 @@ describe('website smoke test', () => {
     app.unmount()
   }, 20000)
 
-  // The footer's line. The rights-holder attribution and its terms link
-  // (sharinghistory#52) are no longer asserted: legacy has no such line, and
-  // viewer-layout 3.4.0 draws it only on request (`config.footer.rightsHolder`),
-  // with the terms link inside it (Pascal, 2026-10-20). 3.3 still draws both
-  // from the package's `manifest.rights`, so their absence isn't asserted
-  // either until this site moves to 3.4.
-  it('renders the footer line', async () => {
+  // The footer is legacy's (SiteFooter.vue): its six links, then its
+  // copyright entry, a space and the current year — legacy's
+  // "© Museum With No Frontiers (MWNF) 2004 – <year>". The rights-holder
+  // line is not asserted either way (Pascal, 2026-10-20; #128).
+  it('renders legacy\'s footer line', async () => {
     const { app, host } = await mountSite(config, messages)
-    const footer = host.querySelector('.mwnf-footer')
-    expect(footer).not.toBeNull()
-    expect(footer.textContent).toContain(sharedTexts.en['standalone.identity.copyright'])
+    await vi.waitFor(() => expect(host.querySelector('.sh-footer__copyright')).not.toBeNull(), { timeout: 15000 })
+    expect(host.querySelector('.sh-footer__copyright').textContent)
+      .toBe(`${ownTexts['sharinghistory.footer.copyright']} ${new Date().getFullYear()}`)
     app.unmount()
   }, 20000)
 
@@ -744,7 +742,7 @@ describe('website smoke test', () => {
   it('declares every route by name, and leaves the catch-all to the router', () => {
     expect(checkRoutes(config, {
       names: [
-        'home', 'permanent-collection', 'permanent-collection-results', 'database',
+        'home', 'about', 'about-team', 'sponsors', 'sponsors-local', 'permanent-collection', 'permanent-collection-results', 'database',
         'database-results', 'timeline', 'timeline-results', 'timeline-gallery', 'partners', 'partners-results',
         'partner', 'exhibitions', 'exhibition', 'exhibition-introduction',
         'exhibition-further-reading', 'exhibition-theme', 'exhibition-chapter',

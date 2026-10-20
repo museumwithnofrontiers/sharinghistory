@@ -63,8 +63,9 @@
   --mwnf-hyperlinks-link-color: #990000;
 
   /* ---------- Sponsors ---------- */
-  --mwnf-sponsors-padding: 1rem;
-  --mwnf-sponsors-background: transparent;
+  /* Legacy's cooperation band (`section.cooperation`), above the footer. */
+  --mwnf-sponsors-padding: 10px 1rem;
+  --mwnf-sponsors-background: #750101;
   --mwnf-sponsors-gap: 1.5rem;
   --mwnf-sponsors-logo-height: 2.5rem;
 

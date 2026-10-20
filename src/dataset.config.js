@@ -2,6 +2,7 @@ import { languageLabels, offeredLanguages, sectionMeta, useDataPackage } from '@
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
 import { inScope } from './composables/catalogue.js'
+import bannerInside from '../theme/assets/banners/banner_inside.jpg'
 
 // The whole declaration of this website. Before it mounts, the website reads
 // nothing from its package but the manifest: the languages it offers, their
@@ -87,10 +88,16 @@ export default {
   // rather than the path; `label` is an entry name, resolved by the shell
   // itself (only there is the installed catalogue available). The language
   // names come from the data package, not from a translator.
+  //
+  // Legacy's menu opens on "About", a drop-down whose one page is "The
+  // Project" (the drop-down also repeats Historical Background, which has its
+  // own entry here). The shared menu has no drop-downs, so "About" leads to
+  // that page directly.
   navigation: {
     languages: languageLabels(languages),
     links: [
       { section: 'home', label: 'core.nav.home', to: { name: 'home' } },
+      { section: 'about', label: 'core.nav.about', to: { name: 'about' } },
       { section: 'exhibitions', label: 'standalone.nav.exhibitions', to: { name: 'exhibitions' } },
       { section: 'permanent-collection', label: 'standalone.nav.permanentCollection', to: { name: 'permanent-collection' } },
       { section: 'database', label: 'standalone.nav.database', to: { name: 'database' } },
@@ -99,6 +106,21 @@ export default {
       { section: 'historical-profiles', label: 'sharinghistory.nav.historicalProfiles', to: { name: 'historical-profiles' } },
       { section: 'partners', label: 'core.nav.partners', to: { name: 'partners' } },
     ],
+    // The footer is legacy's own (SiteFooter.vue, in SiteShell's footer slot).
+  },
+
+  // Legacy's inner-page banner (`images/banner_inside.jpg` under the page's
+  // title), on the About and Sponsors pages so far; the other pages keep
+  // theirs until the standalone layout (inventory-app#2233 S1) gives every
+  // page its banner.
+  banner: {
+    variant: ({ section }) => (['about', 'sponsors'].includes(section) ? 'section' : ''),
+    image: ({ section }) => (['about', 'sponsors'].includes(section) ? bannerInside : ''),
+    title: ({ section, t }) => {
+      if (section === 'about') return t('sharinghistory.about.bannerTitle')
+      if (section === 'sponsors') return t('sharinghistory.sponsors.bannerTitle')
+      return ''
+    },
   },
 
   // The route map: every route named, kebab-case sections, and the page and
@@ -116,6 +138,38 @@ export default {
       name: 'home',
       component: () => import('@museumwnf/viewer-layout/views').then((views) => views.HomeView),
       meta: meta('home', 'items'),
+    },
+    {
+      // Legacy's about.php and about_team.php. The Chronology beside them
+      // (about_chronology_list.php) is inventory data, a timeline the
+      // inventory imports (Pascal, 2026-10-20): its page follows once the
+      // data package carries it.
+      path: '/about',
+      name: 'about',
+      component: () => import('./views/AboutProject.vue'),
+      meta: meta('about', 'items'),
+    },
+    {
+      path: '/about/team',
+      name: 'about-team',
+      component: () => import('./views/AboutTeam.vue'),
+      meta: meta('about'),
+    },
+    {
+      // Legacy's sponsor_detail.php and sponsor_detail_local.php, reached
+      // from the cooperation band's "Other sponsors".
+      path: '/sponsors',
+      name: 'sponsors',
+      component: () => import('./views/SponsorsPage.vue'),
+      props: { kind: 'international' },
+      meta: meta('sponsors', 'partners'),
+    },
+    {
+      path: '/sponsors/local',
+      name: 'sponsors-local',
+      component: () => import('./views/SponsorsPage.vue'),
+      props: { kind: 'local' },
+      meta: meta('sponsors', 'partners', 'countries'),
     },
     {
       path: '/permanent-collection',
