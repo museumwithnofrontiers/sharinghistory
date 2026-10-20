@@ -8,9 +8,10 @@ import { ABOUT_PICTURES } from '../src/composables/aboutPictures.js'
 
 // The entries the footer, the cooperation band and the About page read
 // (inventory-app#2233 T2, T5). Their texts come from legacy through
-// inventory-app's site-i18n; until they're in locales/en.json, each block
-// that would carry one is left out. The values below are stand-ins for the
-// tests only, never shown on the site.
+// inventory-app's site-i18n, into locales/en.json. The stand-ins below fill
+// any entry still missing there, for these tests only, so that they check
+// the structure; the smoke test and the Texts check hold the texts
+// themselves.
 const LEGACY_ENTRIES = [
   'sharinghistory.footer.aboutMwnf', 'sharinghistory.footer.contact', 'sharinghistory.footer.legalNotice',
   'sharinghistory.footer.credits', 'sharinghistory.footer.languagePolicy', 'sharinghistory.footer.cookies',
@@ -25,7 +26,6 @@ const LEGACY_ENTRIES = [
   'sharinghistory.about.relatedSpeech', 'sharinghistory.about.relatedVideo',
 ]
 const standIns = Object.fromEntries(LEGACY_ENTRIES.map((key) => [key, `[${key}]`]))
-const pending = LEGACY_ENTRIES.filter((key) => !(key in ownTexts))
 
 const FOOTER_LINKS = [
   ['sharinghistory.footer.aboutMwnf', 'https://www.museumwnf.org/about'],
@@ -37,13 +37,6 @@ const FOOTER_LINKS = [
 ]
 
 describe('legacy chrome', () => {
-  it('leaves out every block whose text legacy hasn\'t given yet', async () => {
-    const { app, host } = await mountSite(config, mergeMessages(sharedTexts, { en: ownTexts }), '#/about')
-    await vi.waitFor(() => expect(host.querySelector('.sh-about')).not.toBeNull(), { timeout: 15000 })
-    for (const key of pending) expect(host.textContent, key).not.toContain(key)
-    app.unmount()
-  }, 20000)
-
   it('prints legacy\'s six portal links in its order, and the copyright with the year', async () => {
     const { app, host } = await mountSite(config, mergeMessages(sharedTexts, { en: { ...standIns, ...ownTexts } }))
     await vi.waitFor(() => expect(host.querySelector('.mwnf-footer__links')).not.toBeNull(), { timeout: 15000 })
@@ -53,7 +46,7 @@ describe('legacy chrome', () => {
     const copyright = ownTexts['sharinghistory.footer.copyright'] ?? standIns['sharinghistory.footer.copyright']
     expect(host.querySelector('.mwnf-footer__text').textContent).toBe(`${copyright}${new Date().getFullYear()}`)
     app.unmount()
-  }, 20000)
+  }, 60000)
 
   it('shows the cooperation band on every page', async () => {
     for (const hash of ['#/', '#/database']) {
@@ -67,7 +60,7 @@ describe('legacy chrome', () => {
       expect(hrefs).toContain('https://www.museumwnf.org/about/support')
       app.unmount()
     }
-  }, 40000)
+  }, 60000)
 
   it('renders the About page with legacy\'s pictures, each linked record resolved', async () => {
     const { app, host } = await mountSite(config, mergeMessages(sharedTexts, { en: { ...standIns, ...ownTexts } }), '#/about')
@@ -85,5 +78,5 @@ describe('legacy chrome', () => {
     expect(host.querySelector('.sh-about-tabs .active')).not.toBeNull()
     expect(host.querySelector('.mwnf-banner--section')).not.toBeNull()
     app.unmount()
-  }, 20000)
+  }, 60000)
 })

@@ -2,7 +2,6 @@ import { languageLabels, offeredLanguages, sectionMeta, useDataPackage } from '@
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
 import { inScope } from './composables/catalogue.js'
-import { hasText } from './composables/texts.js'
 import bannerInside from '../theme/assets/banners/banner_inside.jpg'
 
 // The whole declaration of this website. Before it mounts, the website reads
@@ -93,8 +92,7 @@ export default {
   // Legacy's menu opens on "About", a drop-down whose one page is "The
   // Project" (the drop-down also repeats Historical Background, which has its
   // own entry here). The shared menu has no drop-downs, so "About" leads to
-  // that page directly. A menu or footer entry whose text legacy hasn't given
-  // yet is left out (SiteShell.vue).
+  // that page directly.
   navigation: {
     languages: languageLabels(languages),
     links: [
@@ -126,7 +124,7 @@ export default {
   banner: {
     variant: ({ section }) => (section === 'about' ? 'section' : ''),
     image: ({ section }) => (section === 'about' ? bannerInside : ''),
-    title: ({ section, t }) => (section === 'about' && hasText(t, 'sharinghistory.about.bannerTitle') ? t('sharinghistory.about.bannerTitle') : ''),
+    title: ({ section, t }) => (section === 'about' ? t('sharinghistory.about.bannerTitle') : ''),
   },
 
   // The route map: every route named, kebab-case sections, and the page and

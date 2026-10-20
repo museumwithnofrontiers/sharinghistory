@@ -3,42 +3,35 @@
 // them (`about.php`, `about_team.php`, `about_chronology_list.php`): the
 // three pages on the left, "See also Historical Background" on the right.
 // The Team and Chronology pages wait on the decision whether their content
-// is inventory data (inventory-app#2233 T5); a tab appears with its route,
-// and with its text.
+// is inventory data (inventory-app#2233 T5); a tab appears with its route.
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
-import { hasText } from '../composables/texts.js'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 
-// Legacy's own order.
-const TABS = [
-  { route: 'about-team', label: 'sharinghistory.about.tabTeam' },
-  { route: 'about-chronology', label: 'sharinghistory.about.tabChronology' },
-  { route: 'about', label: 'sharinghistory.about.tabAbout' },
+// In the order legacy shows them: its markup lists Team, Chronology, About,
+// and floats each to the right, so they read About, Chronology, Team.
+const tabs = computed(() => [
+  { route: 'about', text: t('sharinghistory.about.tabAbout') },
+  { route: 'about-chronology', text: t('sharinghistory.about.tabChronology') },
+  { route: 'about-team', text: t('sharinghistory.about.tabTeam') },
 ]
-
-const tabs = computed(() => TABS
-  .filter((tab) => router.hasRoute(tab.route) && hasText(t, tab.label))
-  .map((tab) => ({ ...tab, text: t(tab.label), active: route.name === tab.route })))
-
-const seeAlso = computed(() => (hasText(t, 'sharinghistory.about.seeAlsoHistoricalBackground')
-  ? t('sharinghistory.about.seeAlsoHistoricalBackground')
-  : ''))
+  .filter((tab) => router.hasRoute(tab.route))
+  .map((tab) => ({ ...tab, active: route.name === tab.route })))
 </script>
 
 <template>
-  <nav v-if="tabs.length || seeAlso" class="sh-about-tabs">
+  <nav class="sh-about-tabs">
     <ul class="sh-about-tabs__pages">
       <li v-for="tab in tabs" :key="tab.route" :class="{ active: tab.active }">
         <RouterLink :to="{ name: tab.route }" :aria-current="tab.active ? 'page' : undefined">{{ tab.text }}</RouterLink>
       </li>
     </ul>
-    <RouterLink v-if="seeAlso" class="sh-about-tabs__see-also" :to="{ name: 'historical-background' }">
-      <span class="sh-about-tabs__icon" aria-hidden="true"></span>{{ seeAlso }}
+    <RouterLink class="sh-about-tabs__see-also" :to="{ name: 'historical-background' }">
+      <span class="sh-about-tabs__icon" aria-hidden="true"></span>{{ t('sharinghistory.about.seeAlsoHistoricalBackground') }}
     </RouterLink>
   </nav>
 </template>

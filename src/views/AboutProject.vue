@@ -2,22 +2,18 @@
 // Legacy's About page (`about.php`): the strip of About pages, the pictures
 // on the left, and on the right the project's heading, its name, its About
 // text and the related content. Every text is legacy's, through
-// inventory-app's site-i18n, and a block whose text isn't there yet is left
-// out (composables/texts.js). Legacy's "Download as Word" is not carried
+// inventory-app's site-i18n. Legacy's "Download as Word" is not carried
 // over: it was a document the PHP site generated on request.
 import { computed } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import AboutTabs from '../components/AboutTabs.vue'
 import { ABOUT_PICTURES } from '../composables/aboutPictures.js'
 import { useData } from '../composables/data.js'
-import { hasText } from '../composables/texts.js'
 import arrow from '../../theme/assets/icons/flip_black.png'
 import speech from '../../theme/assets/documents/Extract_Ulrike_Al-Khamis_SMD.pdf?url'
 
 const { t } = useI18n()
 const { items, labelOf, md, mdInline, mdStrip } = useData()
-const has = (key) => hasText(t, key)
-const text = (key) => (has(key) ? t(key) : '')
 
 const files = import.meta.glob('../../theme/assets/about/*.jpg', { eager: true, import: 'default' })
 const fileUrl = (name) => files[`../../theme/assets/about/${name}`]
@@ -30,10 +26,6 @@ const pictures = computed(() => {
     return { file: picture.file, src: fileUrl(picture.file), item, name }
   })
 })
-
-const relatedSpeech = computed(() => text('sharinghistory.about.relatedSpeech'))
-const relatedVideo = computed(() => text('sharinghistory.about.relatedVideo'))
-const hasRelated = computed(() => has('sharinghistory.about.relatedContent') && Boolean(relatedSpeech.value || relatedVideo.value))
 </script>
 
 <template>
@@ -52,16 +44,14 @@ const hasRelated = computed(() => has('sharinghistory.about.relatedContent') && 
         </template>
       </div>
       <div class="sh-about__text">
-        <div v-if="has('sharinghistory.about.heading') || has('sharinghistory.about.projectName')" class="sh-about__heading">
-          <h1 v-if="has('sharinghistory.about.heading')" class="sh-about__title">{{ t('sharinghistory.about.heading') }}</h1>
-          <p v-if="has('sharinghistory.about.projectName')" class="sh-about__name">{{ t('sharinghistory.about.projectName') }}</p>
+        <div class="sh-about__heading">
+          <h1 class="sh-about__title">{{ t('sharinghistory.about.heading') }}</h1>
+          <p class="sh-about__name">{{ t('sharinghistory.about.projectName') }}</p>
         </div>
-        <div v-if="has('sharinghistory.about.body')" class="mwnf-prose" v-html="md(t('sharinghistory.about.body'))" />
-        <template v-if="hasRelated">
-          <p><b>{{ t('sharinghistory.about.relatedContent') }}</b></p>
-          <p v-if="relatedSpeech"><img :src="arrow" alt="" /><a :href="speech" target="_blank" rel="noopener">{{ relatedSpeech }}</a></p>
-          <p v-if="relatedVideo"><img :src="arrow" alt="" /><span v-html="mdInline(relatedVideo)" /></p>
-        </template>
+        <div class="mwnf-prose" v-html="md(t('sharinghistory.about.body'))" />
+        <p><b>{{ t('sharinghistory.about.relatedContent') }}</b></p>
+        <p><img :src="arrow" alt="" /><a :href="speech" target="_blank" rel="noopener">{{ t('sharinghistory.about.relatedSpeech') }}</a></p>
+        <p><img :src="arrow" alt="" /><span v-html="mdInline(t('sharinghistory.about.relatedVideo'))" /></p>
       </div>
     </div>
   </div>
@@ -85,16 +75,22 @@ const hasRelated = computed(() => has('sharinghistory.about.relatedContent') && 
     padding-right: calc(100% / 6);
   }
 }
+/* Legacy's `.about_left_bg`: two columns of 108 × 83 pictures, each
+   stretched to its cell, on the band's oxblood. */
 .sh-about__pictures {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 108px);
+  grid-auto-rows: 83px;
   gap: 10px;
   align-content: start;
+  justify-self: start;
+  padding: 10px;
+  background: #750101;
 }
 .sh-about__picture img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 /* Legacy's `h3.big_text` and `p.big_p` (css/style_inside.css). */
 .sh-about__title {
