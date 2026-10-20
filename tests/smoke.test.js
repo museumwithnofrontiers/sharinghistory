@@ -78,21 +78,15 @@ describe('website smoke test', () => {
     app.unmount()
   }, 20000)
 
-  // The footer's attribution and terms link (sharinghistory#52): SiteShell
-  // reads them off the package's own `manifest.rights` through viewer-core's
-  // `useSiteRights()` — nothing this site declares itself.
-  // The footer is legacy's (SiteFooter.vue): its links and copyright only.
-  // Legacy has no rights-holder line, so the one the shell would draw from
-  // the package's rights block is not there (Pascal, 2026-10-20).
-  it('renders legacy\'s footer, without a rights-holder line', async () => {
+  // The footer is legacy's (SiteFooter.vue): its six links, then its
+  // copyright entry, a space and the current year — legacy's
+  // "© Museum With No Frontiers (MWNF) 2004 – <year>". The rights-holder
+  // line is not asserted either way (Pascal, 2026-10-20; #128).
+  it('renders legacy\'s footer line', async () => {
     const { app, host } = await mountSite(config, messages)
-    const { manifest } = useDataPackage()
-    expect(manifest.rights?.attribution, 'fixture: the package declares an attribution').toBeTruthy()
-
-    await vi.waitFor(() => expect(host.querySelector('.sh-footer')).not.toBeNull(), { timeout: 15000 })
-    expect(host.querySelector('.mwnf-footer__attribution')).toBeNull()
-    expect(host.querySelector('.mwnf-footer').textContent).not.toContain(manifest.rights.attribution)
-
+    await vi.waitFor(() => expect(host.querySelector('.sh-footer__copyright')).not.toBeNull(), { timeout: 15000 })
+    expect(host.querySelector('.sh-footer__copyright').textContent)
+      .toBe(`${ownTexts['sharinghistory.footer.copyright']} ${new Date().getFullYear()}`)
     app.unmount()
   }, 20000)
 
