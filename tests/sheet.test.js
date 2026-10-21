@@ -45,3 +45,26 @@ describe('item sheet spec', () => {
     }
   })
 })
+
+describe('the institution lines', () => {
+  const object = { id: 'o1', type: 'object' }
+  const monument = { id: 'm1', type: 'monument' }
+
+  it("prints an object's holding institution in English and in its own language, as legacy did", () => {
+    const text = { holder: 'National Museum of Anthropology', holding_institution_org: 'Museo Nacional de Antropología' }
+    expect(row(fieldsOf(object), 'holder').value({ record: object, text })).toBe('National Museum of Anthropology')
+    expect(row(fieldsOf(object), 'holdingInstitutionOriginal').value).toBe('holding_institution_org')
+  })
+
+  it('prints only the own-language line when legacy has no English name', () => {
+    const text = { holder: 'Ministério das Finanças', holding_institution_org: 'Ministério das Finanças' }
+    expect(row(fieldsOf(object), 'holder').value({ record: object, text })).toBe('')
+  })
+
+  it("prints a monument's institution and its responsible institution in its own language", () => {
+    const keys = fieldsOf(monument).map((f) => f.key)
+    expect(keys.slice(0, 4)).toEqual(['alsoKnownAs', 'location', 'holder', 'responsibleInstitutionOriginal'])
+    const text = { holder: 'Institut national du Patrimoine', responsible_institution_org: 'Institut national du Patrimoine' }
+    expect(row(fieldsOf(monument), 'holder').value({ record: monument, text })).toBe('')
+  })
+})

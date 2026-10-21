@@ -1,8 +1,15 @@
-import { languageLabels, offeredLanguages, sectionMeta, useDataPackage } from '@museumwnf/viewer-core'
+import { languageLabels, mwnfLinks, offeredLanguages, sectionMeta, useDataPackage } from '@museumwnf/viewer-core'
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
-import { inScope } from './composables/catalogue.js'
-import bannerInside from '../theme/assets/banners/banner_inside.jpg'
+import { exhibitionTiles, historicalProfileLinks } from './composables/menu.js'
+
+// The chrome is legacy's own pictures, kept in this repository under
+// theme/assets/ (decision D7; theme/assets/SOURCES.json names where each one
+// was taken from), handed to the layout as one map that Vite builds and
+// fingerprints. The config below names a file by its path under theme/assets/.
+const chrome = import.meta.glob('../theme/assets/**/*.{jpg,jpeg,png,gif,svg}', {
+  eager: true, query: '?url', import: 'default',
+})
 
 // The whole declaration of this website. Before it mounts, the website reads
 // nothing from its package but the manifest: the languages it offers, their
@@ -19,10 +26,10 @@ const languages = offeredLanguages({ declared: OFFERED_LANGUAGES })
 
 // Every route says which section it belongs to, and the shell reads that
 // (viewer-core's `useSection`) for the active menu entry rather than
-// deriving it from the path. No entity is common to every route here (the
-// entrance pages before a results page load none at all), so there is no
-// `chrome` to declare.
-const meta = sectionMeta()
+// deriving it from the path. Every page loads the collections and the
+// countries: the menu's Historical Profiles drop-down names each country
+// with a profile, on every page, as legacy's did.
+const meta = sectionMeta(['collections', 'countries'])
 
 export default {
   // The dataset package this website renders. Must match the alias in
@@ -48,79 +55,84 @@ export default {
 
   languages,
 
+  // viewer-layout's standalone family shell, around this website's own
+  // cooperation band and footer (src/SiteShell.vue): legacy Sharing
+  // History's chrome (shTemplates/, includes/header_bottom.php), read from
+  // `standalone` below. Every text is an entry of locales/, extracted from
+  // legacy by inventory-app's `scripts/site-i18n` (`extract:standalone`).
   shell: SiteShell,
 
-  // The landing page, viewer-layout's `HomeView`: the welcome, the seven
-  // sections as cards, and one item with an image on display, picked once
-  // per visit — every text an entry name, written out, that the view
-  // resolves. `filter: inScope` keeps the pick to the records legacy shows
-  // at all: without it, the pick can land on a record kept only to
-  // illustrate Historical Background, and the featured item silently
-  // disappears rather than falling back to another one.
-  home: {
-    title: 'sharinghistory.home.title',
-    intro: 'sharinghistory.home.intro',
-    cards: [
-      { title: 'standalone.nav.permanentCollection', description: 'standalone.home.permanentCollectionText', action: 'core.action.browse', to: { name: 'permanent-collection' } },
-      { title: 'standalone.nav.database', description: 'standalone.home.databaseText', action: 'core.action.search', to: { name: 'database' } },
-      { title: 'core.nav.timeline', description: 'standalone.home.timelineText', action: 'core.action.explore', to: { name: 'timeline' } },
-      { title: 'core.nav.partners', description: 'standalone.home.partnersText', action: 'core.action.browse', to: { name: 'partners' } },
-      { title: 'standalone.nav.exhibitions', description: 'sharinghistory.home.exhibitionsText', action: 'core.action.explore', to: { name: 'exhibitions' } },
-      { title: 'sharinghistory.nav.historicalBackground', description: 'sharinghistory.home.historicalBackgroundText', action: 'core.action.read', to: { name: 'historical-background' } },
-      { title: 'sharinghistory.nav.historicalProfiles', description: 'sharinghistory.home.historicalProfilesText', action: 'core.action.browse', to: { name: 'historical-profiles' } },
-    ],
-    featured: {
-      entity: 'items',
-      heading: 'standalone.home.itemOnDisplay',
-      action: 'core.action.viewDetails',
-      route: 'item',
-      eyebrow: (record) => record.type,
-      meta: ['location', 'dates'],
-      filter: inScope,
+  chrome,
+
+  standalone: {
+    // The logo links to the MWNF portal, as legacy's did.
+    logo: {
+      src: 'logos/logo_sh_en.png',
+      alt: 'sharinghistory.identity.pageTitle',
+      href: mwnfLinks.portal,
+      print: 'logos/logo_print.gif',
     },
-    panels: true,
+    heading: 'sharinghistory.identity.heading',
+    subheading: 'sharinghistory.identity.subheading',
+    headerLinks: [
+      { label: 'sharinghistory.nav.portal', href: mwnfLinks.portal },
+      { label: 'sharinghistory.nav.home', to: { name: 'home' }, on: 'inner' },
+    ],
+    // The home page's picture with its two lines over it (bannerText.php);
+    // every other page's band.
+    banner: {
+      home: 'banners/banner.jpg',
+      inner: 'banners/banner_inside.jpg',
+      homeTitle: 'sharinghistory.identity.heading',
+      homeText: 'sharinghistory.identity.subheading',
+    },
+    // libs/config.inc.php offers English only: no switcher.
+    languages: false,
+    // The home page: the exhibitions, each over its own picture, under
+    // legacy's caption (shTemplates/exhibitionListImg.php).
+    home: {
+      tiles: { caption: 'sharinghistory.home.exhibitionsCaption', items: exhibitionTiles },
+    },
   },
 
-  // The menu SiteShell (@museumwnf/viewer-layout/components) reads directly:
-  // legacy's own top-level sections, in its own order — this site leads with
-  // the exhibitions and adds the two historical sections. Each `section`
-  // matches the route meta below, so the active entry follows `useSection()`
-  // rather than the path; `label` is an entry name, resolved by the shell
-  // itself (only there is the installed catalogue available). The language
-  // names come from the data package, not from a translator.
-  //
-  // Legacy's menu opens on "About", a drop-down whose one page is "The
-  // Project" (the drop-down also repeats Historical Background, which has its
-  // own entry here). The shared menu has no drop-downs, so "About" leads to
-  // that page directly.
+  // The menu, in legacy's order (shTemplates/menuSH.php), with its two
+  // drop-downs: About (The Project, Historical Background) and Historical
+  // Profiles (each country with a profile). My Collection leaves for the
+  // portal, as legacy's did. It sits under the home page's picture, and
+  // above every other page's band.
   navigation: {
     languages: languageLabels(languages),
     links: [
-      { section: 'home', label: 'core.nav.home', to: { name: 'home' } },
-      { section: 'about', label: 'core.nav.about', to: { name: 'about' } },
-      { section: 'exhibitions', label: 'standalone.nav.exhibitions', to: { name: 'exhibitions' } },
-      { section: 'permanent-collection', label: 'standalone.nav.permanentCollection', to: { name: 'permanent-collection' } },
-      { section: 'database', label: 'standalone.nav.database', to: { name: 'database' } },
-      { section: 'timeline', label: 'core.nav.timeline', to: { name: 'timeline' } },
-      { section: 'historical-background', label: 'sharinghistory.nav.historicalBackground', to: { name: 'historical-background' } },
-      { section: 'historical-profiles', label: 'sharinghistory.nav.historicalProfiles', to: { name: 'historical-profiles' } },
-      { section: 'partners', label: 'core.nav.partners', to: { name: 'partners' } },
+      {
+        section: 'about',
+        label: 'sharinghistory.nav.introduction',
+        to: { name: 'about' },
+        children: [
+          { label: 'sharinghistory.nav.aboutProject', to: { name: 'about' } },
+          { label: 'sharinghistory.nav.historicalBackground', to: { name: 'historical-background' } },
+        ],
+      },
+      { section: 'exhibitions', label: 'sharinghistory.nav.exhibitions', to: { name: 'exhibitions' } },
+      { section: 'permanent-collection', label: 'sharinghistory.nav.permanentCollection', to: { name: 'permanent-collection' } },
+      { section: 'database', label: 'sharinghistory.nav.database', to: { name: 'database' } },
+      { section: 'timeline', label: 'sharinghistory.nav.timeline', to: { name: 'timeline' } },
+      { section: 'historical-profiles', label: 'sharinghistory.nav.historicalProfiles', to: { name: 'historical-profiles' }, children: historicalProfileLinks },
+      { section: 'partners', label: 'sharinghistory.nav.partners', to: { name: 'partners' } },
+      { label: 'sharinghistory.nav.myCollection', href: mwnfLinks.myCollection, external: true },
     ],
-    // The footer is legacy's own (SiteFooter.vue, in SiteShell's footer slot).
-  },
-
-  // Legacy's inner-page banner (`images/banner_inside.jpg` under the page's
-  // title), on the About and Sponsors pages so far; the other pages keep
-  // theirs until the standalone layout (inventory-app#2233 S1) gives every
-  // page its banner.
-  banner: {
-    variant: ({ section }) => (['about', 'sponsors'].includes(section) ? 'section' : ''),
-    image: ({ section }) => (['about', 'sponsors'].includes(section) ? bannerInside : ''),
-    title: ({ section, t }) => {
-      if (section === 'about') return t('sharinghistory.about.bannerTitle')
-      if (section === 'sponsors') return t('sharinghistory.sponsors.bannerTitle')
-      return ''
+    placement: ({ section }) => (section === 'home' ? 'after-banner' : 'before-banner'),
+    // The title on each section's band (each page's <h2><span>).
+    sectionTitles: {
+      about: 'sharinghistory.about.bannerTitle',
+      sponsors: 'sharinghistory.sponsors.bannerTitle',
+      'permanent-collection': 'sharinghistory.section.permanentCollection',
+      database: 'sharinghistory.section.database',
+      timeline: 'sharinghistory.nav.timeline',
+      partners: 'sharinghistory.section.partners',
+      'historical-background': 'sharinghistory.nav.historicalBackground',
+      'historical-profiles': 'sharinghistory.section.historicalBackground',
     },
+    // The footer is legacy's own (SiteFooter.vue, in the shell's footer slot).
   },
 
   // The route map: every route named, kebab-case sections, and the page and
@@ -136,8 +148,8 @@ export default {
     {
       path: '/',
       name: 'home',
-      component: () => import('@museumwnf/viewer-layout/views').then((views) => views.HomeView),
-      meta: meta('home', 'items'),
+      component: () => import('@museumwnf/viewer-layout/standalone').then((family) => family.StandaloneHome),
+      meta: meta('home'),
     },
     {
       // Legacy's about.php and about_team.php. The Chronology beside them

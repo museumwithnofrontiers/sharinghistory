@@ -51,29 +51,25 @@ describe('website smoke test', () => {
     // the manifest; the page carries the lockup.
     const { manifest } = useDataPackage()
     expect(config.siteName).toBe(manifest.site.names.en)
-    expect(host.textContent).toContain(ownTexts['sharinghistory.identity.title'])
     expect(host.querySelector('.mwnf-page')).not.toBeNull()
 
-    // The home route renders viewer-layout's HomeView from `config.home`, in
-    // place of viewer-core's generic home view: the welcome and the seven
-    // sections, the welcome in the site's panel.
+    // The home route renders legacy's home page (inventory-app#2233): the
+    // picture with its two lines, the menu under it, the exhibitions over
+    // their own pictures — no card grid, no welcome text legacy never had.
     expect(host.querySelector('.vc-home')).toBeNull()
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-home__welcome')).not.toBeNull(), { timeout: 15000 })
-    expect(host.querySelector('.mwnf-home__welcome').classList.contains('mwnf-panel')).toBe(true)
-    expect(host.querySelectorAll('.mwnf-cards__title')).toHaveLength(7)
-
-    // The featured record (`home.featured.filter: inScope`, dataset.config.js)
-    // is picked only from the records legacy shows at all — without that
-    // filter, a pick landing on a Historical-Background illustration makes
-    // the block vanish instead of falling back to another record.
-    const featuredLink = host.querySelector('.mwnf-featured__link')
-    if (featuredLink) {
-      const [items] = await loadEntities(['items'])
-      const featuredId = decodeURIComponent(featuredLink.getAttribute('href').split('/').pop())
-      const featuredItem = items.find((item) => item.id === featuredId)
-      expect(featuredItem).toBeTruthy()
-      expect(inScope(featuredItem)).toBe(true)
-    }
+    await vi.waitFor(() => expect(host.querySelectorAll('.mwnf-standalone-tiles__tile').length).toBe(10), { timeout: 15000 })
+    expect(host.querySelector('.mwnf-cards')).toBeNull()
+    expect(host.querySelector('.mwnf-standalone-home-banner__title').textContent).toBe(ownTexts['sharinghistory.identity.heading'])
+    expect(host.querySelector('.mwnf-standalone-home-banner__line').textContent).toBe(ownTexts['sharinghistory.identity.subheading'])
+    expect(host.querySelector('.mwnf-standalone-tiles__caption').textContent).toBe(ownTexts['sharinghistory.home.exhibitionsCaption'])
+    expect(host.querySelector('.mwnf-standalone-tiles__image').getAttribute('src')).toMatch(/homeImg\d+/)
+    // Legacy's menu, in its order, with its two drop-downs.
+    expect([...host.querySelectorAll('.mwnf-nav__link')].map((l) => l.textContent.trim())).toEqual([
+      'About', 'Exhibitions', 'Collections', 'Database', 'Timeline', 'Historical Profiles', 'Partners', 'My Collection',
+    ])
+    const dropDowns = host.querySelectorAll('.mwnf-nav__item--parent')
+    expect([...dropDowns[0].querySelectorAll('.mwnf-nav__sublink')].map((a) => a.textContent.trim())).toEqual(['The Project', 'Historical Background'])
+    expect(dropDowns[1].querySelectorAll('.mwnf-nav__sublink').length).toBeGreaterThan(5)
 
     app.unmount()
   }, 20000)
@@ -825,13 +821,12 @@ describe('website smoke test', () => {
     const { app, host } = await mountSite(config, messages)
 
     const text = host.textContent
-    // From viewer-i18n: the layout's skip link and the menu's first entry.
+    // From viewer-i18n: the layout's skip link.
     expect(text).toContain('Skip to content')
-    expect(text).toContain('Home')
-    // From locales/en.json: the header lockup, a menu entry, the footer.
+    // From locales/en.json: the banner's words, a menu entry, the footer.
+    expect(text).toContain('Sharing History')
+    expect(text).toContain('Collections')
     expect(text).toContain('Museum With No Frontiers')
-    expect(text).toContain('Permanent Collection')
-    expect(text).toContain('Welcome to Sharing History')
     // Nothing rendered as a bare entry name, which is what a missing text
     // looks like — there is no exception to throw for one. Every namespace
     // the pages render, not just this site's own: a raw shared key (record,
