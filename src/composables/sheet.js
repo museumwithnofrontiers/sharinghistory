@@ -33,9 +33,17 @@ function authorWithDates(c) {
 // legacy printed it (decision D5, inventory-app#2233).
 const periodDynasty = (c) => removeEndingPoint(c.text.dynasty)
 
+// Legacy prints an institution twice when it has both names: in English
+// (`holder`, which the import fills with the other name when legacy has only
+// that one) and in its own language, on a line of its own. The English line
+// is the holder only where the two differ.
+const englishInstitution = (own) => (c) => (c.text.holder && c.text.holder !== c.text[own] ? c.text.holder : '')
+
 const monumentFacts = [
   { key: 'alsoKnownAs', label: 'sheet.field.alsoKnownAs', value: 'alternate_name' },
   { key: 'location', label: 'sheet.field.location', value: locationWithCountry },
+  { key: 'holder', label: 'sharinghistory.sheet.institution', value: englishInstitution('responsible_institution_org'), render: 'custom' },
+  { key: 'responsibleInstitutionOriginal', label: 'sharinghistory.sheet.responsibleInstitutionOriginal', value: 'responsible_institution_org' },
   { key: 'date', label: 'sheet.field.dateOfMonument', value: 'dates' },
   { key: 'architects', label: 'sheet.field.architects', value: 'architects' },
   { key: 'patrons', label: 'sheet.field.patrons', value: (c) => c.text.patrons ?? c.text.initial_owner },
@@ -47,7 +55,10 @@ const monumentFacts = [
 const objectFacts = [
   { key: 'alsoKnownAs', label: 'sheet.field.alsoKnownAs', value: 'alternate_name' },
   { key: 'location', label: 'sheet.field.location', value: locationWithCountry },
-  { key: 'holder', label: 'sheet.field.holdingInstitution', value: 'holder', render: 'custom' },
+  { key: 'holder', label: 'sheet.field.holdingInstitution', value: englishInstitution('holding_institution_org'), render: 'custom' },
+  { key: 'holdingInstitutionOriginal', label: 'sharinghistory.sheet.holdingInstitutionOriginal', value: 'holding_institution_org' },
+  { key: 'originalOwner', label: 'sheet.field.originalOwner', value: 'initial_owner' },
+  { key: 'currentOwner', label: 'sheet.field.currentOwner', value: 'owner' },
   { key: 'date', label: 'sheet.field.dateOfObject', value: 'dates' },
   { key: 'author', label: 'sharinghistory.sheet.author', value: authorWithDates },
   { key: 'scribe', label: 'sheet.field.scribe', value: 'scriber' },
@@ -55,11 +66,9 @@ const objectFacts = [
   { key: 'materials', label: 'sheet.field.materials', value: 'materials' },
   { key: 'dimensions', label: 'sheet.field.dimensions', value: 'dimensions' },
   { key: 'dynasty', label: 'sheet.field.periodDynasty', value: periodDynasty },
-  { key: 'provenance', label: 'sheet.field.provenance', value: 'provenance' },
   { key: 'workshop', label: 'sheet.field.workshop', value: 'workshop' },
+  { key: 'provenance', label: 'sheet.field.provenance', value: 'provenance' },
   { key: 'binding', label: 'sheet.field.binding', value: 'binding_desc' },
-  { key: 'currentOwner', label: 'sheet.field.currentOwner', value: 'owner' },
-  { key: 'originalOwner', label: 'sheet.field.originalOwner', value: 'initial_owner' },
   { key: 'placeOfProduction', label: 'sheet.field.placeOfProduction', value: 'place_of_production' },
 ]
 
