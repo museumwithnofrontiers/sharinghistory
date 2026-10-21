@@ -1,7 +1,7 @@
 <script setup>
 import { timelineLinkFor } from '@museumwnf/viewer-core'
 import {
-  BackLink, OnDisplayIn, PartnerPanel, RecordLanguages, RelatedMedia, SpecialFeatures,
+  BackLink, OnDisplayIn, PartnerPanel, RecordLanguages, RelatedMedia, SourceCredit, SpecialFeatures,
 } from '@museumwnf/viewer-layout/content'
 import { RecordView } from '@museumwnf/viewer-layout/views'
 import { useData } from '../composables/data.js'
@@ -14,7 +14,8 @@ import { itemSheetSpec } from '../composables/sheet.js'
 // text and its partner's summary, and, after the sheet, the platform's
 // item-page blocks fed with this website's records: a monument's special
 // features, the related media, the exhibitions and chapters the item is on
-// display in.
+// display in. Legacy's two unheaded paragraphs frame the sheet: `notice`, in
+// italics, before it, and `notice_c` after the credits (database_item.php).
 
 defineProps({ id: { type: String, required: true } })
 
@@ -63,11 +64,20 @@ const thgGalleryGroups = (record) => [{
       <h1 class="detail-title" :dir="dir" v-html="mdInline(text.name ?? record.internal_name ?? record.id, { glossary })"></h1>
     </template>
 
+    <template #before-sheet="{ text, dir, glossary }">
+      <p v-if="text.notice" class="detail-notice" :dir="dir"><em v-html="mdInline(text.notice, { glossary })"></em></p>
+    </template>
+
     <template #holder="{ row, record, language, dir, glossary }">
       <span v-html="mdInline(row.value, { glossary })"></span>
       <template v-for="partner in [holderPartner(record, language)]" :key="'holder-partner'">
         <PartnerPanel v-if="partner" variant="summary" :partner="partner" label="partner.info.about" :dir="dir" />
       </template>
+    </template>
+
+    <template #source="{ text, dir, glossary }">
+      <p v-if="text.notice_c" class="detail-notice-c" :dir="dir" v-html="mdInline(text.notice_c, { glossary })"></p>
+      <SourceCredit />
     </template>
 
     <template #after-sheet="{ record, language, dir, glossary }">
