@@ -20,8 +20,10 @@ function entryFor(node, itemId) {
   return node?.items?.find((entry) => entry.id === itemId) ?? null
 }
 
+// The page language's own text: legacy's exhibition pages read that language's
+// rows and printed nothing where it had none.
 function localizedCaption(entry, language) {
-  return entry?.caption?.[language] ?? entry?.caption?.en ?? {}
+  return entry?.caption?.[language] ?? {}
 }
 
 /** `items.caption`: the entry's own name overrides the item's translation. */
@@ -63,13 +65,13 @@ export function curatorJustification(item, node, language) {
   if (!item) return ''
   const entry = entryFor(node, item.id)
   const caption = localizedCaption(entry, language)
-  const just = entry?.justifications?.[language] ?? entry?.justifications?.en ?? null
+  const just = entry?.justifications?.[language] ?? null
   return just?.curator ?? caption.justification ?? ''
 }
 export function partnerJustification(item, node, language) {
   if (!item) return ''
   const entry = entryFor(node, item.id)
-  const just = entry?.justifications?.[language] ?? entry?.justifications?.en ?? null
+  const just = entry?.justifications?.[language] ?? null
   return just?.partner ?? ''
 }
 
