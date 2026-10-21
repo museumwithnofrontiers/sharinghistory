@@ -1,5 +1,4 @@
 import { artistLine, removeEndingPoint } from '@museumwnf/viewer-core'
-import { useData } from './data.js'
 
 // The item sheet, as a spec: what viewer-layout's `RecordView` renders on
 // `/item/:id`. The mechanics — which language the record is read in, what is
@@ -10,11 +9,13 @@ import { useData } from './data.js'
 // an object), and the prose sections under it. Every label is an entry
 // name, written out so the check that every name resolves can read it.
 
-const { labelOf } = useData()
-
-// Legacy shows "City, Country", not the bare city the translation holds.
+// Legacy's Location line: the place, then a "Public domain" record's present-day
+// country, then the record's country — the country names in the record's own
+// language, as legacy printed them ("Vienna, Autriche, Domaine public"), and
+// nothing for a name that language lacks.
 function locationWithCountry(c) {
-  return [c.text.location, labelOf('countries', c.record.country_id)].filter(Boolean).join(', ')
+  const countryName = (id) => (id ? c.translations('countries')[id]?.name ?? '' : '')
+  return [c.text.location, countryName(c.text.country_id_present_days), countryName(c.record.country_id)].filter(Boolean).join(', ')
 }
 
 // The "Author" line is the artwork's creator with life dates, joined as
@@ -99,7 +100,7 @@ const isMonument = (ctx) => ctx.record?.type === 'monument'
 
 export const itemSheetSpec = {
   entity: 'items',
-  translations: ['glossary'],
+  translations: ['glossary', 'countries'],
   fields: (ctx) => (isMonument(ctx) ? monumentFacts : objectFacts),
   sections: (ctx) => (isMonument(ctx) ? monumentSections : objectSections),
   layout: 'table',
