@@ -14,7 +14,7 @@
     "namespace": "sharinghistory"
   },
   "dependencies": {
-    "@museumwnf/sharinghistory-data": "^1.2.22",
+    "@museumwnf/sharinghistory-data": "^1.2.23",
     "@museumwnf/viewer-core": "^2.8.0",
     "@museumwnf/viewer-i18n": "^6.1.0",
     "@museumwnf/viewer-layout": "^3.8.0",
