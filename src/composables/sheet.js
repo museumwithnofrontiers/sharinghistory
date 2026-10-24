@@ -21,12 +21,10 @@ function locationWithCountry(c) {
 // The "Author" line is the artwork's creator with life dates, joined as
 // legacy joined them ("Wolffgang Andreas Matthäus (1660, Chemnitz-1736,
 // Augsbourg)"), which the export carries as `artist` and its `artist_*`
-// details, with the structured artist names behind it as a fallback.
-// "Author" is this website's own word — no shared entry names it.
+// details. Nothing when the page's language has no line, as legacy printed
+// nothing. "Author" is this website's own word — no shared entry names it.
 function authorWithDates(c) {
-  const text = c.text
-  if (!text.artist) return c.record.artist_names?.length ? c.record.artist_names.join(', ') : ''
-  return artistLine(text.artist, text)
+  return artistLine(c.text.artist, c.text)
 }
 
 // Legacy's free-text Period / Dynasty line, without its ending period as

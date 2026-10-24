@@ -216,3 +216,26 @@
   --site-light-rule: #e5dada;
   --site-ivory: #f0ede4;
 }
+
+/* ---------- The standalone family's chrome ----------
+ * viewer-layout's standalone family stylesheet, in legacy Sharing History's
+ * colours (css/style.css): the red menu bar with white links and a gold hover
+ * (`ul.nav`), the home picture's dark band with its gold title and white line
+ * (`.banner-text`), the darker red cooperation band (`section.cooperation`). */
+:root {
+  --mwnf-standalone-menu-background: #990000;
+  --mwnf-standalone-menu-alt-background: #990000;
+  --mwnf-standalone-menu-link: #ffffff;
+  --mwnf-standalone-menu-hover: #e0b700;
+  --mwnf-standalone-menu-size: 15px;
+  --mwnf-standalone-menu-weight: 400;
+  --mwnf-standalone-menu-padding: 5px 0;
+  --mwnf-standalone-header-link-color: #ffffff;
+  --mwnf-standalone-home-banner-inset: 0px;
+  --mwnf-standalone-home-banner-bottom: 0px;
+  --mwnf-standalone-home-banner-color: #ffffff;
+  --mwnf-standalone-home-banner-title-size: 46px;
+  --mwnf-standalone-home-banner-line-size: 18px;
+  --mwnf-standalone-sponsors-background: #750101;
+  --mwnf-standalone-sponsors-padding: 10px;
+}

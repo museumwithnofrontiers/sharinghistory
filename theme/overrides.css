@@ -66,3 +66,23 @@
   line-height: 1.7;
   color: var(--mwnf-color-text);
 }
+
+/* The home picture's words sit on legacy's dark band across its foot
+ * (`.banner-text`): the title in gold, the line under it in gold too, and a
+ * darker red rule under the picture. */
+.mwnf-standalone-home-banner {
+  border-bottom: 5px solid #750101;
+}
+.mwnf-standalone-home-banner__text {
+  inset-inline: 0;
+  padding: 13px 0 10px 63px;
+  background-color: rgba(0, 0, 0, 0.52);
+}
+.mwnf-standalone-home-banner__title {
+  line-height: 41px;
+  color: #ffc000;
+}
+.mwnf-standalone-home-banner__line span {
+  font-weight: 300;
+  color: #ffc000;
+}

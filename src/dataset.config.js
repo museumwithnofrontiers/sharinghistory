@@ -120,7 +120,9 @@ export default {
       { section: 'partners', label: 'sharinghistory.nav.partners', to: { name: 'partners' } },
       { label: 'sharinghistory.nav.myCollection', href: mwnfLinks.myCollection, external: true },
     ],
-    placement: ({ section }) => (section === 'home' ? 'after-banner' : 'before-banner'),
+    // Legacy's red menu bar sits under the header on every page, the home
+    // page's picture included (index.php: `links`, then `banner`).
+    placement: 'before-banner',
     // The title on each section's band (each page's <h2><span>).
     sectionTitles: {
       about: 'sharinghistory.about.bannerTitle',

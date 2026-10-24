@@ -36,7 +36,8 @@ describe('item sheet spec', () => {
       artist_birthdate: '1660', artist_birthplace: 'Chemnitz', artist_deathdate: '1736', artist_deathplace: 'Augsbourg',
     }
     expect(field.value({ record: object, text })).toBe('Wolffgang Andreas Matthäus (1660, Chemnitz-1736, Augsbourg)')
-    expect(field.value({ record: object, text: {} })).toBe('W. A. Matthäus')
+    // A language without its own line prints none, whatever another language wrote.
+    expect(field.value({ record: object, text: {} })).toBe('')
   })
 
   it('closes both sheets with the rights line', () => {
