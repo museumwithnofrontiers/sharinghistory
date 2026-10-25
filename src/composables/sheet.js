@@ -9,13 +9,19 @@ import { artistLine, removeEndingPoint } from '@museumwnf/viewer-core'
 // an object), and the prose sections under it. Every label is an entry
 // name, written out so the check that every name resolves can read it.
 
-// Legacy's Location line: the place, then a "Public domain" record's present-day
-// country, then the record's country — the country names in the record's own
-// language, as legacy printed them ("Vienna, Autriche, Domaine public"), and
-// nothing for a name that language lacks.
+// Legacy's Location line: a monument's address, the place, the province, then
+// a "Public domain" record's present-day country, then the record's country —
+// each a field of its own in the package, without its final period as legacy
+// printed them, the country names in the record's own language ("Vienna,
+// Autriche, Domaine public"), and nothing for a name that language lacks.
 function locationWithCountry(c) {
   const countryName = (id) => (id ? c.translations('countries')[id]?.name ?? '' : '')
-  return [c.text.location, countryName(c.text.country_id_present_days), countryName(c.record.country_id)].filter(Boolean).join(', ')
+  const address = c.record?.type === 'monument' ? c.text.monument_contact?.address : ''
+  return [address, c.text.location, c.text.province]
+    .map((part) => removeEndingPoint(part ?? ''))
+    .concat(countryName(c.text.country_id_present_days), countryName(c.record.country_id))
+    .filter(Boolean)
+    .join(', ')
 }
 
 // The "Author" line is the artwork's creator with life dates, joined as
@@ -32,13 +38,16 @@ function authorWithDates(c) {
 const periodDynasty = (c) => removeEndingPoint(c.text.dynasty)
 
 // Legacy prints an institution twice when it has both names: in English
-// (`holder`, which the import fills with the other name when legacy has only
-// that one) and in its own language, on a line of its own. The English line
+// (`holder`) and in its own language, on a line of its own. The English line
 // is the holder only where the two differ.
 const englishInstitution = (own) => (c) => (c.text.holder && c.text.holder !== c.text[own] ? c.text.holder : '')
 
+// The second and third names, each under its own heading as legacy printed
+// them, never joined to the "also known as" line.
 const monumentFacts = [
   { key: 'alsoKnownAs', label: 'sheet.field.alsoKnownAs', value: 'alternate_name' },
+  { key: 'secondName', label: 'sharinghistory.sheet.secondNameMonument', value: 'second_name' },
+  { key: 'originalName', label: 'sharinghistory.sheet.originalName', value: 'third_name' },
   { key: 'location', label: 'sheet.field.location', value: locationWithCountry },
   { key: 'holder', label: 'sharinghistory.sheet.institution', value: englishInstitution('responsible_institution_org'), render: 'custom' },
   { key: 'responsibleInstitutionOriginal', label: 'sharinghistory.sheet.responsibleInstitutionOriginal', value: 'responsible_institution_org' },
@@ -52,6 +61,8 @@ const monumentFacts = [
 // rendered by the `holder` slot in ItemDetail.vue instead.
 const objectFacts = [
   { key: 'alsoKnownAs', label: 'sheet.field.alsoKnownAs', value: 'alternate_name' },
+  { key: 'secondName', label: 'sharinghistory.sheet.secondNameObject', value: 'second_name' },
+  { key: 'originalName', label: 'sharinghistory.sheet.originalName', value: 'third_name' },
   { key: 'location', label: 'sheet.field.location', value: locationWithCountry },
   { key: 'holder', label: 'sheet.field.holdingInstitution', value: englishInstitution('holding_institution_org'), render: 'custom' },
   { key: 'holdingInstitutionOriginal', label: 'sharinghistory.sheet.holdingInstitutionOriginal', value: 'holding_institution_org' },
@@ -79,6 +90,8 @@ const copyright = { key: 'copyright', label: 'sheet.field.copyrightInformation',
 const monumentSections = [
   { key: 'history', label: 'sheet.field.history', value: 'history' },
   { key: 'description', label: 'sheet.field.description', value: 'description' },
+  // Legacy's second description, under the same heading, after the first.
+  { key: 'description2', label: 'sheet.field.description', value: 'description2' },
   { key: 'dynasty', label: 'sheet.field.periodDynasty', value: periodDynasty },
   { key: 'datation', label: 'sheet.field.monumentDatationMethod', value: 'method_for_datation' },
   { key: 'provenanceMethod', label: 'sheet.field.provenanceMethod', value: 'method_for_provenance' },
@@ -89,6 +102,8 @@ const monumentSections = [
 
 const objectSections = [
   { key: 'description', label: 'sheet.field.description', value: 'description' },
+  // Legacy's second description, under the same heading, after the first.
+  { key: 'description2', label: 'sheet.field.description', value: 'description2' },
   { key: 'datation', label: 'sheet.field.datationMethod', value: 'method_for_datation' },
   { key: 'obtention', label: 'sheet.field.obtentionMethod', value: 'obtention' },
   { key: 'provenanceMethod', label: 'sheet.field.provenanceMethod', value: 'method_for_provenance' },

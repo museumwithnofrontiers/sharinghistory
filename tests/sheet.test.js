@@ -23,9 +23,10 @@ describe('item sheet spec', () => {
     expect(field.value({ record: object, text: {} })).toBe('')
   })
 
-  it("prints a monument's Period / Dynasty after its description", () => {
+  it("prints a monument's Period / Dynasty after its two descriptions", () => {
     const keys = sectionsOf(monument).map((s) => s.key)
-    expect(keys.indexOf('dynasty')).toBe(keys.indexOf('description') + 1)
+    expect(keys.indexOf('description2')).toBe(keys.indexOf('description') + 1)
+    expect(keys.indexOf('dynasty')).toBe(keys.indexOf('description2') + 1)
     expect(row(sectionsOf(monument), 'dynasty').value({ record: monument, text: { dynasty: 'Habsburg' } })).toBe('Habsburg')
   })
 
@@ -64,8 +65,21 @@ describe('the institution lines', () => {
 
   it("prints a monument's institution and its responsible institution in its own language", () => {
     const keys = fieldsOf(monument).map((f) => f.key)
-    expect(keys.slice(0, 4)).toEqual(['alsoKnownAs', 'location', 'holder', 'responsibleInstitutionOriginal'])
+    expect(keys.slice(0, 6)).toEqual(['alsoKnownAs', 'secondName', 'originalName', 'location', 'holder', 'responsibleInstitutionOriginal'])
     const text = { holder: 'Institut national du Patrimoine', responsible_institution_org: 'Institut national du Patrimoine' }
     expect(row(fieldsOf(monument), 'holder').value({ record: monument, text })).toBe('')
+  })
+})
+
+describe('the location line', () => {
+  const countries = { aut: { name: 'Austria' }, xxx: { name: 'Public domain' }, tun: { name: 'Tunisia' } }
+  const ctx = (record, text) => ({ record, text, translations: () => countries })
+
+  it("composes legacy's line from the place, the province and the countries, without final periods", () => {
+    const line = row(fieldsOf(object), 'location').value
+    expect(line(ctx({ ...object, country_id: 'xxx' }, { location: 'Vienna', country_id_present_days: 'aut' }))).toBe('Vienna, Austria, Public domain')
+    expect(line(ctx({ ...monument, country_id: 'tun' }, { location: 'Le Bardo.', province: 'Tunis', monument_contact: { address: 'Rue Mongi Slim' } }))).toBe(
+      'Rue Mongi Slim, Le Bardo, Tunis, Tunisia',
+    )
   })
 })
