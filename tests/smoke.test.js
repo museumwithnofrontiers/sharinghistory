@@ -10,14 +10,13 @@ import countryTexts from '@museumwnf/sharinghistory-data/translations/countries.
 import itemTexts from '@museumwnf/sharinghistory-data/translations/items.en.json'
 import partnerTexts from '@museumwnf/sharinghistory-data/translations/partners.en.json'
 import timelineEventTexts from '@museumwnf/sharinghistory-data/translations/timeline_events.en.json'
-import { collectionTitle, inScope, itemIdsUnder } from '../src/composables/catalogue.js'
+import { collectionTitle, itemIdsUnder } from '../src/composables/catalogue.js'
 import config from '../src/dataset.config.js'
-import { exhibitionsTree } from '../src/composables/exhibitions.js'
+import { exhibitionsTree, minisiteHref } from '../src/composables/exhibitions.js'
+import minisites from '../src/minisites.json'
 import { historicalProfilesTree } from '../src/composables/history.js'
 import { OFFERED_LANGUAGES } from '../src/languages.js'
 import { useData } from '../src/composables/data.js'
-import { relatedContentLinks } from '../src/composables/exhibitionSpecs.js'
-import { timelineResultsSpec } from '../src/composables/timeline.js'
 
 // The same two layers main.js assembles, in the same order: the shared bundle
 // first, this website's own file last. Mounting without them would prove
@@ -25,21 +24,6 @@ import { timelineResultsSpec } from '../src/composables/timeline.js'
 const messages = mergeMessages(sharedTexts, { en: ownTexts })
 
 describe('website smoke test', () => {
-  // The Related Content box sends each link with the query key of the page
-  // it opens. The timeline reads its controls' keys only, so a key it does
-  // not declare (it used to be `exhibition`) opened unfiltered results.
-  it('sends the related-content timeline links with the timeline\'s own control keys', () => {
-    const links = relatedContentLinks({ exhibitionId: 'x1', hasThematicTimeline: true, hasFurtherReading: false, t: (key) => key })
-    const timelineLinks = links.filter((link) => link.href.startsWith('#/timeline/results?'))
-    expect(timelineLinks.map((link) => link.href)).toEqual([
-      '#/timeline/results?collection=pc',
-      '#/timeline/results?collection=x1',
-    ])
-    const controlKeys = new Set(timelineResultsSpec.controls.map((control) => control.key))
-    for (const link of timelineLinks) {
-      for (const key of new URLSearchParams(link.href.split('?')[1]).keys()) expect(controlKeys.has(key)).toBe(true)
-    }
-  })
   it('mounts against the configured data package', async () => {
     const { app, host } = await mountSite(config, messages)
 
@@ -125,154 +109,42 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The theme and chapter pages run on `EssayView`, over the exhibition tree
-  // in composables/exhibitions.js (metanull/viewer-layout#34-36,
-  // sharinghistory#37/#38). Fixtures are found in the package itself rather
-  // than hardcoded: a theme with its own item panel, and a multi-chapter
-  // theme with a following sibling theme, to prove the crossing navigation.
-  // A theme whose own item grid (not a chapter's) carries at least one item.
-  function findThemeWithItems() {
-    const root = exhibitionsTree.root.value
-    for (const exhibition of exhibitionsTree.children(root.id)) {
-      const theme = exhibitionsTree.children(exhibition.id).find((candidate) => candidate.items?.length)
-      if (theme) return { exhibition, theme }
-    }
-    return null
-  }
-
-  it('renders the theme page on EssayView, with its own item panel', async () => {
+  // Each exhibition is a website of its own (a mini-site, inventory-app#2359):
+  // this site lists the exhibitions and links each to its own address
+  // (src/minisites.json), and the addresses its exhibition pages had lead
+  // there.
+  it('lists the exhibitions, each leading to its own website', async () => {
     await loadEntities(['collections'])
-    const fixture = findThemeWithItems()
-    expect(fixture, 'fixture: a theme with its own items').not.toBeNull()
-    const { exhibition, theme } = fixture
+    const exhibitions = exhibitionsTree.children(exhibitionsTree.root.value.id)
+    expect(exhibitions.length).toBeGreaterThan(0)
+    for (const exhibition of exhibitions) expect(minisites[exhibition.id], exhibition.internal_name).toMatch(/^https:\/\//)
 
-    const { app, host } = await mountSite(config, messages,
-      `#/exhibitions/${encodeURIComponent(exhibition.id)}/theme/${encodeURIComponent(theme.id)}`,
-    )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-essay')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.mwnf-essay__panel')).not.toBeNull()
-    expect(host.querySelector('.theme-chapters')).not.toBeNull()
-
-    // The view reads the collection's title through the tree's own entity,
-    // not through a fallback to the spec's entity. A wrong entity renders
-    // the internal_name instead of the translated title.
-    const titleEl = host.querySelector('.mwnf-essay__title')
-    expect(titleEl).not.toBeNull()
-    const expectedTitle = collectionTexts[theme.id]?.title
-    expect(titleEl.textContent.trim()).toContain(expectedTitle)
-    expect(titleEl.textContent).not.toContain(theme.internal_name)
-
-    // When the collection carries a description, the body must render it.
-    if (collectionTexts[theme.id]?.description) {
-      const bodyEl = host.querySelector('.mwnf-essay__body, .mwnf-essay__prose')
-      expect(bodyEl).not.toBeNull()
-      expect(bodyEl.textContent).toBeTruthy()
-    }
-
-    // EssayView's own default `after` content (sharinghistory#52): the
-    // citation's permalink, off the same site origin as the item sheet's.
-    const creditLink = host.querySelector('.mwnf-source-credit a')
-    expect(creditLink).not.toBeNull()
-    expect(creditLink.getAttribute('href').startsWith(`${config.site.origin}/#`)).toBe(true)
-
+    const { app, host } = await mountSite(config, messages, '#/exhibitions?lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-cards')).not.toBeNull(), { timeout: 20000 })
+    const hrefs = Array.from(host.querySelectorAll('.mwnf-cards__link')).map((a) => a.getAttribute('href'))
+    expect(hrefs).toHaveLength(exhibitions.length)
+    for (const href of hrefs) expect(Object.values(minisites).some((base) => href.startsWith(base))).toBe(true)
     app.unmount()
   }, 60000)
 
-  // A chapter whose item grid carries a curator/partner justification pair.
-  function findJustifiedChapter() {
-    const root = exhibitionsTree.root.value
-    for (const exhibition of exhibitionsTree.children(root.id)) {
-      for (const theme of exhibitionsTree.children(exhibition.id)) {
-        for (const chapter of exhibitionsTree.children(theme.id)) {
-          const justified = (chapter.items ?? []).some(
-            (entry) => entry.justifications && Object.keys(entry.justifications).length,
-          )
-          if (justified) return { exhibition, theme, chapter }
-        }
-      }
-    }
-    return null
-  }
-
-  it('renders the chapter page on EssayView, with the justification block where the data has one', async () => {
+  // A theme's address on this site is the same theme's overview on the
+  // mini-site, numbered as the mini-site lists its themes (those with a title).
+  it('places a theme and a chapter where their mini-site shows them', async () => {
     await loadEntities(['collections'])
-    const fixture = findJustifiedChapter()
-    expect(fixture, 'fixture: a chapter with a curator/partner justification').not.toBeNull()
-
-    const { app, host } = await mountSite(config, messages,
-      `#/exhibitions/${encodeURIComponent(fixture.exhibition.id)}/theme/${encodeURIComponent(fixture.theme.id)}/chapter/${encodeURIComponent(fixture.chapter.id)}`,
-    )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-essay')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.mwnf-essay__panel')).not.toBeNull()
-    expect(host.querySelector('.chapter-justification')).not.toBeNull()
-
-    // The view reads the collection's title through the tree's own entity,
-    // not through a fallback to the spec's entity. A wrong entity renders
-    // the internal_name instead of the translated title.
-    const titleEl = host.querySelector('.mwnf-essay__title')
-    expect(titleEl).not.toBeNull()
-    const expectedTitle = collectionTexts[fixture.chapter.id]?.title
-    expect(titleEl.textContent.trim()).toContain(expectedTitle)
-    expect(titleEl.textContent).not.toContain(fixture.chapter.internal_name)
-
-    // When the collection carries a description, the body must render it.
-    if (collectionTexts[fixture.chapter.id]?.description) {
-      const bodyEl = host.querySelector('.mwnf-essay__body, .mwnf-essay__prose')
-      expect(bodyEl).not.toBeNull()
-      expect(bodyEl.textContent).toBeTruthy()
+    const exhibition = exhibitionsTree.children(exhibitionsTree.root.value.id)[0]
+    const theme = exhibitionsTree.children(exhibition.id).find((t) => collectionTexts[t.id]?.title)
+    const chapter = exhibitionsTree.children(theme.id).find((c) => collectionTexts[c.id]?.title)
+    const { minisitePlace } = useData()
+    const titled = (node) => !!collectionTexts[node.id]?.title?.trim()
+    const themeNumber = exhibitionsTree.children(exhibition.id).filter(titled).indexOf(theme) + 1
+    expect(minisitePlace(theme.id)).toEqual({ theme: themeNumber, page: 0 })
+    if (chapter) {
+      const page = exhibitionsTree.children(theme.id).filter(titled).indexOf(chapter) + 1
+      expect(minisitePlace(chapter.id)).toEqual({ theme: themeNumber, page })
     }
-
-    app.unmount()
-  }, 60000)
-
-  it('crosses from a theme\'s last chapter into the next theme', async () => {
-    await loadEntities(['collections'])
-    const root = exhibitionsTree.root.value
-    let fixture = null
-    for (const exhibition of exhibitionsTree.children(root.id)) {
-      const themes = exhibitionsTree.children(exhibition.id)
-      for (let i = 0; i < themes.length - 1; i++) {
-        const chapters = exhibitionsTree.children(themes[i].id)
-        if (chapters.length > 1) {
-          fixture = { exhibition, theme: themes[i], nextTheme: themes[i + 1], lastChapter: chapters[chapters.length - 1] }
-          break
-        }
-      }
-      if (fixture) break
-    }
-    expect(fixture, 'fixture: a multi-chapter theme with a following sibling theme').not.toBeNull()
-
-    const { app, host } = await mountSite(config, messages,
-      `#/exhibitions/${encodeURIComponent(fixture.exhibition.id)}/theme/${encodeURIComponent(fixture.theme.id)}/chapter/${encodeURIComponent(fixture.lastChapter.id)}`,
-    )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-essay')).not.toBeNull(), { timeout: 20000 })
-    const nextLink = host.querySelector('.mwnf-essay__nav-link--next')
-    expect(nextLink).not.toBeNull()
-    expect(decodeURIComponent(nextLink.getAttribute('href'))).toContain(fixture.nextTheme.id)
-
-    app.unmount()
-  }, 60000)
-
-  // National Context collections (purpose "national-context", #54) carry no
-  // title of their own and sit next to a theme under an exhibition, so a
-  // theme address built from one must not fall through to `EssayView`'s
-  // own not-found (a missing id) or to an essay headed by the internal name
-  // — it is caught earlier, by exhibitionsTree membership (exhibitions.js).
-  it('renders not-found for a National Context id on the theme route, not an essay page', async () => {
-    const [collections] = await loadEntities(['collections'])
-    const nc = collections.find((c) => c.purpose === 'national-context')
-    expect(nc, 'fixture: a National Context collection').toBeDefined()
-    const exhibition = collections.find((c) => c.id === nc.parent_id)
-    expect(exhibition, 'fixture: the National Context collection\'s own exhibition').toBeDefined()
-
-    const { app, host } = await mountSite(config, messages,
-      `#/exhibitions/${encodeURIComponent(exhibition.id)}/theme/${encodeURIComponent(nc.id)}`,
-    )
-    await vi.waitFor(() => expect(host.querySelector('.vc-not-found')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.mwnf-essay')).toBeNull()
-    expect(host.textContent).not.toContain(nc.internal_name)
-
-    app.unmount()
+    expect(minisiteHref(exhibition.id, 'en', { theme: 2, page: 3 })).toBe(`${minisites[exhibition.id]}#/theme/2/3?lang=en`)
+    expect(minisiteHref(exhibition.id, 'en', { theme: 2, page: 0 })).toBe(`${minisites[exhibition.id]}#/theme/2?lang=en`)
+    expect(minisiteHref(exhibition.id, 'en', 'introduction')).toBe(`${minisites[exhibition.id]}#/introduction?lang=en`)
   }, 60000)
 
   // Legacy always named a National Context collection by its country
@@ -305,7 +177,7 @@ describe('website smoke test', () => {
 
     const { exhibitionLinksForItem } = useData()
     const links = exhibitionLinksForItem(itemId)
-    expect(links.some((l) => l.exhibitionId === nc.parent_id && l.themeId === null)).toBe(true)
+    expect(links.some((l) => l.exhibitionId === nc.parent_id && l.themeId === null && l.at === 'introduction')).toBe(true)
     expect(links.every((l) => l.themeId !== nc.id)).toBe(true)
   })
 
@@ -376,21 +248,6 @@ describe('website smoke test', () => {
       expect(bodyEl).not.toBeNull()
       expect(bodyEl.textContent).toBeTruthy()
     }
-
-    app.unmount()
-  }, 60000)
-
-  it('renders the exhibition further-reading page on LinkListView', async () => {
-    await loadEntities(['collections'])
-    const root = exhibitionsTree.root.value
-    const exhibition = exhibitionsTree.children(root.id)[0]
-    expect(exhibition, 'fixture: an exhibition').toBeDefined()
-
-    const { app, host } = await mountSite(config, messages, `#/exhibitions/${encodeURIComponent(exhibition.id)}/further-reading`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-link-list')).not.toBeNull(), { timeout: 20000 })
-    // Either real entries or the view's own empty state — both are the
-    // link-list shape, and the page never falls back to a hard not-found.
-    expect(host.querySelector('.mwnf-link-list__groups, .mwnf-link-list__empty')).not.toBeNull()
 
     app.unmount()
   }, 60000)

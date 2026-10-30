@@ -1,10 +1,11 @@
 <script setup>
-import { timelineLinkFor } from '@museumwnf/viewer-core'
+import { timelineLinkFor, useI18n } from '@museumwnf/viewer-core'
 import {
   BackLink, OnDisplayIn, PartnerPanel, RecordLanguages, RelatedMedia, SourceCredit, SpecialFeatures,
 } from '@museumwnf/viewer-layout/content'
 import { RecordView } from '@museumwnf/viewer-layout/views'
 import { useData } from '../composables/data.js'
+import { minisiteHref } from '../composables/exhibitions.js'
 import { partnerViewOf } from '../composables/partner.js'
 import { itemSheetSpec } from '../composables/sheet.js'
 
@@ -20,6 +21,7 @@ import { itemSheetSpec } from '../composables/sheet.js'
 defineProps({ id: { type: String, required: true } })
 
 const { exhibitionLinksForItem, mdInline, partnerById, tr } = useData()
+const { locale } = useI18n()
 
 const timelineLink = (record) => timelineLinkFor(record, { name: 'timeline-results' })
 
@@ -32,12 +34,12 @@ function holderPartner(record, language) {
   return partner ? partnerViewOf(partner, tr('partners', partner.id, language)) : null
 }
 
+// Each exhibition page that places the item, on the exhibition's own website
+// (its mini-site), in the site's language.
 const onDisplayInGroups = (record) => [{
   links: exhibitionLinksForItem(record.id).map((l) => ({
     label: mdInline(l.label),
-    to: l.themeId
-      ? { name: 'exhibition-theme', params: { exhibitionId: l.exhibitionId, themeId: l.themeId } }
-      : { name: 'exhibition-introduction', params: { exhibitionId: l.exhibitionId } },
+    href: minisiteHref(l.exhibitionId, locale.value, l.at) ?? undefined,
   })),
 }]
 
@@ -70,7 +72,7 @@ const thgGalleryGroups = (record) => [{
 
     <template #holder="{ row, record, language, dir, glossary }">
       <span v-html="mdInline(row.value, { glossary })"></span>
-      <template v-for="partner in [holderPartner(record, language)]" :key="'holder-partner'">
+      <template v-for="partner in [holderPartner(record, language)]" :key="partner?.id ?? 'holder-partner'">
         <PartnerPanel v-if="partner" variant="summary" :partner="partner" label="partner.info.about" :dir="dir" />
       </template>
     </template>
