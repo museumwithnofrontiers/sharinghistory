@@ -2,20 +2,21 @@
 import { computed } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import { SectionCards } from '@museumwnf/viewer-layout/content'
-import { exhibitionList } from '../composables/exhibitions.js'
+import { exhibitionList, minisiteHref } from '../composables/exhibitions.js'
 import { useData } from '../composables/data.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { mdStrip, tr } = useData()
 
-// `SectionCards` interpolates a card's `title` as plain text, so the
-// exhibition title is stripped rather than rendered — the same trade-off
+// One card per exhibition, leading to the exhibition's own website (its
+// mini-site). `SectionCards` interpolates a card's `title` as plain text, so
+// the exhibition title is stripped rather than rendered — the same trade-off
 // `LinkListView`'s labels make, for the same reason (see the pull request
 // description).
 const cards = computed(() =>
   exhibitionList.value.map((exhibition) => ({
     title: mdStrip(tr('collections', exhibition.id)?.title ?? exhibition.internal_name),
-    to: { name: 'exhibition', params: { exhibitionId: exhibition.id } },
+    href: minisiteHref(exhibition.id, locale.value) ?? undefined,
   })),
 )
 </script>

@@ -16,9 +16,7 @@ import { useData } from '../composables/data.js'
 // list has nowhere to link to (legacy never filled the "read more" popup
 // text in), and the country table carries two links per row. A small
 // wrapper of its own, over the two `useCollectionTree` subtrees in
-// composables/history.js, the way ExhibitionSplash.vue is a wrapper over
-// the exhibition tree for the same reason (see the pull request
-// description).
+// composables/history.js (see the pull request description).
 
 const { t } = useI18n()
 const { labelOf, md, mdInline, tr } = useData()

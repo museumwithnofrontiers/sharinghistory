@@ -46,8 +46,7 @@ watchEffect(() => {
 const activePageId = computed(() => props.pageId ?? pages.value[0]?.id ?? null)
 
 // The importer injects the same language-keyed bibliography map into every
-// translation's own extra, the way exhibitionSpecs.js's own
-// `bibliographyLinks` reads it for an exhibition.
+// translation's own extra.
 function bibliographyMarkdown(tr, language) {
   const bib = tr('collections', record.value.id).extra?.bibliography
   if (!bib) return ''

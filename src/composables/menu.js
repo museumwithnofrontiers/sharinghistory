@@ -1,4 +1,5 @@
-import { exhibitionList } from './exhibitions.js'
+import { useI18n } from '@museumwnf/viewer-core'
+import { exhibitionList, minisiteHref } from './exhibitions.js'
 import { historicalProfileCountries, historicalProfileNodeRoute, historicalProfilesTree } from './history.js'
 import { useData } from './data.js'
 
@@ -26,12 +27,16 @@ export function historicalProfileLinks() {
 // theme/assets/exhibitions/ (theme/assets/SOURCES.json).
 const exhibitionNumber = (exhibition) => String(exhibition.backward_compatibility ?? '').split(':').pop()
 
-/** The home page's tiles: every exhibition, its title from the package, over legacy's picture. */
+/**
+ * The home page's tiles: every exhibition, its title from the package, over
+ * legacy's picture, leading to the exhibition's own website (its mini-site).
+ */
 export function exhibitionTiles() {
   const { tr } = useData()
+  const { locale } = useI18n()
   return exhibitionList.value.map((exhibition) => ({
     image: `exhibitions/homeImg${exhibitionNumber(exhibition)}.jpg`,
     text: tr('collections', exhibition.id)?.title ?? exhibition.internal_name,
-    to: { name: 'exhibition', params: { exhibitionId: exhibition.id } },
+    href: minisiteHref(exhibition.id, locale.value) ?? undefined,
   }))
 }

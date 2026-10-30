@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useCollectionTree } from '@museumwnf/viewer-core'
+import minisites from '../minisites.json'
 
 // The exhibition tree — exhibitions → themes → chapters — replaces the
 // hand-written parent_id walk this file used to be part of (the
@@ -34,7 +35,7 @@ const rawTree = useCollectionTree({
 // so the true ancestry of every exhibition, theme and chapter carries two
 // extra, unrelated crumbs — the project collection and the marker itself —
 // ahead of "exhibition › theme". Bounded here to the marker, once, so every
-// consumer (the specs' `route`, EssayView's own breadcrumb) sees only
+// consumer (the cross-links, the mini-site addresses) sees only
 // exhibition-relative ancestry.
 //
 // Returns `null` for a node that is not under the marker at all — the
@@ -49,10 +50,9 @@ function ancestryWithin(id) {
 }
 
 /**
- * The tree the six exhibition pages read: `children`, `itemsUnder`,
- * `containing`, `walk`, `previous`/`next` unchanged from `useCollectionTree`;
- * `parents`/`breadcrumb` bounded to this tree's own root (see above), which
- * is what makes them safe to hand to `EssayView` as a pre-built `tree`.
+ * The exhibition tree: `children`, `itemsUnder`, `containing`, `walk`
+ * unchanged from `useCollectionTree`; `parents`/`breadcrumb` bounded to this
+ * tree's own root (see above).
  */
 export const exhibitionsTree = {
   ...rawTree,
@@ -71,25 +71,40 @@ export const exhibitionList = computed(() => {
   return root ? exhibitionsTree.children(root.id) : []
 })
 
+// Each exhibition is a website of its own now, a mini-site
+// (inventory-app#2359): this site lists the exhibitions and links to them,
+// and its package keeps of them only what it shows — each exhibition's,
+// theme's and chapter's title, and which items each one places (the
+// Permanent Collection's exhibition filter, an item sheet's "on display in").
+// Where each one lives is this site's own configuration, src/minisites.json
+// (exhibition id → its address).
+
 /**
- * A node's own page address, from its position in the exhibition tree
- * rather than from route params a caller would otherwise have to thread
- * through: an exhibition (no ancestors within this tree) goes to its
- * splash, a theme (one ancestor) to its theme page, a chapter (two
- * ancestors) to its chapter page. `null` for a node this tree does not
- * carry at all.
+ * An exhibition's mini-site, in the page language: its home page, one of its
+ * own pages by name (`at`: 'introduction', 'further-reading'), or a theme's
+ * overview or chapter by their 1-based numbers (`at`: `{ theme, page }`, page
+ * 0 the overview). Null for an exhibition with no mini-site.
  */
-export function exhibitionNodeRoute(node) {
+export function minisiteHref(exhibitionId, language, at = null) {
+  const base = minisites[exhibitionId]
+  if (!base) return null
+  const query = language ? `?lang=${encodeURIComponent(language)}` : ''
+  if (typeof at === 'string') return `${base}#/${at}${query}`
+  if (at?.theme) return `${base}#/theme/${at.theme}${at.page ? `/${at.page}` : ''}${query}`
+  return `${base}#/${query}`
+}
+
+/**
+ * Where a theme or a chapter is on its exhibition's mini-site,
+ * `{ theme, page }`: the mini-site numbers only the pages legacy listed,
+ * those with a title (`titled`). Null for anything else.
+ */
+export function minisiteAt(node, titled) {
   const ancestry = ancestryWithin(node.id)
-  if (!ancestry) return null
-  if (ancestry.length === 0) return { name: 'exhibition', params: { exhibitionId: node.id } }
-  if (ancestry.length === 1) {
-    return { name: 'exhibition-theme', params: { exhibitionId: ancestry[0].id, themeId: node.id } }
-  }
-  return {
-    name: 'exhibition-chapter',
-    params: { exhibitionId: ancestry[0].id, themeId: ancestry[1].id, chapterId: node.id },
-  }
+  const number = (parent, id) => exhibitionsTree.children(parent.id).filter(titled).findIndex((n) => n.id === id) + 1
+  if (ancestry?.length === 1) return { theme: number(ancestry[0], node.id), page: 0 }
+  if (ancestry?.length === 2) return { theme: number(ancestry[0], ancestry[1].id), page: number(ancestry[1], node.id) }
+  return null
 }
 
 /**
@@ -100,21 +115,4 @@ export function exhibitionNodeRoute(node) {
  */
 export function exhibitionAncestry(node) {
   return ancestryWithin(node.id)
-}
-
-/**
- * True when `id` is a real node of this tree — the root itself, or reachable
- * through `children()`'s own type filtering (exhibition → theme → chapter).
- * `byId`/`parents` walk the raw `parent_id` chain regardless of type, so a
- * National Context collection (#54, purpose "national-context") — sitting
- * next to a theme under its exhibition but never a `children()` result —
- * resolves through those two just as a real theme or chapter would; this is
- * the check that tells the two apart. Used by the theme and chapter routes
- * so such an id renders not-found instead of an essay page headed by the
- * collection's internal name.
- */
-export function inExhibitionTree(id) {
-  const root = rawTree.root.value
-  if (!root) return false
-  return id === root.id || rawTree.walk().some((node) => node.id === id)
 }
