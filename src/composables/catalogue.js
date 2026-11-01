@@ -1,5 +1,5 @@
 import {
-  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, centuryPresets, objectsAndMonumentsSummary, searchFieldOptions,
+  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, SEARCH_LANGUAGE_KEY, centuryPresets, objectsAndMonumentsSummary, searchFieldOptions,
   searchFields, searchRowKeys, searchSummary, useFieldSearch,
 } from '@museumwnf/viewer-core'
 import { exhibitionsTree } from './exhibitions.js'
@@ -206,7 +206,7 @@ const { narrow } = useFieldSearch({ fields: SEARCH_FIELDS })
 
 export const databaseResultsSpec = {
   entity: 'items',
-  keys: [...searchRowKeys(), 'from', 'to', 'lang'],
+  keys: [...searchRowKeys(), 'from', 'to', SEARCH_LANGUAGE_KEY],
   scope: (item) => inScope(item),
   narrow,
   dates: { mode: CATALOGUE_DATE_MODE, begin: 'from', end: 'to' },
