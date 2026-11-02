@@ -1,16 +1,14 @@
-import { partnerView } from '@museumwnf/viewer-core'
-import { inScope, itemSummary } from './catalogue.js'
+import { CATALOGUE_PAGE_SIZE, partnerView, removeEndingPoint } from '@museumwnf/viewer-core'
+import { resultTile } from './catalogue.js'
 import { useData } from './data.js'
 
-// The partner pages: the groups of the partner list on `/partners` and what
-// `RecordView` renders on `/partner/:id`. The engine — the field sheet, the
-// media gallery, the content language — is the platform's; what is declared
-// here is only what is this website's: which partners are listed at all
-// (legacy's INNER JOINs on a name translation and a country), legacy's
-// grouping, and the partner's view-model with this website's routes, plus
-// the held items a partner's own record does not declare as a relation (the
-// package models it the other way, an item pointing at its partner, so it is
-// read the same way the original page scanned for it).
+// The partner pages: the groups of the partner list on `/partners`, the
+// profile's view-model on `/partner/:id` and its items on
+// `/partner/:id/items`. The pages are viewer-layout's standalone family's;
+// what is declared here is only what is this website's: which partners are
+// listed at all (legacy's INNER JOINs on a name translation and a country),
+// legacy's grouping, and a partner's items, read from the items that point
+// at it (the package models the relation that way round).
 
 const { items, labelOf, md, mdInline, partners, tr } = useData()
 
@@ -49,17 +47,67 @@ export function partnerListGroups() {
 }
 
 // ── The partner page ────────────────────────────────────────────────────────
-// `RecordView` carries the record's language, its load and the not-found
-// case; the page's body is viewer-layout's `PartnerPanel`
-// (inventory-app#2035), rendering the partner's view-model — the About/
-// Contact/Logo tabs, the homepage link, the pictures and the map. So the
-// sheet declares nothing of its own: no field, no media gallery (the
-// pictures are the panel's), no citation, no `related`.
+// viewer-layout's `StandalonePartnerPage` (PartnerDetail.vue) renders the
+// partner's view-model; what is this website's is the pill to its items and
+// the page of those items (PartnerItems.vue, legacy's pm_items.php).
 
-// Where a partner's "View Objects"/"View Monuments" lands: the Permanent
-// Collection, filtered on the partner.
+// The partner's items of one kind, as legacy's pm_items.php read them: by
+// country, then number (the record's legacy key), twenty a page in the
+// Permanent Collection's tile.
+const itemsOf = (partnerId, kind) => (items.value ?? []).filter((item) => item.partner_id === partnerId && item.type === kind)
+const legacyNumber = (item) => {
+  const [, , , country = '', number = ''] = String(item.backward_compatibility ?? '').split(':')
+  return { country, number: Number(number) }
+}
+export function partnerItemsSpec(partnerId, kind) {
+  return {
+    entity: 'items',
+    keys: [],
+    scope: (item) => item.partner_id === partnerId && item.type === kind,
+    sort: (list) => [...list].sort((a, b) => {
+      const x = legacyNumber(a)
+      const y = legacyNumber(b)
+      return x.country.localeCompare(y.country) || x.number - y.number
+    }),
+    pageSize: CATALOGUE_PAGE_SIZE,
+    record: resultTile,
+    summary: () => [],
+    empty: 'sharinghistory.pcr.empty',
+  }
+}
+
+// Where a partner's "View Objects"/"View Monuments" lands: its objects when
+// it holds any, else its monuments (legacy's hasobjects_/hasmonuments_).
+export function partnerItemsKind(partner) {
+  if (!partner) return null
+  if (itemsOf(partner.id, 'object').length) return 'object'
+  return itemsOf(partner.id, 'monument').length ? 'monument' : null
+}
 export function partnerObjectsLink(partner) {
-  return { path: '/permanent-collection/results', query: { partner: partner.id } }
+  return { name: 'partner-items', params: { id: partner.id }, query: { type: partnerItemsKind(partner) ?? 'object' } }
+}
+export function partnerItemsLink(partner) {
+  const kind = partnerItemsKind(partner)
+  if (!kind) return null
+  return {
+    label: kind === 'monument' ? 'sharinghistory.pp.viewMonuments' : 'sharinghistory.pp.viewObjects',
+    to: partnerObjectsLink(partner),
+  }
+}
+
+// The profile's view-model, read as legacy's pm_partner.php printed it: the
+// name, the city and the contact lines without their ending period.
+const plain = (value) => (value ? removeEndingPoint(String(value)) : value)
+export function partnerProfileView(partner, text) {
+  const own = text ?? {}
+  const view = partnerViewOf(partner, {
+    ...own,
+    ...Object.fromEntries(['name', 'city', 'address', 'phone', 'fax', 'email'].map((key) => [key, plain(own[key])])),
+  })
+  view.persons = view.persons.map((person) =>
+    Object.fromEntries(Object.entries(person).map(([key, value]) => [key, typeof value === 'string' ? plain(value) : value])),
+  )
+  return view
 }
 
 // The partner's view-model, which `PartnerPanel` renders on the partner page
@@ -73,23 +121,4 @@ export function partnerViewOf(partner, text) {
     route: (p) => ({ name: 'partner', params: { id: p.id } }),
     objectsRoute: partnerObjectsLink,
   })
-}
-// The items a partner holds — `item.partner_id`, the package's own relation,
-// read in reverse; `related` (a record's own declared references) does not
-// apply here, so this feeds the `#related` slot directly rather than the
-// spec's `related` option. Shared row shape with the timeline gallery
-// (`itemSummary`, composables/catalogue.js).
-export function heldItems(partner) {
-  return (items.value ?? []).filter((item) => inScope(item) && item.partner_id === partner.id)
-}
-export function heldItemRows(partner) {
-  return heldItems(partner).map(itemSummary)
-}
-
-export const partnerSheetSpec = {
-  entity: 'partners',
-  fields: [],
-  media: () => [],
-  citation: false,
-  related: false,
 }

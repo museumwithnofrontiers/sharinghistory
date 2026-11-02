@@ -113,3 +113,13 @@ a:hover {
 .sharinghistory-pl .mwnf-standalone-pl__associated p { margin: 0 0 3px 2px; padding: 0 32px; }
 .sharinghistory-pl .mwnf-standalone-pl__row a { margin-left: -4px; }
 .sharinghistory-pl .mwnf-standalone-pl__none { font-size: 14px; }
+
+/* The partner profile and its items (pm_partner.php, pm_items.php): the
+   way back a line of 16px (.arrow_bakward) 5px above the 15 under it; the
+   profile's pills a line of 16px, as legacy's 14px Roboto, 3px more under
+   them. */
+.mwnf-standalone-partner__back,
+.mwnf-standalone-pmi .mwnf-standalone-pcr__back { align-items: flex-start; min-height: 21px; line-height: 16px; }
+.mwnf-standalone-partner__tabs,
+.mwnf-standalone-partner__items { line-height: 16px; }
+.mwnf-standalone-partner__bar { padding-bottom: 3px; }

@@ -1,60 +1,47 @@
 <script setup>
-import { BackLink, PartnerPanel, RecordLanguages, RelatedRecords } from '@museumwnf/viewer-layout/content'
-import { RecordView } from '@museumwnf/viewer-layout/views'
-import { heldItemRows, partnerObjectsLink, partnerSheetSpec, partnerViewOf } from '../composables/partner.js'
+import { useI18n } from '@museumwnf/viewer-core'
+import { StandalonePartnerPage } from '@museumwnf/viewer-layout/standalone'
+import { partnerItemsLink, partnerProfileView } from '../composables/partner.js'
 
-// The partner profile: the platform's composed record page (the record's
-// language, its load, the not-found case), with viewer-layout's
-// `PartnerPanel` as its body — the name and location, the About/Contact/
-// Logo tabs and the homepage link (decision D2, inventory-app#2035), the
-// pictures, the map. What is this website's: the way back and the record's
-// languages, the type badge, the "View Objects/Monuments" link the Permanent
-// Collection reads `?partner=` from, and the held-items grid (the package
-// models the relation the other way round, an item pointing at its partner,
-// so `related` — a record's own declared references — does not reach it).
+// The partner profile as legacy's pm_partner.php: the standalone family's
+// page (viewer-layout's `StandalonePartnerPage`), with what is this
+// website's: its ways back, its link to the partner's items, the band of
+// its languages and its map for every partner that has them, and every word
+// legacy's own (sharinghistory.pp.*, its translation table).
 
 defineProps({ id: { type: String, required: true } })
+
+const { locale } = useI18n()
+
+const back = () => [
+  { label: 'sharinghistory.pcr.back', history: true },
+  { label: 'sharinghistory.pp.allPartners', to: { name: 'partners', query: { lang: locale.value } } },
+  { label: 'sharinghistory.pl.sponsors', to: { name: 'sponsors', query: { lang: locale.value } } },
+]
+
+const labels = {
+  about: 'sharinghistory.pp.about',
+  contact: 'sharinghistory.pp.contact',
+  logo: 'sharinghistory.pp.logo',
+  homepage: 'sharinghistory.pp.homepage',
+  addresses: 'sharinghistory.pp.addresses',
+  phone: 'sharinghistory.pp.phone',
+  fax: 'sharinghistory.pp.fax',
+  map: 'sharinghistory.pp.map',
+}
+
+const hasMap = (record) => record?.latitude != null && record?.longitude != null
+const everyPartner = () => true
 </script>
 
 <template>
-  <RecordView :spec="partnerSheetSpec" :id="id" class="detail mwnf-panel">
-    <template #header="{ language, languages, select }">
-      <div class="detail-top">
-        <BackLink variant="bar" label="partner.nav.back" :to="{ name: 'partners' }" />
-      </div>
-      <RecordLanguages :languages="languages" :language="language" @select="select" />
-    </template>
-
-    <template #before-sheet="{ record, text, dir }">
-      <PartnerPanel variant="full" :partner="partnerViewOf(record, text)" :heading="1" :dir="dir">
-        <template #badge>
-          <div><span class="detail-type-badge">{{ record.type === 'institution' ? $t('partner.info.typeInstitution') : $t('partner.info.typeMuseum') }}</span></div>
-        </template>
-        <template #actions>
-          <RouterLink v-if="record.item_count" :to="partnerObjectsLink(record)" class="mwnf-button">
-            {{ record.type === 'institution' ? $t('partner.action.viewMonuments') : $t('partner.action.viewObjects') }} ({{ record.item_count }}) →
-          </RouterLink>
-        </template>
-      </PartnerPanel>
-    </template>
-
-    <template #related="{ record }">
-      <RelatedRecords :heading="$t('record.related.items')" :records="heldItemRows(record)" variant="list" />
-    </template>
-  </RecordView>
+  <StandalonePartnerPage
+    :id="id"
+    :view="partnerProfileView"
+    :back="back"
+    :items="partnerItemsLink"
+    :map="hasMap"
+    :bands="everyPartner"
+    :labels="labels"
+  />
 </template>
-
-<style scoped>
-.detail-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-
-.detail-type-badge {
-  display: inline-block;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--mwnf-heading-color);
-  border: 1px solid var(--site-rule-color);
-  padding: 2px 8px;
-  font-family: 'Roboto', sans-serif;
-}
-</style>
