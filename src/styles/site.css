@@ -207,7 +207,8 @@ a:hover {
    red band under the banner across the page (section.language_option
    .hstr_bg), its tabs 26px high, the page's own on red, "About the Project"
    on the right, then 23px to the content. */
-:has(> .mwnf-content .sharinghistory-hbb) { container-type: inline-size; }
+:has(> .mwnf-content .sharinghistory-hbb),
+:has(> .mwnf-content .sh-about-tabs) { container-type: inline-size; }
 .sharinghistory-hbb {
   display: flex;
   justify-content: space-between;
@@ -400,10 +401,12 @@ a:hover {
   .sharinghistory-pl .mwnf-standalone-pl__head h3:last-child { margin-bottom: 10px; }
   .sharinghistory-bib__languages .mwnf-languages__button,
   .mwnf-standalone-item__top .mwnf-languages__button,
-  .sharinghistory-hbb a { font-size: 11px; line-height: normal; }
+  .sharinghistory-hbb a,
+  .mwnf-standalone .sh-about-tabs a { font-size: 11px; line-height: normal; }
 }
 @media (max-width: 390px) {
   .sharinghistory-bib__languages .mwnf-languages__button,
   .mwnf-standalone-item__top .mwnf-languages__button,
-  .sharinghistory-hbb a { font-size: 9px; line-height: normal; }
+  .sharinghistory-hbb a,
+  .mwnf-standalone .sh-about-tabs a { font-size: 9px; line-height: normal; }
 }

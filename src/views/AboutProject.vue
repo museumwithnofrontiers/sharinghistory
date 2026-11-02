@@ -61,7 +61,7 @@ const pictures = computed(() => {
 .sh-about {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 23px;
 }
 .sh-about__columns {
   display: grid;
@@ -69,10 +69,15 @@ const pictures = computed(() => {
   gap: 1.5rem;
 }
 @media (min-width: 48rem) {
-  /* Legacy's col-md-4 and col-md-6. */
+  /* Legacy's col-md-4 and col-md-6, 30px apart; the pictures three across
+     on the first's whole width. */
   .sh-about__columns {
-    grid-template-columns: 4fr 6fr;
-    padding-right: calc(100% / 6);
+    grid-template-columns: calc((100% + 30px) / 3 - 30px) calc((100% + 30px) / 2 - 30px);
+    column-gap: 30px;
+  }
+  .sh-about__columns .sh-about__pictures {
+    grid-template-columns: repeat(3, 108px);
+    justify-self: stretch;
   }
 }
 /* Legacy's `.about_left_bg`: two columns of 108 × 83 pictures, each
@@ -99,6 +104,7 @@ const pictures = computed(() => {
   font-size: 24px;
   font-style: italic;
   font-weight: 500;
+  line-height: normal;
   color: #990000;
 }
 .sh-about__name {
@@ -106,7 +112,36 @@ const pictures = computed(() => {
   font-size: 16px;
   font-style: italic;
   font-weight: 500;
+  line-height: 22px;
   color: #990000;
+}
+/* Legacy's body text, 16px on 22px lines, its bold 500. */
+.sh-about__text,
+.sh-about__text :deep(.mwnf-prose) {
+  font-size: 16px;
+  line-height: 22px;
+}
+.sh-about__text :deep(b),
+.sh-about__text :deep(strong) {
+  font-weight: 500;
+}
+/* Its paragraphs a blank line apart (legacy's <br/><br/>), its list 20px
+   in with no space between the entries, its links in the text's colour. */
+.sh-about__text :deep(.mwnf-prose p) {
+  margin: 0 0 22px;
+}
+.sh-about__text :deep(.mwnf-prose p:has(+ ul)) {
+  margin-bottom: 10px;
+}
+.sh-about__text :deep(.mwnf-prose ul) {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+.sh-about__text :deep(.mwnf-prose li) {
+  margin: 0;
+}
+.sh-about__text :deep(.mwnf-prose a) {
+  color: #222;
 }
 .sh-about__heading {
   margin-bottom: 15px;
