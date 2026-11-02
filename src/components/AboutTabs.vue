@@ -72,4 +72,13 @@ const tabs = computed(() => [
 .sh-about-tabs__icon::before {
   content: '»\00a0';
 }
+/* On a phone legacy's words are 11px, 9px up to 390px
+   (css/responsive_style.css), the strip on one line. */
+@media (max-width: 767px) {
+  .sh-about-tabs { flex-wrap: nowrap; }
+  .sh-about-tabs a { font-size: 11px; line-height: normal; }
+}
+@media (max-width: 390px) {
+  .sh-about-tabs a { font-size: 9px; }
+}
 </style>
