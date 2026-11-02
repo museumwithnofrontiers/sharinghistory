@@ -389,6 +389,10 @@ a:hover {
   .mwnf-standalone .mwnf-content { margin-bottom: 24px; }
   .mwnf-standalone .mwnf-sponsors { padding-inline: 24px; }
   .sharinghistory-tlp__picture img { max-width: 100%; }
+  /* The Timeline entrance: three blank lines over the word to the visitor,
+     the thematic form 15px further under the political one. */
+  .sharinghistory-tle { margin-top: 48px; }
+  .sharinghistory-tle__form + .sharinghistory-tle__form { margin-top: 15px; }
   .sharinghistory-pl { margin-right: 10px; }
   .sharinghistory-pl .mwnf-standalone-pl__toggle { margin-left: 0; }
   .sharinghistory-pl .mwnf-standalone-pl__back { margin-bottom: 35px; }
