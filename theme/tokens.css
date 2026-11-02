@@ -281,6 +281,22 @@
   --mwnf-standalone-refine-search-color: #222222;
   --mwnf-standalone-refine-new-background: #750101;
   --mwnf-standalone-refine-shadow: #500101;
+  /* The partner list (pm_partner_list.php, section.pm_partner): white words
+     and white arrows on the red page, the countries under a lighter red rule
+     that runs into the "See Associated Museums" band, its arrow pointing
+     down whether open or closed. */
+  --mwnf-standalone-pl-ground: #990000;
+  --mwnf-standalone-pl-back-color: #ffffff;
+  --mwnf-standalone-pl-back-weight: 400;
+  --mwnf-standalone-pl-back-arrow: url('./assets/icons/white_back_arrow.png');
+  --mwnf-standalone-pl-group-color: #ffffff;
+  --mwnf-standalone-pl-group-weight: 400;
+  --mwnf-standalone-pl-rule: #af2626;
+  --mwnf-standalone-pl-toggle-color: #ffffff;
+  --mwnf-standalone-pl-link-color: #ffffff;
+  --mwnf-standalone-pl-link-weight: 300;
+  --mwnf-standalone-pl-bullet: url('./assets/icons/white_next_arrow.png');
+  --mwnf-standalone-accordion-closed: url('./assets/icons/down_arrow.png');
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and
