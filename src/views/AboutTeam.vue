@@ -83,16 +83,21 @@ const toggleCountry = (id) => { openCountry.value = openCountry.value === id ? n
 </template>
 
 <style scoped>
+/* The heading 23px under the About strip, the team 15px under it. */
 .sh-team {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 15px;
+}
+.sh-team > :first-child {
+  margin-bottom: 8px;
 }
 /* Legacy's `.short_heading h3`. */
 .sh-team__heading {
   margin: 0;
   font-size: 19px;
   font-weight: 400;
+  line-height: normal;
   color: #222222;
 }
 .sh-team__columns {
@@ -101,9 +106,10 @@ const toggleCountry = (id) => { openCountry.value = openCountry.value === id ? n
   gap: 1.5rem;
 }
 @media (min-width: 48rem) {
-  /* Legacy's two col-md-6. */
+  /* Legacy's two col-md-6, 30px apart. */
   .sh-team__columns {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, calc((100% + 30px) / 2 - 30px));
+    column-gap: 30px;
   }
 }
 .sh-team__category h2,
@@ -114,8 +120,8 @@ const toggleCountry = (id) => { openCountry.value = openCountry.value === id ? n
 /* Legacy's `h3.team_txt_head`: an oxblood bar per category. */
 .sh-team__toggle {
   display: block;
-  width: 100%;
-  margin: 0 0 20px;
+  width: calc(100% - 30px);
+  margin: 0 15px 20px;
   padding: 5px 10px;
   border: 0;
   background: #750101;
@@ -123,6 +129,7 @@ const toggleCountry = (id) => { openCountry.value = openCountry.value === id ? n
   font: inherit;
   font-size: 18px;
   font-weight: 300;
+  line-height: 21px;
   text-align: left;
   cursor: pointer;
 }

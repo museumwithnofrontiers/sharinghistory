@@ -447,12 +447,10 @@ a:hover {
   .sharinghistory-pl .mwnf-standalone-pl__head h3:last-child { margin-bottom: 10px; }
   .sharinghistory-bib__languages .mwnf-languages__button,
   .mwnf-standalone-item__top .mwnf-languages__button,
-  .sharinghistory-hbb a,
-  .mwnf-standalone .sh-about-tabs a { font-size: 11px; line-height: normal; }
+  .sharinghistory-hbb a { font-size: 11px; line-height: normal; }
 }
 @media (max-width: 390px) {
   .sharinghistory-bib__languages .mwnf-languages__button,
   .mwnf-standalone-item__top .mwnf-languages__button,
-  .sharinghistory-hbb a,
-  .mwnf-standalone .sh-about-tabs a { font-size: 9px; line-height: normal; }
+  .sharinghistory-hbb a { font-size: 9px; line-height: normal; }
 }
