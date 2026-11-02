@@ -189,16 +189,38 @@ describe('website smoke test', () => {
     expect(links.every((l) => l.themeId !== nc.id)).toBe(true)
   })
 
-  // The Historical Background/Profiles pages, and the country page, run on
-  // `useCollectionTree` (composables/history.js) and `EssayView`
-  // (composables/historySpecs.js) — #39, following the exhibition tree's own
-  // move in #37/#38.
-  it('renders the Historical Background page as its own wrapper, over both subtrees', async () => {
-    const { app, host } = await mountSite(config, messages, '#/historical-background')
-    await vi.waitFor(() => expect(host.querySelector('.perspective-tabs')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.topic-list')).not.toBeNull()
-    expect(host.querySelector('.insight-table')).not.toBeNull()
-    app.unmount()
+  // Legacy's Historical Background (historical_background*.php): the band of
+  // its pages, the About page's twenty portraits, its word to the visitor,
+  // the three perspectives and Related Content; a perspective's portraits,
+  // text and countries; Read more's topics; Country Insight's lists and a
+  // country's maps with their words (Austria's first: "1815").
+  it("renders the Historical Background pages as legacy's", async () => {
+    const about = await mountSite(config, messages, '#/historical-background?lang=en')
+    await vi.waitFor(() => expect(about.host.querySelectorAll('.sharinghistory-hb__pages a').length).toBe(3), { timeout: 20000 })
+    expect([...about.host.querySelectorAll('.sharinghistory-hbb__tabs a')].map((a) => a.textContent)).toEqual(['About', 'Country Insight', 'Read more'])
+    expect(about.host.querySelector('.sharinghistory-hbb__tab--active').textContent.trim()).toBe('About')
+    expect(about.host.querySelectorAll('.sharinghistory-hb__mosaic img').length).toBe(20)
+    expect([...about.host.querySelectorAll('.sharinghistory-hb__pages a')].map((a) => a.textContent)).toEqual(['Arab Perspective', 'Ottoman Perspective', 'European Perspective'])
+    expect([...about.host.querySelectorAll('.sharinghistory-hb__related a')].map((a) => a.textContent)).toEqual(['Timeline', 'Historical Profiles', 'Maps'])
+    about.app.unmount()
+
+    const page = await mountSite(config, messages, '#/historical-background/perspective/1?lang=en')
+    await vi.waitFor(() => expect(page.host.querySelector('.sharinghistory-hbp__text h2')?.textContent).toBe('Arab Perspective'), { timeout: 20000 })
+    expect(page.host.querySelectorAll('.sharinghistory-hbp__portraits img').length).toBe(8)
+    expect(page.host.querySelector('.sharinghistory-hbp__others').textContent.replace(/\s+/g, ' ').trim()).toBe('Ottoman Perspective | European Perspective')
+    expect(page.host.querySelector('.sharinghistory-hbp__countries').textContent).toContain('Saudi Arabia')
+    page.app.unmount()
+
+    const more = await mountSite(config, messages, '#/historical-background/read-more?lang=en')
+    await vi.waitFor(() => expect(more.host.querySelectorAll('.sharinghistory-hbr__topics a').length).toBe(10), { timeout: 20000 })
+    expect(more.host.querySelector('.sharinghistory-hbr__heading').textContent).toBe('Select a topic')
+    more.app.unmount()
+
+    const insight = await mountSite(config, messages, '#/historical-background/insight?mapcountry=aut&lang=en')
+    await vi.waitFor(() => expect(insight.host.querySelector('.sharinghistory-hbi__words')?.textContent).toBe('1815'), { timeout: 20000 })
+    expect(insight.host.querySelector('.sharinghistory-hbi__maps h3').textContent).toBe('Maps | Austria')
+    expect(insight.host.querySelectorAll('.sharinghistory-hbi__thumbs img').length).toBe(3)
+    insight.app.unmount()
   }, 60000)
 
   it('renders the Historical Profiles list on SectionCards', async () => {

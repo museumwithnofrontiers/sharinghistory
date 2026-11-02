@@ -1,184 +1,71 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { I18nText, useI18n } from '@museumwnf/viewer-core'
-import {
-  historicalPerspectives,
-  historicalProfileCountries,
-  historicalProfileNodeRoute,
-  historicalProfilesTree,
-  historicalTopics,
-} from '../composables/history.js'
+import HistoricalBackgroundBand from '../components/HistoricalBackgroundBand.vue'
+import config from '../historicalBackground.json'
+import { historicalPerspectives, historicalProfileCountries, historicalProfileNodeRoute } from '../composables/history.js'
 import { useData } from '../composables/data.js'
+import { POLITICAL } from '../composables/timeline.js'
 
-// None of `TextPageView` (a single Markdown body, no slots of its own) or
-// `SectionCards` (one link per card) fits this page's three boxes: the
-// perspective tabs switch prose in place rather than navigating, the topic
-// list has nowhere to link to (legacy never filled the "read more" popup
-// text in), and the country table carries two links per row. A small
-// wrapper of its own, over the two `useCollectionTree` subtrees in
-// composables/history.js (see the pull request description).
+// The Historical Background as legacy's historical_background.php: its band
+// (About), the mosaic of its twenty portraits — ten columns, each an `a`
+// portrait over its `b`, named on the pointer — its word to the visitor,
+// the three perspectives' pages, and Related Content: the political
+// context timeline, the historical profiles (Austria's first, as legacy
+// linked) and the maps. Every word is legacy's own (sharinghistory.hb.*);
+// the portraits and their names are the site's (src/historicalBackground.json).
 
-const { t } = useI18n()
-const { labelOf, md, mdInline, tr } = useData()
+const router = useRouter()
+const { t, locale } = useI18n()
+const { mdInline, tr } = useData()
 
-const activePerspectiveIndex = ref(0)
+const portrait = (key) => ({ key, name: config.portraits[key], src: new URL(`../../theme/assets/hb/${key}.jpg`, import.meta.url).href })
+const columns = Array.from({ length: 10 }, (_, i) => [portrait(`a${i + 1}`), portrait(`b${i + 1}`)])
 
 const perspectives = computed(() =>
-  historicalPerspectives.value.map((p) => ({
-    id: p.id,
-    title: tr('collections', p.id)?.title ?? p.internal_name,
-    description: tr('collections', p.id)?.description ?? '',
+  historicalPerspectives.value.map((record, index) => ({
+    id: record.id,
+    title: mdInline(tr('collections', record.id)?.title ?? record.internal_name),
+    to: { name: 'historical-background-page', params: { page: index + 1 }, query: { lang: locale.value } },
   })),
 )
 
-const activePerspective = computed(() => perspectives.value[activePerspectiveIndex.value] ?? null)
-
-// "Read more" topics: legacy never filled their texts in, so this stays a
-// plain list — exactly as much content as legacy had.
-const topics = computed(() =>
-  historicalTopics.value.map((topic) => ({
-    id: topic.id,
-    title: tr('collections', topic.id)?.title ?? topic.internal_name,
-  })),
-)
-
-// Country Insight: direct access to each country's Historical Profile and
-// Political Context timeline, alphabetical by (English) country name.
-const insightCountries = computed(() =>
-  [...historicalProfileCountries.value]
-    .map((record) => ({
-      record,
-      name: labelOf('countries', record.country_id),
-      profileRoute: historicalProfileNodeRoute(historicalProfilesTree.children(record.id)[0] ?? record),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name)),
-)
+const austria = computed(() => {
+  const record = historicalProfileCountries.value.find((candidate) => candidate.country_id === 'aut')
+  return record ? historicalProfileNodeRoute(record) : null
+})
+const related = computed(() => [
+  { label: t('sharinghistory.hb.timeline'), to: { name: 'timeline-results', query: { theme: POLITICAL, lang: locale.value } }, target: '_blank' },
+  ...(austria.value ? [{ label: t('sharinghistory.hb.profiles'), to: austria.value, target: '_blank' }] : []),
+  ...(router.hasRoute('historical-background-insight')
+    ? [{ label: t('sharinghistory.hb.maps'), to: { name: 'historical-background-insight', query: { lang: locale.value } } }]
+    : []),
+])
 </script>
 
 <template>
-  <div class="hb-wrap">
-    <div class="mwnf-panel">
-      <h1 class="mwnf-heading">{{ t('sharinghistory.nav.historicalBackground') }}</h1>
-      <I18nText tag="p" class="hb-intro-note" keypath="sharinghistory.history.intro" />
-
-      <div v-if="perspectives.length" class="perspective-tabs">
-        <button
-          v-for="(p, idx) in perspectives"
-          :key="p.id"
-          class="perspective-tab"
-          :class="{ active: idx === activePerspectiveIndex }"
-          @click="activePerspectiveIndex = idx"
-        >{{ p.title }}</button>
-      </div>
-
-      <div v-if="activePerspective">
-        <h2 class="perspective-title" v-html="mdInline(activePerspective.title)" />
-        <div class="mwnf-prose" v-html="md(activePerspective.description)" />
+  <div class="sharinghistory-hb">
+    <HistoricalBackgroundBand active="about" />
+    <div class="sharinghistory-hb__mosaic">
+      <div v-for="(column, index) in columns" :key="index" class="sharinghistory-hb__column">
+        <img v-for="p in column" :key="p.key" :src="p.src" :alt="p.name" :title="p.name">
       </div>
     </div>
-
-    <div v-if="topics.length" class="mwnf-panel">
-      <h2 class="mwnf-heading">{{ t('sharinghistory.action.readMore') }}</h2>
-      <ul class="topic-list">
-        <li v-for="topic in topics" :key="topic.id" class="topic-row">
-          <span class="topic-name" v-html="mdInline(topic.title)" />
-        </li>
-      </ul>
-    </div>
-
-    <div class="mwnf-panel">
-      <h2 class="mwnf-heading">{{ t('sharinghistory.history.countryInsight') }}</h2>
-      <I18nText tag="p" class="hb-intro-note" keypath="sharinghistory.history.countryInsightIntro" />
-      <table class="insight-table">
-        <tbody>
-          <tr v-for="c in insightCountries" :key="c.record.id">
-            <th>{{ c.name }}</th>
-            <td>
-              <RouterLink :to="c.profileRoute">
-                {{ t('sharinghistory.related.historicalProfile') }}
-              </RouterLink>
-            </td>
-            <td>
-              <RouterLink
-                :to="{ path: '/timeline/results', query: { country: c.record.country_id, collection: 'pc' } }"
-              >
-                {{ t('sharinghistory.related.politicalContextTimeline') }}
-              </RouterLink>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="sharinghistory-hb__text">
+      <I18nText tag="h3" keypath="sharinghistory.hb.intro" />
+      <p class="sharinghistory-hb__pages">
+        <template v-for="p in perspectives" :key="p.id">
+          <!-- eslint-disable-next-line vue/no-v-html -- the record's own Markdown, rendered and escaped by viewer-core -->
+          <RouterLink :to="p.to"><span v-html="p.title"></span></RouterLink><br>
+        </template>
+      </p>
+      <p class="sharinghistory-hb__related">
+        <b>{{ t('sharinghistory.tlr.related') }}</b><br>
+        <template v-for="link in related" :key="link.label">
+          <RouterLink :to="link.to" :target="link.target">{{ link.label }}</RouterLink><br>
+        </template>
+      </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.hb-wrap { display: flex; flex-direction: column; gap: 16px; }
-
-.hb-intro-note {
-  font-family: 'Roboto', sans-serif;
-  font-size: 13px;
-  color: var(--mwnf-color-muted);
-  margin-bottom: 14px;
-}
-
-.perspective-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--mwnf-color-border);
-  padding-bottom: 10px;
-}
-.perspective-tab {
-  font-family: 'Roboto', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 6px 14px;
-  background: none;
-  border: 1px solid var(--mwnf-color-border);
-  color: var(--mwnf-heading-color);
-  cursor: pointer;
-}
-.perspective-tab:hover { color: var(--mwnf-link-hover-text); border-color: var(--mwnf-color-accent); }
-.perspective-tab.active {
-  background: var(--mwnf-color-accent);
-  border-color: var(--mwnf-color-accent);
-  color: #fff;
-}
-
-.perspective-title {
-  font-size: 17px;
-  font-weight: 500;
-  color: var(--mwnf-heading-color);
-  margin-bottom: 10px;
-  font-family: 'Roboto', sans-serif;
-}
-
-.topic-list { list-style: none; }
-.topic-row {
-  padding: 8px 4px;
-  border-bottom: 1px solid var(--site-light-rule);
-}
-.topic-row:last-child { border-bottom: none; }
-.topic-name {
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  color: var(--mwnf-heading-color);
-}
-
-.insight-table { border-collapse: collapse; width: 100%; font-family: 'Roboto', sans-serif; font-size: 13px; }
-.insight-table th {
-  text-align: left;
-  font-weight: 500;
-  color: var(--mwnf-heading-color);
-  padding: 7px 16px 7px 4px;
-  border-bottom: 1px solid var(--site-light-rule);
-  white-space: nowrap;
-}
-.insight-table td {
-  padding: 7px 16px 7px 0;
-  border-bottom: 1px solid var(--site-light-rule);
-}
-.insight-table a { color: var(--mwnf-link-text); }
-</style>
