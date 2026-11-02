@@ -323,6 +323,24 @@
   --mwnf-standalone-tlr-link-weight: 300;
   --mwnf-standalone-tlr-download-weight: 400;
   --mwnf-standalone-tlr-bullet: url('./assets/icons/white_next_arrow.png');
+  /* The item's timeline window (hcr.php, #hcr_timeline): the red ground, the
+     dark red band with legacy's picture and the dark red article, the yellow
+     band of years and round ×, the white words of the left column, the
+     item's picture 135px high at its own width. */
+  --mwnf-standalone-window-background: #990000;
+  --mwnf-standalone-window-header: #750101;
+  --mwnf-standalone-window-header-image: url('./assets/icons/hcr_header.jpg');
+  --mwnf-standalone-window-heading-color: #ffffff;
+  --mwnf-standalone-window-heading-weight: 500;
+  --mwnf-standalone-window-close: #febe40;
+  --mwnf-standalone-window-article: #750101;
+  --mwnf-standalone-window-input-border: #790d0d;
+  --mwnf-standalone-hcr-scale: #febe40;
+  --mwnf-standalone-hcr-dash: url('./assets/icons/hcr_timeline_dash.gif');
+  --mwnf-standalone-hcr-text-color: #ffffff;
+  --mwnf-standalone-hcr-image-width: auto;
+  --mwnf-standalone-hcr-image-height: 135px;
+  --mwnf-standalone-hcr-image-ground: transparent;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and

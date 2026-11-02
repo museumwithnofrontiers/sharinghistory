@@ -325,6 +325,31 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
+  // Legacy's hcr.php ("Timeline for this item"): the sheet offers the window
+  // when the item's country has events; the window shows the item's country
+  // and period, the item, and legacy's events for it (this Austrian fez,
+  // 1890–1900: legacy's eleven events, from 1850 to 1897, measured on legacy's window on
+  // 2026-11-02).
+  it("opens the item's timeline as legacy's hcr.php", async () => {
+    const fez = 'bb542d79-d99d-5291-a57c-0b72137d0e2f'
+    const sheet = await mountSite(config, messages, `#/item/${fez}?lang=en`)
+    await vi.waitFor(() => expect(sheet.host.querySelector('.sharinghistory-timeline-link a')).not.toBeNull(), { timeout: 20000 })
+    const link = sheet.host.querySelector('.sharinghistory-timeline-link a')
+    expect(link.textContent).toBe('Timeline for this item')
+    expect(link.getAttribute('href')).toContain(`#/item/${fez}/timeline`)
+    sheet.app.unmount()
+
+    const { app, host } = await mountSite(config, messages, `#/item/${fez}/timeline?lang=en`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-hcr__event')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-hcr__main h3').textContent).toBe('Austria - 1890 - 1900 A.D.')
+    expect([...host.querySelectorAll('.mwnf-standalone-hcr__event b')].map((b) => b.textContent)).toEqual([
+      '1850 - 1900 A.D.', '1850 - 1900 A.D.', '1858 - 1910 A.D.', '1872 - 1891 A.D.', '1887 - 1918 A.D.', '1891 - 1891 A.D.',
+      '1893 - 1893 A.D.', '1895 - 1895 A.D.', '1896 - 1896 A.D.', '1896 - 1896 A.D.', '1897 - 1897 A.D.',
+    ])
+    expect(host.querySelector('.mwnf-standalone-hcr__left strong').textContent).toContain('Fez of a common soldier')
+    app.unmount()
+  }, 60000)
+
   // Legacy's hcr_home.php: its word to the visitor, the Political Context
   // Timeline of a country and the Thematic Timelines of a theme, each with
   // legacy's periods and Go, refused without a country or a theme.
@@ -568,7 +593,7 @@ describe('website smoke test', () => {
         'database-results', 'timeline', 'timeline-results', 'timeline-gallery', 'partners', 'partners-results',
         'partner', 'exhibitions', 'exhibition', 'exhibition-introduction',
         'exhibition-further-reading', 'exhibition-theme', 'exhibition-chapter',
-        'historical-background', 'historical-profiles', 'historical-profile', 'item',
+        'historical-background', 'historical-profiles', 'historical-profile', 'item', 'item-timeline', 'partner-items',
       ],
       legacyPaths: ['/historical-background/:recordId'],
     })).toEqual([])
