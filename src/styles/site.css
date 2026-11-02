@@ -397,8 +397,23 @@ a:hover {
 @media (max-width: 767px) {
   .sh-chronology__body { margin-left: 0; }
   .sh-chronology__blank { display: none; }
-  .sh-chronology__row,
   .sh-chronology__columns { grid-template-columns: 1fr; }
+}
+/* Up to 750px legacy draws the list as dark red rows, every other one
+   lighter, each its years and place and its title in halves, the words
+   11px and white (css/responsive_style.css). */
+@media (max-width: 750px) {
+  .sh-chronology__body { margin: 21px -5px 0; padding-top: 15px; }
+  .sh-chronology__row {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 0;
+    margin: 0 -10px;
+    padding: 10px 10px 0;
+    background: #750101;
+  }
+  .sh-chronology__row:nth-child(even) { background: #990000; }
+  .sh-chronology__row p { padding: 0 15px; font-size: 11px; color: #fff; }
+  .sh-chronology__row a { color: #fff; text-decoration: none; }
 }
 
 /* Phone (below 768px): legacy's MWNF phone frame is the family's
