@@ -25,3 +25,9 @@ a:hover {
 .mwnf-sheet__label--notice { display: none; }
 .mwnf-sheet__label--notice + .mwnf-sheet__value { margin: 8px 0 0; padding: 0; }
 .sharinghistory-notice { font-style: italic; }
+
+/* Legacy's header links end 25px from the page's right edge, where the
+   logo starts 65px from its left (.portal_links). */
+.mwnf-standalone .mwnf-header__tools { margin-right: -40px; }
+/* Its 16px line on a 24px line, 4px into the heading's 34px (.header_heading p). */
+.mwnf-standalone .mwnf-header__subtitle { margin-top: -4px; line-height: 24px; }

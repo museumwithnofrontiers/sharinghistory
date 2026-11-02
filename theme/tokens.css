@@ -34,7 +34,7 @@
   --mwnf-header-background: #750101;
   --mwnf-header-text: #ffffff;
   --mwnf-header-title-size: 1.75rem;
-  --mwnf-header-subtitle-size: 0.7rem;
+  --mwnf-header-subtitle-size: 16px;
   --mwnf-header-subtitle-color: #ffffff;
 
   /* ---------- Banner ---------- */
@@ -231,6 +231,19 @@
   --mwnf-standalone-menu-weight: 400;
   --mwnf-standalone-menu-padding: 5px 0;
   --mwnf-standalone-header-link-color: #ffffff;
+  /* The header hangs from the top: the logo (120 wide) 15px down, the light
+     heading 14px down on a 34px line with its 16px line under it, the links
+     13px down, legacy's spacing around the "|". */
+  --mwnf-standalone-header-align: start;
+  --mwnf-standalone-header-inset: 65px;
+  --mwnf-standalone-header-brand-offset: 15px;
+  --mwnf-standalone-header-title-offset: 14px;
+  --mwnf-standalone-header-tools-offset: 13px;
+  --mwnf-standalone-header-links-gap: 5.5px;
+  --mwnf-standalone-header-title-line-height: 34px;
+  --mwnf-standalone-heading-weight: 300;
+  --mwnf-standalone-logo-height: 50px;
+  --mwnf-standalone-logo-width: 120px;
   --mwnf-standalone-home-banner-inset: 0px;
   --mwnf-standalone-home-banner-bottom: 0px;
   --mwnf-standalone-home-banner-color: #ffffff;
