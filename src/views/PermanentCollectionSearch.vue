@@ -26,7 +26,7 @@ function open(query) {
 }
 
 function openPartners(value) {
-  if (value === 'SH') router.push({ name: 'partners-results', query: { lang: locale.value } })
+  if (value === 'SH') router.push({ name: 'partners', query: { lang: locale.value } })
 }
 
 // Legacy's selectTimePeriod(): a start after the end is refused with its

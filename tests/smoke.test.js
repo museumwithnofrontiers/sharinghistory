@@ -418,37 +418,26 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The partner list runs on the platform's composed `PartnerListView`
-  // (composables/partner.js): the country accordion and the "Name, City" row
-  // are the shared component's; this website's own scope — a partner needs a
-  // name translation and a country, legacy pm_partner_list.php's INNER
-  // JOINs — decides which of the package's 120 partners the list shows at
-  // all, asserted here against the real fixture count.
-  it('renders the partner list on the composed view, grouped by country with "Name, City" rows', async () => {
+  // Legacy's pm_partner_list.php: Back and Sponsors, then one row a country
+  // by its name, its partners as "Name, City", and "See Associated Museums",
+  // which opens the country's associated partners. A partner needs a name
+  // translation and a country (legacy's INNER JOINs): 114 of the package's 120.
+  it("renders the partner list as legacy's pm_partner_list.php", async () => {
     const [partners] = await loadEntities(['partners'])
-    const fixture = partners.find(
-      (p) => p.country_id && partnerTexts[p.id]?.name && partnerTexts[p.id]?.city && (!p.level || p.level === 'partner'),
-    )
-    expect(fixture, 'fixture: a main partner with a name, a country and a city').not.toBeNull()
+    const listed = partners.filter((p) => p.country_id && partnerTexts[p.id]?.name)
+    const fixture = listed.find((p) => p.level === 'partner' && partnerTexts[p.id]?.city)
     const countryName = countryTexts[fixture.country_id]?.name
-    expect(countryName, 'fixture: the partner\'s country has an English name').toBeTruthy()
-    const listedCount = partners.filter((p) => p.country_id && partnerTexts[p.id]?.name).length
+    const associated = listed.filter((p) => p.level === 'associated_partner' && p.country_id === fixture.country_id)
 
-    const { app, host } = await mountSite(config, messages, '#/partners/results')
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-partner-list__row')).not.toBeNull(), { timeout: 20000 })
+    const { app, host } = await mountSite(config, messages, '#/partners?lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pl__group')).not.toBeNull(), { timeout: 20000 })
 
-    expect(host.querySelector('.mwnf-heading').textContent).toContain('Partners')
-    // The view's own count undercounts a nested child (metanull/viewer-layout#…);
-    // this site walks `groups` itself instead (PartnersResults.vue) — asserted
-    // against the site's own listing rule, not the view's built-in total.
-    expect(host.querySelector('.result-count').textContent).toContain(`Partners found: ${listedCount}`)
-
-    const groupHeadings = Array.from(host.querySelectorAll('.mwnf-partner-list__group-title')).map((el) => el.textContent)
-    expect(groupHeadings.some((heading) => heading.includes(countryName))).toBe(true)
-    // A row's name is `PartnerPanel`'s once the list renders its rows through
-    // it (museumwithnofrontiers/inventory-app#2033); this test holds on both.
-    const rowNames = Array.from(host.querySelectorAll('.mwnf-partner-list__name, .mwnf-partner-panel__name')).map((el) => el.textContent)
-    expect(rowNames.some((name) => name.includes(partnerTexts[fixture.id].name) && name.includes(partnerTexts[fixture.id].city))).toBe(true)
+    expect([...host.querySelectorAll('.mwnf-standalone-pl__back .mwnf-standalone-item__back-link')].map((a) => a.textContent)).toEqual(['Back', 'Sponsors'])
+    expect(host.querySelectorAll('.mwnf-standalone-pl__main p, .mwnf-standalone-pl__associated p:not(.mwnf-standalone-pl__none)').length).toBe(listed.length)
+    const group = [...host.querySelectorAll('.mwnf-standalone-pl__group')].find((g) => g.querySelector('.mwnf-standalone-pl__head h3').textContent === countryName)
+    expect(group.querySelector('.mwnf-standalone-pl__main').textContent).toContain(`${partnerTexts[fixture.id].name},\u00a0${partnerTexts[fixture.id].city}`)
+    expect(group.querySelector('.mwnf-standalone-pl__toggle').textContent).toBe('See Associated Partners')
+    expect(group.querySelectorAll('.mwnf-standalone-pl__associated p:not(.mwnf-standalone-pl__none)').length).toBe(associated.length)
 
     app.unmount()
   }, 60000)

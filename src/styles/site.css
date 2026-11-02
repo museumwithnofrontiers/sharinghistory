@@ -99,3 +99,17 @@ a:hover {
    back a line of 16px (.arrow_bakward), 5px above the heading's 15. */
 .sharinghistory-dbr .mwnf-standalone-refine { padding-bottom: 9px; }
 .sharinghistory-dbr .mwnf-standalone-pcr__back { align-items: flex-start; min-height: 21px; line-height: 16px; }
+
+/* The partner list (pm_partner_list.php): no headings over the columns; the
+   way back a line of 16px, 20px above the first country; the band 10px in
+   from its column; the names 12px in, their arrows 4px back, the associated
+   ones 32px in, 3px apart (section.pm_partner's .center_contents and
+   .accordion-section-content). */
+.sharinghistory-pl .mwnf-standalone-pl__heads { display: none; }
+.sharinghistory-pl .mwnf-standalone-pl__back { align-items: flex-start; margin-bottom: 20px; line-height: 16px; }
+.sharinghistory-pl .mwnf-standalone-pl__toggle { margin-left: 10px; }
+.sharinghistory-pl .mwnf-standalone-pl__main p { margin: 0 0 0 2px; padding: 0 0 0 12px; }
+.sharinghistory-pl .mwnf-standalone-pl__associated { padding-left: 0; }
+.sharinghistory-pl .mwnf-standalone-pl__associated p { margin: 0 0 3px 2px; padding: 0 32px; }
+.sharinghistory-pl .mwnf-standalone-pl__row a { margin-left: -4px; }
+.sharinghistory-pl .mwnf-standalone-pl__none { font-size: 14px; }

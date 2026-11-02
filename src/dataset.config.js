@@ -235,14 +235,15 @@ export default {
     {
       path: '/partners',
       name: 'partners',
-      component: () => import('./views/PartnersEntrance.vue'),
-      meta: meta('partners'),
+      component: () => import('./views/PartnerList.vue'),
+      meta: meta('partners', 'partners', 'countries'),
     },
     {
+      // Legacy had one partner page; the list was once a second one here.
       path: '/partners/results',
       name: 'partners-results',
-      component: () => import('./views/PartnersResults.vue'),
-      meta: meta('partners', 'partners', 'countries'),
+      redirect: (to) => ({ name: 'partners', query: to.query }),
+      meta: meta('partners'),
     },
     {
       path: '/partner/:id',
