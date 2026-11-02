@@ -297,6 +297,14 @@
   --mwnf-standalone-pl-link-weight: 300;
   --mwnf-standalone-pl-bullet: url('./assets/icons/white_next_arrow.png');
   --mwnf-standalone-accordion-closed: url('./assets/icons/down_arrow.png');
+  /* The partner profile's pills (pm_partner.php's .tabs-menu and
+     .tabs-menu-sh): dark red, the open tab and View Objects white, the
+     others white at 62%. */
+  --mwnf-standalone-pill: #750101;
+  --mwnf-standalone-pill-color: #ffffff;
+  --mwnf-standalone-pill-muted: rgb(255 255 255 / 0.62);
+  --mwnf-standalone-pill-weight: 400;
+  --mwnf-standalone-pill-separator: #ffffff;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and

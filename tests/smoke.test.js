@@ -442,51 +442,38 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The partner profile runs on the platform's composed `RecordView`
-  // (composables/partner.js): the description/contact/logo rows are the
-  // sheet's own custom-rendered fields, the media gallery is the platform's;
-  // this website's own are the "View Objects" count (the package's
-  // `item_count`, not a local scan) and the held-items grid — the package
-  // models the relation the other way round, an item pointing at its
-  // partner, so `related` (a record's own declared references) does not
-  // reach it and the view's `#related` slot builds it directly.
-  it('renders the partner profile on the composed record view, with its contact block and held items', async () => {
+  // The partner profile as legacy's pm_partner.php (viewer-layout's
+  // `StandalonePartnerPage`): the ways back, the name over its place, the
+  // About | Contact | Logo | homepage pill beside "View Objects", the map
+  // under legacy's heading. Its pill leads to legacy's pm_items.php: the
+  // partner's objects, twenty a page, beside "Partner Profile".
+  it("renders a partner profile as legacy's pm_partner.php, and its objects as pm_items.php", async () => {
     const [partners, items] = await loadEntities(['partners', 'items'])
     const fixture = partners.find(
-      (p) => partnerTexts[p.id]?.description && partnerTexts[p.id]?.phone && p.logos?.length && p.item_count > 0,
+      (p) => partnerTexts[p.id]?.description && partnerTexts[p.id]?.phone && p.logos?.length && p.latitude != null
+        && items.some((i) => i.partner_id === p.id && i.type === 'object'),
     )
-    expect(fixture, 'fixture: a partner with a description, phone, a logo and held items').not.toBeNull()
+    expect(fixture, 'fixture: a partner with a description, a phone, a logo, coordinates and objects').toBeTruthy()
     const text = partnerTexts[fixture.id]
-    const heldItems = items.filter((i) => i.partner_id === fixture.id && i.display_status !== 'N')
-    expect(heldItems.length, 'fixture: the partner\'s held, visible items').toBeGreaterThan(0)
+    const objects = items.filter((i) => i.partner_id === fixture.id && i.type === 'object')
 
-    const { app, host } = await mountSite(config, messages, `#/partner/${encodeURIComponent(fixture.id)}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-partner-panel--full')).not.toBeNull(), { timeout: 20000 })
+    const { app, host, router } = await mountSite(config, messages, `#/partner/${encodeURIComponent(fixture.id)}?lang=en`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-partner__name')?.textContent).toContain(text.name.replace(/\.$/, '')), { timeout: 20000 })
 
-    // The body is viewer-layout's `PartnerPanel` (inventory-app#2035): the
-    // About tab open, the Contact and Logo panels behind their tabs.
-    expect(host.querySelector('h1.mwnf-partner-panel__name').textContent).toContain(text.name)
-    expect(host.querySelector('.mwnf-partner-panel__description').textContent).toContain(text.description.replace(/[*_]/g, '').slice(0, 30))
-    const contact = host.querySelector('.mwnf-partner-panel__panel--contact')
-    // The address is rendered Markdown, its line breaks <br>: compared without whitespace.
-    expect(contact.querySelector('.mwnf-partner-panel__address').textContent.replace(/\s+/g, '')).toBe(text.address.replace(/\s+/g, ''))
-    expect(contact.textContent).toContain(text.phone)
-    expect(host.querySelector('.mwnf-partner-panel__logos img')).not.toBeNull()
+    expect([...host.querySelectorAll('.mwnf-standalone-item__back-link')].map((link) => link.textContent.trim()))
+      .toEqual(['Back', 'All Partners', 'Sponsors'])
+    expect(host.querySelector('.mwnf-standalone-partner__location').textContent).toContain(countryTexts[fixture.country_id].name)
+    expect([...host.querySelectorAll('[role="tab"]')].map((tab) => tab.textContent.trim())).toEqual(['About', 'Contact', 'Logo'])
+    expect(host.querySelector('.mwnf-standalone-partner__map-heading').textContent).toBe('Google Maps')
+    const viewItems = host.querySelector('.mwnf-standalone-partner__items')
+    expect(viewItems.textContent.trim()).toBe('View Objects')
 
-    const viewLink = host.querySelector('.mwnf-partner-panel__actions .mwnf-button')
-    expect(viewLink, 'the "View Objects/Monuments" link, off item_count').not.toBeNull()
-    expect(viewLink.textContent).toContain(String(fixture.item_count))
-
-    // The held-items grid, off real fixture text rather than element count alone.
-    const related = host.querySelector('.mwnf-related')
-    expect(related).not.toBeNull()
-    for (const item of heldItems) {
-      const name = itemTexts[item.id]?.name ?? item.internal_name ?? item.id
-      // A held item's name may itself carry Markdown emphasis; strip it so the
-      // assertion reads the same plain text the row renders.
-      expect(related.textContent).toContain(name.replace(/[*_]/g, ''))
-    }
-
+    viewItems.click()
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('partner-items'), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pmi')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-pmi .mwnf-standalone-pcr__heading').textContent).toBe(text.name.replace(/\.$/, ''))
+    expect(host.querySelectorAll('.mwnf-standalone-results__cell').length).toBe(Math.min(objects.length, 20))
+    expect(host.querySelector('.mwnf-standalone-pcr__related a').textContent).toBe('Partner Profile')
     app.unmount()
   }, 60000)
 

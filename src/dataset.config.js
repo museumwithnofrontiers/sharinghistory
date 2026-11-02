@@ -253,6 +253,15 @@ export default {
       meta: meta('partners', 'partners', 'items', 'countries'),
     },
     {
+      // Legacy's pm_items.php: the partner's objects (`?type=object`) or
+      // monuments (`?type=monument`).
+      path: '/partner/:id/items',
+      name: 'partner-items',
+      component: () => import('./views/PartnerItems.vue'),
+      props: (route) => ({ id: decodeURIComponent(route.params.id), type: route.query.type }),
+      meta: meta('partners', 'partners', 'items', 'countries'),
+    },
+    {
       path: '/exhibitions',
       name: 'exhibitions',
       component: () => import('./views/ExhibitionsEntrance.vue'),
