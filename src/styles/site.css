@@ -31,3 +31,10 @@ a:hover {
 .mwnf-standalone .mwnf-header__tools { margin-right: -40px; }
 /* Its 16px line on a 24px line, 4px into the heading's 34px (.header_heading p). */
 .mwnf-standalone .mwnf-header__subtitle { margin-top: -4px; line-height: 24px; }
+/* On the home page legacy's one link ("MWNF Portal") ends 85px from the
+   right edge. */
+.mwnf-standalone--home .mwnf-header__tools { margin-right: 20px; }
+/* The exhibitions' band starts 20px under the banner (section.partnet_galery),
+   its caption 10px over the tiles. */
+.mwnf-standalone--home .mwnf-standalone-home { margin-top: -7px; }
+.mwnf-standalone-tiles__caption { margin-bottom: 10px; }

@@ -29,14 +29,18 @@ const exhibitionNumber = (exhibition) => String(exhibition.backward_compatibilit
 
 /**
  * The home page's tiles: every exhibition, its title from the package, over
- * legacy's picture, leading to the exhibition's own website (its mini-site).
+ * legacy's picture, leading to the exhibition's own website (its mini-site),
+ * by title as legacy listed them. Until the titles have loaded a tile shows
+ * no name, never the record's internal one (`sh_exhibition_1`).
  */
 export function exhibitionTiles() {
   const { tr } = useData()
   const { locale } = useI18n()
-  return exhibitionList.value.map((exhibition) => ({
-    image: `exhibitions/homeImg${exhibitionNumber(exhibition)}.jpg`,
-    text: tr('collections', exhibition.id)?.title ?? exhibition.internal_name,
-    href: minisiteHref(exhibition.id, locale.value) ?? undefined,
-  }))
+  return exhibitionList.value
+    .map((exhibition) => ({
+      image: `exhibitions/homeImg${exhibitionNumber(exhibition)}.jpg`,
+      text: tr('collections', exhibition.id)?.title ?? '',
+      href: minisiteHref(exhibition.id, locale.value) ?? undefined,
+    }))
+    .sort((a, b) => a.text.localeCompare(b.text, locale.value))
 }

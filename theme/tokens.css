@@ -251,6 +251,31 @@
   --mwnf-standalone-home-banner-line-size: 18px;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
+  /* The home page's exhibitions (index.php's .top_exhibtion_title and
+     .exhibition_item): the caption's words red in capitals on a white strip,
+     centred; the 234×135 tiles 30px apart across the window less 30px each
+     side; each name italic and centred on a translucent red band; the
+     pictures' white corner marks. */
+  --mwnf-standalone-home-padding: 0 0 36px;
+  --mwnf-standalone-tiles-reach: -36px;
+  --mwnf-standalone-tiles-width: 234px;
+  --mwnf-standalone-tiles-gap: 30px;
+  --mwnf-standalone-tiles-frame: rgb(255 255 255 / 0.4);
+  --mwnf-standalone-tiles-caption-padding: 11px 0 15px;
+  --mwnf-standalone-tiles-caption-align: center;
+  --mwnf-standalone-tiles-caption-text: #990000;
+  --mwnf-standalone-tiles-caption-text-background: #ffffff;
+  --mwnf-standalone-tiles-caption-text-padding: 3px 10px;
+  --mwnf-standalone-tiles-caption-size: 16px;
+  --mwnf-standalone-tiles-caption-weight: 500;
+  --mwnf-standalone-tiles-caption-transform: uppercase;
+  --mwnf-standalone-tiles-label-background: rgb(153 0 0 / 0.48);
+  --mwnf-standalone-tiles-label-padding: 10px 0;
+  --mwnf-standalone-tiles-label-size: 14px;
+  --mwnf-standalone-tiles-label-style: italic;
+  --mwnf-standalone-tiles-label-weight: 100;
+  --mwnf-standalone-tiles-label-line-height: 14px;
+  --mwnf-standalone-tiles-label-align: center;
   /* The item sheet (modules/database_item.php, css/style_inside.css): the
      arrows before its links and its way back; the language band, dark red
      with the shown language on red; the "medium" picture's 320×240 box and
