@@ -37,11 +37,16 @@ const tabs = computed(() => [
 </template>
 
 <style scoped>
-/* Legacy's `section.language_option` (css/style_inside.css). */
+/* Legacy's `section.language_option` (css/style_inside.css): across the
+   page right under the banner, its tabs 26px high, as the Historical
+   Background's band (site.css's `.sharinghistory-hbb`). */
 .sh-about-tabs {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  margin: calc(-1 * var(--mwnf-content-padding-block, 20px)) calc(50% - 50cqw) 0;
+  padding: 0 calc(50cqw - 50%);
+  line-height: 16px;
   background-color: #750101;
 }
 .sh-about-tabs__pages {
