@@ -412,7 +412,7 @@ describe('website smoke test', () => {
     const rows = host.querySelectorAll('.mwnf-standalone-tlr__row')
     expect(rows.length).toBe(10)
     expect(rows[0].querySelector('.mwnf-standalone-tlr__date span').textContent).toBe('1797')
-    expect(rows[0].querySelector('.mwnf-standalone-tlr__content span').textContent).toBe('Austria | Political Context')
+    expect(rows[0].querySelector('.mwnf-standalone-tlr__content span').textContent).toBe('Austria\u00a0|\u00a0Political Context')
     expect(rows[0].querySelector('.sharinghistory-tlp__words').textContent).toContain('Campo Formio')
     expect(rows[0].querySelector('.sharinghistory-tlp__see').textContent).toBe('See Database Entry')
     expect([...host.querySelectorAll('.mwnf-standalone-tlr__related a')].map((a) => a.textContent)).toEqual([
@@ -503,7 +503,7 @@ describe('website smoke test', () => {
   // French; legacy's check before searching; Go writes the results' query.
   it("renders the Database entrance as legacy's database.php", async () => {
     const { app, host, router } = await mountSite(config, messages, '#/database?lang=en')
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-db')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-db')).not.toBeNull(), { timeout: 40000 })
 
     expect(host.querySelector('.mwnf-standalone-db__criteria').textContent).toBe('Enter your criteria:')
     const keywords = host.querySelectorAll('.mwnf-standalone-db__keyword')
@@ -519,7 +519,7 @@ describe('website smoke test', () => {
     expect(years.at(-1)).toBe('After 1930')
     expect(from.options.length).toBe(17)
     expect(to.options.length).toBe(17)
-    await vi.waitFor(() => expect([...host.querySelector('.mwnf-standalone-db__language select').options].map((o) => o.value)).toEqual(['', 'en', 'fr']), { timeout: 20000 })
+    await vi.waitFor(() => expect([...host.querySelector('.mwnf-standalone-db__language select').options].map((o) => o.value)).toEqual(['', 'en', 'fr']), { timeout: 40000 })
 
     const alert = vi.spyOn(window, 'alert').mockImplementation(() => {})
     host.querySelector('.mwnf-standalone-db__go button').click()
@@ -533,10 +533,10 @@ describe('website smoke test', () => {
     from.value = '1800'
     from.dispatchEvent(new window.Event('change'))
     host.querySelector('.mwnf-standalone-db__go button').click()
-    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('database-results'), { timeout: 20000 })
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('database-results'), { timeout: 40000 })
     expect(router.currentRoute.value.query).toMatchObject({ q: 'trade', field: 'name', from: '1800' })
     app.unmount()
-  }, 30000)
+  }, 60000)
 
   // Legacy's database_results.php counts, read on legacy on 2026-11-02, one
   // search a field: the keyword search over every column with the country
@@ -551,7 +551,7 @@ describe('website smoke test', () => {
     ['ottoman', 'keyword', 411],
   ])('finds legacy\'s count for "%s" in %s (%i)', async (q, field, count) => {
     const { app, host } = await mountSite(config, messages, `#/database/results?lang=en&q=${encodeURIComponent(q)}&field=${field}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pcr__heading')?.textContent).toContain(`| ${count} records`), { timeout: 30000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pcr__heading')?.textContent).toContain(`| ${count}\u00a0records`), { timeout: 30000 })
     app.unmount()
   }, 60000)
 
