@@ -257,15 +257,18 @@ describe('website smoke test', () => {
   // spec in composables/sheet.js, and what only this website has — the
   // header, the holder text and its partner's summary, the special features —
   // fills the view's slots.
-  it('renders the item sheet on the composed record view', async () => {
+  it("renders the item sheet as legacy's three columns, in legacy's words", async () => {
     const [items, partners] = await loadEntities(['items', 'partners'])
     const partnerIds = new Set(partners.map((p) => p.id))
     const object = items.find((i) => i.type === 'object' && i.partner_id && partnerIds.has(i.partner_id)) ?? items[0]
-    const { app, host } = await mountSite(config, messages, `#/item/${encodeURIComponent(object.id)}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-sheet__label')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.mwnf-record')).not.toBeNull()
-    expect(host.querySelector('.detail-type-badge').textContent.trim()).toBe(object.type)
-    expect(host.querySelector('.detail-title').textContent.trim()).not.toBe('')
+    const { app, host } = await mountSite(config, messages, `#/item/${encodeURIComponent(object.id)}?lang=en`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-sheet__label--name')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-item')).not.toBeNull()
+    expect(host.querySelector('.mwnf-sheet__label--name').textContent).toBe('Name of Object:')
+    expect([...host.querySelectorAll('.mwnf-standalone-item__back-link')].map((a) => a.textContent)).toEqual(['Back', 'Collections start page'])
+    expect(host.querySelector('.mwnf-standalone-related__heading').textContent).toBe('Related Content')
+    expect([...host.querySelectorAll('.mwnf-standalone-related__download button')].map((b) => b.textContent))
+      .toEqual(['As PDF (including images)', 'As Word (text only)'])
     // The holder's partner, as viewer-layout's `PartnerPanel` summary — "About
     // {name}, {city}, {country}" — linking to its page (inventory-app#2035).
     const summary = host.querySelector('.mwnf-partner-panel--summary')
@@ -281,15 +284,9 @@ describe('website smoke test', () => {
     expect(decodeURIComponent(creditLink.getAttribute('href'))).toContain(`/item/${object.id}`)
     expect(creditLink.textContent).toBe(creditLink.getAttribute('href'))
 
-    // #1727 cleanup: `itemSheetSpec` no longer names a project for the citation
-    // (composables/sheet.js), so `RecordView` resolves it from the record's
-    // own `project_id` against the manifest — read here off the installed
-    // data package rather than hardcoded, so the assertion tracks the
-    // source of truth rather than repeating it.
-    const { manifest } = useDataPackage()
-    const expectedProjectName = projectLabel(manifest, object.project_id, 'en')
-    expect(expectedProjectName).toBeTruthy()
-    expect(host.querySelector('.mwnf-credits__citation').textContent).toContain(expectedProjectName)
+    // Legacy's citation: the name in quotes, its phrase for the project, the
+    // year, then the page's address.
+    expect(host.querySelector('.mwnf-credits__citation').textContent).toContain('in "Sharing History", Museum With No Frontiers,')
 
     app.unmount()
   }, 60000)

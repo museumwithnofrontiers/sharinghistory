@@ -1,22 +1,20 @@
 <script setup>
 import { timelineLinkFor, useI18n } from '@museumwnf/viewer-core'
-import {
-  BackLink, OnDisplayIn, PartnerPanel, RecordLanguages, RelatedMedia, SourceCredit, SpecialFeatures,
-} from '@museumwnf/viewer-layout/content'
-import { RecordView } from '@museumwnf/viewer-layout/views'
+import { OnDisplayIn, PartnerPanel, RelatedMedia, SpecialFeatures } from '@museumwnf/viewer-layout/content'
+import { StandaloneItemSheet } from '@museumwnf/viewer-layout/standalone'
 import { useData } from '../composables/data.js'
 import { minisiteHref } from '../composables/exhibitions.js'
 import { partnerViewOf } from '../composables/partner.js'
 import { itemSheetSpec } from '../composables/sheet.js'
 
-// The item sheet is the platform's composed record page, rendering the spec
-// in composables/sheet.js. What fills the page's slots is this website's own:
-// the header — the way back, the timeline link, the type badge — the holder
-// text and its partner's summary, and, after the sheet, the platform's
-// item-page blocks fed with this website's records: a monument's special
-// features, the related media, the exhibitions and chapters the item is on
-// display in. Legacy's two unheaded paragraphs frame the sheet: `notice`, in
-// italics, before it, and `notice_c` after the credits (database_item.php).
+// The item sheet: legacy database_item.php in its three columns, the
+// standalone family's `StandaloneItemSheet` over the spec in
+// composables/sheet.js. What is this website's fills its slots: legacy's
+// italic notice before the name, the holding institution's partner line in
+// the sheet, a monument's special features and legacy's closing paragraph
+// (`notice_c`) under it, and, in the Related Content column, legacy's blocks
+// in legacy's order — the timeline for this item, the related videos, then
+// where the item is on display (the exhibitions and the galleries).
 
 defineProps({ id: { type: String, required: true } })
 
@@ -24,6 +22,38 @@ const { exhibitionLinksForItem, mdInline, partnerById, tr } = useData()
 const { locale } = useI18n()
 
 const timelineLink = (record) => timelineLinkFor(record, { name: 'timeline-results' })
+
+// The way back, as legacy's breadcrumbs: the previous page, then the
+// collections' start page.
+const back = [
+  { label: 'sharinghistory.item.back', history: true },
+  { label: 'sharinghistory.item.collectionStart', to: { name: 'permanent-collection' } },
+]
+
+// Related Content's own parts: the related records by type, and Download:
+// the browser's print ("As PDF") and legacy's export.php ("As Word"), the
+// sheet's texts as a .doc named after the record's legacy key and language
+// (sh_objects:awe:pt:102 → object_awe_pt_102_en.doc).
+const wordFile = (record, language) => {
+  const [, table, ...key] = String(record?.backward_compatibility ?? '').split(':')
+  const type = { sh_objects: 'object', sh_monuments: 'monument' }[table] ?? 'item'
+  return `${[type, ...key, language].join('_')}.doc`
+}
+
+const related = {
+  heading: 'sharinghistory.item.relatedContent',
+  groups: [
+    { heading: 'sharinghistory.item.relatedObjects', type: 'object' },
+    { heading: 'sharinghistory.item.relatedMonuments', type: 'monument' },
+  ],
+  download: {
+    heading: 'sharinghistory.item.download',
+    print: 'sharinghistory.item.asPdf',
+    word: 'sharinghistory.item.asWord',
+    title: 'sharinghistory.item.wordTitle',
+    wordFile,
+  },
+}
 
 // The holding institution (decision D3, inventory-app#2035): the holder
 // text, then the partner it refers to as `PartnerPanel`'s summary — "About
@@ -35,8 +65,10 @@ function holderPartner(record, language) {
 }
 
 // Each exhibition page that places the item, on the exhibition's own website
-// (its mini-site), in the site's language.
+// (its mini-site), in the site's language, under legacy's heading for the
+// Sharing History exhibitions (`gn_rel_exhibition_sh`).
 const onDisplayInGroups = (record) => [{
+  heading: 'sharinghistory.item.relExhibition',
   links: exhibitionLinksForItem(record.id).map((l) => ({
     label: mdInline(l.label),
     href: minisiteHref(l.exhibitionId, locale.value, l.at) ?? undefined,
@@ -51,38 +83,24 @@ const thgGalleryGroups = (record) => [{
 </script>
 
 <template>
-  <RecordView :spec="itemSheetSpec" :id="id" class="detail mwnf-panel">
-    <template #header="{ record, text, language, languages, select, dir, glossary }">
-      <!-- Two links sharing a header row is this page's own layout; only the
-           tokens (colour, hover) come from the shared bar class. -->
-      <div class="detail-top">
-        <BackLink variant="bar" label="record.action.backToResults" :to="{ name: 'home' }" />
-        <RouterLink v-if="timelineLink(record)" :to="timelineLink(record)" class="mwnf-back-bar mwnf-back-bar--link">{{ $t('record.action.viewOnTimeline') }} →</RouterLink>
-      </div>
-      <!-- In a block of its own: the view lays the header out as a column,
-           and a badge placed directly in it would stretch to the full width. -->
-      <div><span class="detail-type-badge">{{ record.type }}</span></div>
-      <RecordLanguages :languages="languages" :language="language" @select="select" />
-      <h1 class="detail-title" :dir="dir" v-html="mdInline(text.name ?? record.internal_name ?? record.id, { glossary })"></h1>
-    </template>
-
-    <template #before-sheet="{ text, dir, glossary }">
-      <p v-if="text.notice" class="detail-notice" :dir="dir"><em v-html="mdInline(text.notice, { glossary })"></em></p>
+  <StandaloneItemSheet :spec="itemSheetSpec" :id="id" :back="back" :related="related">
+    <template #notice="{ row, dir, glossary }">
+      <em class="sharinghistory-notice" :dir="dir" v-html="mdInline(row.value, { glossary })"></em>
     </template>
 
     <template #holder="{ row, record, language, dir, glossary }">
       <span v-html="mdInline(row.value, { glossary })"></span>
-      <template v-for="partner in [holderPartner(record, language)]" :key="partner?.id ?? 'holder-partner'">
-        <PartnerPanel v-if="partner" variant="summary" :partner="partner" label="partner.info.about" :dir="dir" />
-      </template>
+      <PartnerPanel
+        v-if="holderPartner(record, language)"
+        variant="summary"
+        :partner="holderPartner(record, language)"
+        label="partner.info.about"
+        :dir="dir"
+      />
     </template>
 
-    <template #source="{ text, dir, glossary }">
-      <p v-if="text.notice_c" class="detail-notice-c" :dir="dir" v-html="mdInline(text.notice_c, { glossary })"></p>
-      <SourceCredit />
-    </template>
-
-    <template #after-sheet="{ record, language, dir, glossary }">
+    <template #after-sheet="{ record, text, language, dir, glossary }">
+      <p v-if="text.notice_c" class="sharinghistory-notice-c" :dir="dir" v-html="mdInline(text.notice_c, { glossary })"></p>
       <SpecialFeatures
         :features="record.details ?? []"
         :tr="(feature) => tr('items', feature.id, language)"
@@ -90,32 +108,27 @@ const thgGalleryGroups = (record) => [{
         :glossary="glossary"
         :dir="dir"
       />
-      <RelatedMedia :media="record.media ?? []" :language="language" heading="record.related.video" :dir="dir" />
-      <OnDisplayIn :groups="onDisplayInGroups(record)" :dir="dir" />
-      <OnDisplayIn heading="record.related.galleries" :groups="thgGalleryGroups(record)" :dir="dir" />
     </template>
-  </RecordView>
+
+    <template #sidebar="{ record, language, dir }">
+      <p v-if="timelineLink(record)" class="sharinghistory-timeline-link">
+        <RouterLink :to="timelineLink(record)">{{ $t('sharinghistory.item.timeline') }}</RouterLink>
+      </p>
+      <RelatedMedia :media="record.media ?? []" :language="language" heading="sharinghistory.item.relatedVideos" :dir="dir" />
+      <div v-if="onDisplayInGroups(record)[0].links.length || thgGalleryGroups(record)[0].links.length" class="sharinghistory-on-display">
+        <br><p><strong><u>{{ $t('sharinghistory.item.onDisplayIn') }}</u></strong></p>
+      </div>
+      <OnDisplayIn heading="sharinghistory.item.exhibitions" :groups="onDisplayInGroups(record)" :dir="dir" />
+      <OnDisplayIn heading="sharinghistory.item.galleries" :groups="thgGalleryGroups(record)" :dir="dir" />
+    </template>
+  </StandaloneItemSheet>
 </template>
 
 <style scoped>
-.detail-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-
-.detail-type-badge {
-  display: inline-block;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--mwnf-heading-color);
-  border: 1px solid var(--site-rule-color);
-  padding: 2px 8px;
-  margin-bottom: 10px;
-}
-
-.detail-title {
-  font-size: 24px;
-  font-weight: 400;
-  color: var(--mwnf-heading-color);
-  margin: 10px 0 16px;
-  line-height: 1.3;
+/* Legacy's "On display in": a line of the column's text, then the words on
+   their own line, 16px under the block before them and 10px over the
+   exhibitions. */
+.sharinghistory-on-display {
+  margin: 16px 0 10px;
 }
 </style>

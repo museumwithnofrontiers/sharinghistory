@@ -22,7 +22,7 @@
   --mwnf-link-hover-text: #990000;
   --mwnf-color-muted: #5a5a5a;
   --mwnf-color-border: #b08c8c;
-  --mwnf-content-width: 60rem; /* legacy 960px container */
+  --mwnf-content-width: min(90.3%, 1349px); /* legacy's Bootstrap container: 1233px at 1366px */
   --mwnf-content-padding: 1rem;
   --mwnf-space: 0.75rem;
   --mwnf-radius: 0; /* legacy design has square corners */
@@ -73,7 +73,7 @@
   --mwnf-footer-padding: 0.625rem;
   --mwnf-footer-background: #990000;
   --mwnf-footer-text-color: #ffffff;
-  --mwnf-footer-text-size: 0.75rem;
+  --mwnf-footer-text-size: 14px;
 
   /* ---------- Content: the record page ---------- */
   /* The sheet as the legacy site set it: a bordered table with warm
@@ -238,4 +238,33 @@
   --mwnf-standalone-home-banner-line-size: 18px;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
+  /* The item sheet (modules/database_item.php, css/style_inside.css): the
+     arrows before its links and its way back; the language band, dark red
+     with the shown language on red; the "medium" picture's 320×240 box and
+     its 50px thumbnails 10px apart; the red Related Content column with
+     white words and white arrows, up to the band and out to the page's
+     right; the sheet's black labels over dark grey values, its links blue. */
+  --mwnf-standalone-bullet: url('./assets/icons/next_arrow.png');
+  --mwnf-standalone-back-arrow: url('./assets/icons/back_arrow.png');
+  --mwnf-standalone-related-bullet: url('./assets/icons/white_next_arrow.png');
+  --mwnf-standalone-download-icon: url('./assets/icons/download_white.png');
+  --mwnf-standalone-language-bar: #750101;
+  --mwnf-standalone-language-color: #ffffff;
+  --mwnf-standalone-language-active: #990000;
+  --mwnf-standalone-item-picture-width: 320px;
+  --mwnf-standalone-item-picture-height: 240px;
+  --mwnf-standalone-item-thumb-size: 50px;
+  --mwnf-standalone-item-thumb-gap: 10px;
+  --mwnf-standalone-item-thumb-margin: 10px 0;
+  --mwnf-standalone-related-background: #990000;
+  --mwnf-standalone-related-text: #ffffff;
+  --mwnf-standalone-related-link: #ffffff;
+  --mwnf-standalone-related-margin: 0 -15px;
+  --mwnf-standalone-related-reach-top: 20px;
+  --mwnf-standalone-related-reach-right: 167%;
+  --mwnf-standalone-related-heading-weight: 500;
+  --mwnf-standalone-download-weight: 400;
+  --mwnf-standalone-sheet-label-color: #000000;
+  --mwnf-standalone-sheet-value-color: #222222;
+  --mwnf-standalone-sheet-link-color: rgb(1 141 206);
 }
