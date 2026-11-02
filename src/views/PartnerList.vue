@@ -14,11 +14,14 @@ import { partnerListGroups } from '../composables/partner.js'
 const { t, locale } = useI18n()
 const { tr } = useData()
 
+// Legacy printed the partner row's own city ("Roma"), the same in every
+// language; a package without it gives the translation's.
 const link = (partner, withCity) => {
   const text = tr('partners', partner.id)
+  const city = partner.city ?? text.city
   return {
     id: partner.id,
-    label: withCity && text.city ? `${text.name},\u00a0${text.city}` : text.name,
+    label: withCity && city ? `${text.name},\u00a0${city}` : text.name,
     to: { name: 'partner', params: { id: partner.id }, query: { lang: locale.value } },
   }
 }

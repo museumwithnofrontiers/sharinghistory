@@ -23,10 +23,22 @@ import minisites from '../minisites.json'
 // the country-specific "National Context" collections sit next to the real
 // themes under an exhibition but carry type `collection`, not `theme`, so
 // filtering an exhibition's children to `theme` keeps them out.
+//
+// An exhibition legacy did not list (`published: false`, its political
+// context) is not part of the tree: the package carries it for the
+// timeline's gallery alone (unpublishedItemsUnder below).
+const LEVELS = ['exhibition', 'theme', 'subtheme']
 const rawTree = useCollectionTree({
   purpose: 'exhibitions-root',
-  childType: ['exhibition', 'theme', 'subtheme'],
+  childType: (node, depth) => node.published !== false && node.type === LEVELS[depth - 1],
 })
+
+// A relation the curator did not confirm (`curator_status: 'N'`): legacy's
+// Collections results and timeline gallery list its record, its item
+// sheet's "on display in" does not.
+const confirmedIn = (node, itemId) =>
+  (node?.items ?? []).some((entry) => (typeof entry === 'object' ? entry.id === itemId && entry.curator_status !== 'N' : entry === itemId))
+const idsOf = (node) => (node?.items ?? []).map((entry) => (typeof entry === 'object' ? entry.id : entry))
 
 // `rawTree.parents`/`.breadcrumb` walk a record's true ancestry past the
 // tree's own root by design (a breadcrumb elsewhere wants that). Here the
@@ -63,6 +75,28 @@ export const exhibitionsTree = {
     if (!node) return []
     return ancestry ? [...ancestry, node] : [node]
   },
+}
+
+/** The collections that place an item by a confirmed relation. */
+export function confirmedContaining(itemId) {
+  return rawTree.containing(itemId).filter((node) => confirmedIn(node, itemId))
+}
+
+/**
+ * The items an exhibition legacy did not list places, with its themes and
+ * chapters (its National Context pages are not in the package): legacy's
+ * gallery of the political context's timeline.
+ */
+export function unpublishedItemsUnder(id) {
+  const all = [...rawTree.byId.value.values()]
+  const out = new Set()
+  const visit = (node) => {
+    for (const itemId of idsOf(node)) out.add(itemId)
+    for (const child of all.filter((candidate) => candidate.parent_id === node.id)) visit(child)
+  }
+  const node = rawTree.byId.value.get(id)
+  if (node) visit(node)
+  return out
 }
 
 /** The exhibitions themselves: the tree root's own children. */

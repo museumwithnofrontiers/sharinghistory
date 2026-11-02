@@ -1,6 +1,6 @@
 import { computed } from 'vue'
 import { useCatalogue } from '@museumwnf/viewer-core'
-import { exhibitionAncestry, exhibitionsTree, minisiteAt } from './exhibitions.js'
+import { confirmedContaining, exhibitionAncestry, exhibitionsTree, minisiteAt } from './exhibitions.js'
 
 // The website's records, read the one way every website reads them: through
 // viewer-core's catalogue data layer, lazily. Each entity is a shared ref
@@ -72,8 +72,9 @@ function findByPurpose(purpose) {
 const exhibitions = computed(() => {
   const marker = findByPurpose('exhibitions-root')
   if (!marker) return []
+  // An exhibition legacy did not list (`published: false`) is not one.
   return (collections.value ?? [])
-    .filter((c) => c.parent_id === marker.id)
+    .filter((c) => c.parent_id === marker.id && c.published !== false)
     .sort((a, b) => (a.display_order ?? 9999) - (b.display_order ?? 9999))
 })
 
@@ -106,7 +107,7 @@ function exhibitionThemes(exhibitionId) {
 // lookup over the same data.
 //
 // The reverse lookup — which exhibitions/themes/chapters an item is
-// attached to — is `exhibitionsTree.containing(itemId)` (every collection
+// attached to — is `confirmedContaining(itemId)` (every collection
 // that carries the item directly, exhibition tree or not) narrowed by
 // `exhibitionAncestry`, which is `null` for a hit outside the exhibitions
 // tree (a Historical Background page can carry the same item) and the
@@ -123,13 +124,15 @@ const titledInEnglish = (node) => !!tr('collections', node.id).title?.trim()
 function exhibitionLinksForItem(itemId) {
   const links = []
   const seen = new Set()
-  for (const node of exhibitionsTree.containing(itemId)) {
+  // Confirmed relations only, in exhibitions legacy listed.
+  for (const node of confirmedContaining(itemId)) {
     // SH items can be attached at three depths: to the exhibition itself
     // (rel_*_exhibitions), to a theme (rel_*_themes), or to a chapter/
     // subtheme (rel_*_subthemes — collapsed to its theme here).
     const ancestry = exhibitionAncestry(node)
     if (!ancestry) continue
     const exhibition = ancestry.length === 0 ? node : ancestry[0]
+    if (exhibition.published === false) continue
     // National Context collections (purpose "national-context") sit next to
     // themes under an exhibition but link to the exhibition introduction,
     // not to a theme page — their themeId is null (same as direct attachment).

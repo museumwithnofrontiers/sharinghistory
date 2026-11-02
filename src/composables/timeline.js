@@ -1,4 +1,5 @@
 import { DECADES, collectionTitle, itemIdsUnder, resultTile } from './catalogue.js'
+import { unpublishedItemsUnder } from './exhibitions.js'
 import { useData } from './data.js'
 
 // Legacy's timeline (hcr_home.php, hcr_result.php, hcr_gallery.php): the
@@ -163,10 +164,13 @@ function boundExhibitions() {
 
 // ── The timeline gallery (hcr_gallery.php) ─────────────────────────────────
 //
-// The records of the theme's exhibition — its own, its themes' and its
-// chapters' — of the country, in legacy's period, by date. The package does
-// not carry legacy's political context exhibition: its gallery keeps
-// decision D1's scope, the country's records of the period.
+// The records the theme's exhibition places — its own, its themes' and its
+// chapters' — of the country, in legacy's period,
+// by date. The political context's exhibition is one legacy did not list
+// (the timelines' `exhibition_id`, `published: false`); a package without it
+// keeps decision D1's scope, the country's records of the period.
+
+const politicalExhibition = () => (timelines.value ?? []).find((row) => !row.collection_id && row.exhibition_id)?.exhibition_id ?? null
 
 function itemInLegacyPeriod(item, start, end) {
   const from = item.start_date
@@ -183,7 +187,8 @@ function itemInLegacyPeriod(item, start, end) {
 export function timelineGallerySpec(query) {
   const { start, end } = periodOf(query)
   const exhibition = query.theme && query.theme !== POLITICAL && query.theme !== ALL ? query.theme : null
-  const under = exhibition ? itemIdsUnder(exhibition) : null
+  const political = query.theme === POLITICAL ? politicalExhibition() : null
+  const under = exhibition ? itemIdsUnder(exhibition) : political ? unpublishedItemsUnder(political) : null
   const country = query.country && query.country !== ALL && query.country !== 'none' ? query.country : null
   return {
     entity: 'items',
