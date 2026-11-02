@@ -96,7 +96,7 @@ describe('legacy chrome', () => {
 
     // The strip offers the pages that exist, in legacy's order.
     expect([...host.querySelectorAll('.sh-about-tabs__pages a')].map((a) => a.getAttribute('href')))
-      .toEqual(['#/about', '#/about/team'])
+      .toEqual(['#/about', '#/about/chronology', '#/about/team'])
     expect(host.querySelector('.mwnf-standalone-banner').textContent.trim()).toBe(ownTexts['sharinghistory.about.bannerTitle'])
     app.unmount()
   }, 60000)

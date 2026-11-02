@@ -155,10 +155,10 @@ export default {
       meta: meta('home'),
     },
     {
-      // Legacy's about.php and about_team.php. The Chronology beside them
-      // (about_chronology_list.php) is inventory data, a timeline the
-      // inventory imports (Pascal, 2026-10-20): its page follows once the
-      // data package carries it.
+      // Legacy's about.php, about_team.php and the Chronology
+      // (about_chronology_list.php, about_chronology_txt.php): inventory
+      // data, the timeline of the project's root collection (Pascal,
+      // 2026-10-20; composables/chronology.js).
       path: '/about',
       name: 'about',
       component: () => import('./views/AboutProject.vue'),
@@ -169,6 +169,19 @@ export default {
       name: 'about-team',
       component: () => import('./views/AboutTeam.vue'),
       meta: meta('about'),
+    },
+    {
+      path: '/about/chronology',
+      name: 'about-chronology',
+      component: () => import('./views/AboutChronology.vue'),
+      meta: meta('about', 'timelines', 'timeline_events', 'collections'),
+    },
+    {
+      path: '/about/chronology/:id',
+      name: 'about-chronology-event',
+      component: () => import('./views/AboutChronologyEvent.vue'),
+      props: (route) => ({ id: decodeURIComponent(route.params.id) }),
+      meta: meta('about', 'timelines', 'timeline_events', 'collections'),
     },
     {
       // Legacy's sponsor_detail.php and sponsor_detail_local.php, reached
@@ -231,7 +244,7 @@ export default {
       path: '/timeline/gallery',
       name: 'timeline-gallery',
       component: () => import('./views/TimelineGallery.vue'),
-      meta: meta('timeline', 'items', 'countries'),
+      meta: meta('timeline', 'items', 'countries', 'timelines', 'collections'),
     },
     {
       path: '/partners',

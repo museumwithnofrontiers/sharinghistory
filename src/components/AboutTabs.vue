@@ -2,8 +2,7 @@
 // The strip under the About pages' banner, as legacy prints it on each of
 // them (`about.php`, `about_team.php`, `about_chronology_list.php`): the
 // three pages on the left, "See also Historical Background" on the right.
-// The Chronology is inventory data, a timeline the inventory imports
-// (Pascal, 2026-10-20); its tab appears with its route.
+// The Chronology's tab is on for its list and for each of its activities.
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
@@ -16,11 +15,11 @@ const router = useRouter()
 // and floats each to the right, so they read About, Chronology, Team.
 const tabs = computed(() => [
   { route: 'about', text: t('sharinghistory.about.tabAbout') },
-  { route: 'about-chronology', text: t('sharinghistory.about.tabChronology') },
+  { route: 'about-chronology', text: t('sharinghistory.about.tabChronology'), also: ['about-chronology-event'] },
   { route: 'about-team', text: t('sharinghistory.about.tabTeam') },
 ]
   .filter((tab) => router.hasRoute(tab.route))
-  .map((tab) => ({ ...tab, active: route.name === tab.route })))
+  .map((tab) => ({ ...tab, active: route.name === tab.route || (tab.also ?? []).includes(route.name) })))
 </script>
 
 <template>

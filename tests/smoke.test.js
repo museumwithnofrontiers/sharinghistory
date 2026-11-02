@@ -439,6 +439,44 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
+  // The political context's gallery lists the records legacy's exhibition 2
+  // places (the package's unpublished exhibition, `published: false`): for
+  // Austria over the whole period, legacy's 50 — two full pages and ten.
+  it("lists the political context's gallery as legacy's exhibition 2", async () => {
+    const { app, host } = await mountSite(config, messages, '#/timeline/gallery?start=Before%201800&end=After%201930&country=aut&theme=pc&page=3&lang=en')
+    await vi.waitFor(() => expect(host.querySelectorAll('.mwnf-standalone-results__cell').length).toBe(10), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-pcr__heading').textContent).toBe('Timeline | Before 1800 to After 1930 | Austria | Political Context | Gallery')
+    app.unmount()
+  }, 60000)
+
+  // Legacy's Chronology (about_chronology_list.php): the project's activity,
+  // then its eight activities, each its years and place and its title
+  // linking to its page (about_chronology_txt.php): its title, place and
+  // dates, its organisers, its text, and Next to the following one.
+  it("renders the Chronology as legacy's about_chronology pages", async () => {
+    const list = await mountSite(config, messages, '#/about/chronology?lang=en')
+    await vi.waitFor(() => expect(list.host.querySelector('.sh-chronology__row')).not.toBeNull(), { timeout: 20000 })
+    expect(list.host.querySelector('.sh-about-tabs li.active').textContent.trim()).toBe('Chronology')
+    expect(list.host.querySelector('.sh-chronology__heading').textContent.trim()).toBe('Project Chronology')
+    expect(list.host.querySelector('.sh-chronology__body b').textContent).toBe('SHARING HISTORY VIRTUAL EXHIBITIONS')
+    const rows = [...list.host.querySelectorAll('.sh-chronology__row')]
+    expect(rows).toHaveLength(8)
+    expect(rows[0].querySelector('p').textContent).toBe('2012\u00a0\u00a0\u00a0\u00a0San Lorenzo El Escorial (Madrid), Spain')
+    const href = rows[0].querySelector('a').getAttribute('href')
+    expect(rows[0].querySelector('a').textContent.trim()).toBe('FIRST CURATORIAL COORDINATION MEETING, EUROFORUM')
+    list.app.unmount()
+
+    const page = await mountSite(config, messages, href)
+    await vi.waitFor(() => expect(page.host.querySelector('.sh-chronology__text')).not.toBeNull(), { timeout: 20000 })
+    expect(page.host.querySelector('.sh-chronology__title').textContent).toBe('FIRST CURATORIAL COORDINATION MEETING, EUROFORUM')
+    const words = page.host.querySelector('.sh-chronology__text').textContent
+    expect(words).toContain('San Lorenzo El Escorial (Madrid), Spain, from 12-12-2012 to 16-12-2012')
+    expect(words).toContain('Organiser(s): Museum With No Frontiers (MWNF)')
+    expect(page.host.querySelectorAll('.sh-chronology__thumbs img').length).toBeGreaterThan(1)
+    expect(page.host.querySelector('.sh-chronology__next a').textContent).toBe('Next')
+    page.app.unmount()
+  }, 90000)
+
   // Legacy's bibliography.php, reached from a country's timeline: the
   // languages it is in, Back, "All Themes | Portugal", then its timelines'
   // entries, each once, by text, as legacy listed them.
@@ -508,10 +546,24 @@ describe('website smoke test', () => {
     expect([...host.querySelectorAll('.mwnf-standalone-pl__back .mwnf-standalone-item__back-link')].map((a) => a.textContent)).toEqual(['Back', 'Sponsors'])
     expect(host.querySelectorAll('.mwnf-standalone-pl__main p, .mwnf-standalone-pl__associated p:not(.mwnf-standalone-pl__none)').length).toBe(listed.length)
     const group = [...host.querySelectorAll('.mwnf-standalone-pl__group')].find((g) => g.querySelector('.mwnf-standalone-pl__head h3').textContent === countryName)
-    expect(group.querySelector('.mwnf-standalone-pl__main').textContent).toContain(`${partnerTexts[fixture.id].name},\u00a0${partnerTexts[fixture.id].city}`)
+    expect(group.querySelector('.mwnf-standalone-pl__main').textContent).toContain(`${partnerTexts[fixture.id].name},\u00a0${fixture.city ?? partnerTexts[fixture.id].city}`)
     expect(group.querySelector('.mwnf-standalone-pl__toggle').textContent).toBe('See Associated Partners')
     expect(group.querySelectorAll('.mwnf-standalone-pl__associated p:not(.mwnf-standalone-pl__none)').length).toBe(associated.length)
 
+    app.unmount()
+  }, 60000)
+
+  // Legacy printed a partner's city from its base table (sh_partners.city:
+  // Roma, Lisboa…), not the translated one (Rome, Lisbon…): the package's
+  // `city` (inventory-app#2444).
+  it("prints a partner's city as legacy's base table has it", async () => {
+    const [partners] = await loadEntities(['partners'])
+    const partner = partners.find((p) => p.level === 'partner' && p.country_id && p.city && partnerTexts[p.id]?.city && p.city !== partnerTexts[p.id].city)
+    expect(partner, 'fixture: a partner whose base city is not its English one').toBeTruthy()
+    const { app, host } = await mountSite(config, messages, '#/partners?lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pl__group')).not.toBeNull(), { timeout: 20000 })
+    const line = [...host.querySelectorAll('.mwnf-standalone-pl__main p')].find((p) => p.textContent.startsWith(`${partnerTexts[partner.id].name},`))
+    expect(line.textContent).toBe(`${partnerTexts[partner.id].name},\u00a0${partner.city}`)
     app.unmount()
   }, 60000)
 

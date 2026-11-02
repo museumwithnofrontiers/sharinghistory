@@ -18,7 +18,7 @@ const route = useRoute()
 // Historical Background and the Permanent Collection's entrance. Its
 // database, timeline, partner, profile, item and sponsors pages don't.
 const BAND_ROUTES = [
-  'home', 'about', 'about-team', 'historical-background', 'historical-background-page', 'historical-background-read-more',
+  'home', 'about', 'about-team', 'about-chronology', 'about-chronology-event', 'historical-background', 'historical-background-page', 'historical-background-read-more',
   'historical-background-insight', 'permanent-collection',
 ]
 const showBand = computed(() => BAND_ROUTES.includes(route.name))

@@ -355,6 +355,52 @@ a:hover {
   .sharinghistory-bib__entries { margin-left: 0; width: auto; }
 }
 
+/* The Chronology (about_chronology_list.php, about_chronology_txt.php):
+   "Project Chronology" 23px under the About strip; on the list, the
+   project's activity and the rows in legacy's col-md-11, each row its years
+   and place, then its title, in two thirds; on an activity's page, the
+   path in bold, the title in dark red, Back and Next, then its first
+   picture in the first third and the thumbnails and words beside it. */
+.sh-chronology { padding-bottom: 10px; font: 400 16px/22px Roboto, sans-serif; color: #222; }
+.sh-chronology p { margin: 0 0 10px; }
+.sh-chronology b { font-weight: 500; }
+.sh-chronology__heading { margin: 23px 0 15px; font: 400 19px Roboto, sans-serif; color: #222; }
+.sh-chronology__body { margin-left: calc(100% / 12); }
+.sh-chronology__row {
+  display: grid;
+  grid-template-columns: repeat(2, calc((100% + 30px) / 3 - 30px));
+  align-items: start;
+  column-gap: 30px;
+}
+.sh-chronology__row a { color: #222; text-decoration: underline; }
+.sh-chronology__title { margin: 0 0 11px; font: 500 16px/22px Roboto, sans-serif; color: #750101; }
+.sh-chronology__nav { display: flex; justify-content: space-between; }
+.sh-chronology__nav p { margin: 0; }
+.sh-chronology__nav .mwnf-standalone-item__back-link { font: 400 16px/19px Roboto, sans-serif; }
+.sh-chronology__next a {
+  padding-right: 12px;
+  color: #222;
+  text-decoration: none;
+  background: url('../../theme/assets/icons/next_arrow.png') no-repeat right 5px;
+}
+.sh-chronology__columns {
+  display: grid;
+  grid-template-columns: calc((100% + 30px) / 3 - 30px) calc((100% + 30px) * 7 / 12 - 30px);
+  column-gap: 30px;
+  align-items: start;
+}
+.sh-chronology__picture img { display: block; width: 100%; height: auto; }
+.sh-chronology__credit { padding-left: 10px; font-size: 14px; line-height: normal; }
+.sh-chronology__thumbs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+.sh-chronology__thumbs img { display: block; width: auto; max-width: 107px; max-height: 80px; }
+.sh-chronology__description p { margin: 0 0 10px; }
+@media (max-width: 767px) {
+  .sh-chronology__body { margin-left: 0; }
+  .sh-chronology__blank { display: none; }
+  .sh-chronology__row,
+  .sh-chronology__columns { grid-template-columns: 1fr; }
+}
+
 /* Phone (below 768px): legacy's MWNF phone frame is the family's
    (viewer-layout's standalone phone mode); what is Sharing History's own:
    no rule under the header, the header links at the column's edge (the
