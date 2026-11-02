@@ -538,6 +538,23 @@ describe('website smoke test', () => {
     app.unmount()
   }, 30000)
 
+  // Legacy's database_results.php counts, read on legacy on 2026-11-02, one
+  // search a field: the keyword search over every column with the country
+  // and glossary expansions, the location's country match, an object-only
+  // field and the names.
+  it.each([
+    ['trade', 'keyword', 180],
+    ['Istanbul', 'location', 203],
+    ['silk', 'material', 46],
+    ['portrait', 'name', 43],
+    ['Tunis', 'keyword', 221],
+    ['ottoman', 'keyword', 411],
+  ])('finds legacy\'s count for "%s" in %s (%i)', async (q, field, count) => {
+    const { app, host } = await mountSite(config, messages, `#/database/results?lang=en&q=${encodeURIComponent(q)}&field=${field}`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pcr__heading')?.textContent).toContain(`| ${count} records`), { timeout: 30000 })
+    app.unmount()
+  }, 60000)
+
   // Legacy's database_results.php: a word naming a country, in Location,
   // finds that country's records (legacy's country match); the heading
   // counts them, as "Results of your search | N records"; twelve a page, each
