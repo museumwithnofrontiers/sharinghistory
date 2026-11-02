@@ -18,7 +18,7 @@ describe('item sheet spec', () => {
     const keys = fieldsOf(object).map((f) => f.key)
     expect(keys.indexOf('dynasty')).toBe(keys.indexOf('dimensions') + 1)
     const field = row(fieldsOf(object), 'dynasty')
-    expect(field.label).toBe('sheet.field.periodDynasty')
+    expect(field.label).toBe('sharinghistory.sheet.periodDynasty')
     expect(field.value({ record: object, text: { dynasty: 'Ottoman period.' } })).toBe('Ottoman period')
     expect(field.value({ record: object, text: {} })).toBe('')
   })
@@ -43,7 +43,7 @@ describe('item sheet spec', () => {
 
   it('closes both sheets with the rights line', () => {
     for (const record of [object, monument]) {
-      expect(sectionsOf(record).at(-1)).toMatchObject({ key: 'copyright', label: 'sheet.field.copyrightInformation', value: 'copyright' })
+      expect(sectionsOf(record).at(-1)).toMatchObject({ key: 'copyright', label: 'sharinghistory.sheet.copyrightInformation', value: 'copyright' })
     }
   })
 })
@@ -55,7 +55,7 @@ describe('the institution lines', () => {
   it("prints an object's holding institution in English and in its own language, as legacy did", () => {
     const text = { holder: 'National Museum of Anthropology', holding_institution_org: 'Museo Nacional de Antropología' }
     expect(row(fieldsOf(object), 'holder').value({ record: object, text })).toBe('National Museum of Anthropology')
-    expect(row(fieldsOf(object), 'holdingInstitutionOriginal').value).toBe('holding_institution_org')
+    expect(row(fieldsOf(object), 'holdingInstitutionOriginal').value({ record: object, text })).toBe('Museo Nacional de Antropología')
   })
 
   it('prints only the own-language line when legacy has no English name', () => {
@@ -65,7 +65,7 @@ describe('the institution lines', () => {
 
   it("prints a monument's institution and its responsible institution in its own language", () => {
     const keys = fieldsOf(monument).map((f) => f.key)
-    expect(keys.slice(0, 6)).toEqual(['alsoKnownAs', 'secondName', 'originalName', 'location', 'holder', 'responsibleInstitutionOriginal'])
+    expect(keys.slice(0, 8)).toEqual(['notice', 'name', 'alsoKnownAs', 'secondName', 'originalName', 'location', 'holder', 'responsibleInstitutionOriginal'])
     const text = { holder: 'Institut national du Patrimoine', responsible_institution_org: 'Institut national du Patrimoine' }
     expect(row(fieldsOf(monument), 'holder').value({ record: monument, text })).toBe('')
   })

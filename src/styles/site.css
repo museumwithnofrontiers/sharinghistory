@@ -20,3 +20,8 @@ a:hover {
   color: var(--mwnf-link-hover-text);
   text-decoration: underline;
 }
+/* The item sheet's unheaded paragraph in italics before the name
+   (database_item.php's p.notice_text): no word over it. */
+.mwnf-sheet__label--notice { display: none; }
+.mwnf-sheet__label--notice + .mwnf-sheet__value { margin: 8px 0 0; padding: 0; }
+.sharinghistory-notice { font-style: italic; }
