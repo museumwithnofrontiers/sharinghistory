@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { loadEntities, mergeMessages } from '@museumwnf/viewer-core'
 import { mountSite } from '@museumwnf/viewer-core/testing'
+import { mwnfSocialLinks } from '@museumwnf/viewer-layout'
 import { catalogues as sharedTexts } from '@museumwnf/viewer-i18n/standalone'
 import ownTexts from '../locales/en.json'
 import countryTexts from '@museumwnf/sharinghistory-data/translations/countries.en.json'
@@ -52,21 +53,24 @@ const FOOTER_LINKS = [
 ]
 
 describe('legacy chrome', () => {
-  it('prints legacy\'s six portal links in its order, and the copyright with the year', async () => {
-    const { app, host } = await mountSite(config, messages)
-    await vi.waitFor(() => expect(host.querySelector('.sh-footer')).not.toBeNull(), { timeout: 15000 })
-    const links = [...host.querySelectorAll('.sh-footer__link')]
+  it('prints legacy\'s six portal links in its order, the copyright with the year, and its icons', async () => {
+    const { app, host } = await mountSite(config, messages, '#/about')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-footer__links')).not.toBeNull(), { timeout: 15000 })
+    const links = [...host.querySelectorAll('.mwnf-footer__link')]
     expect(links.map((a) => a.getAttribute('href'))).toEqual(FOOTER_LINKS)
     expect(links.every((a) => !a.hasAttribute('target'))).toBe(true)
-    expect(host.querySelector('.sh-footer__copyright').textContent)
+    expect(host.querySelector('.mwnf-footer__text').textContent)
       .toBe(`${text('sharinghistory.footer.copyright')} ${new Date().getFullYear()}`)
+    expect(host.querySelector('.mwnf-footer__attribution')).toBeNull()
+    expect([...host.querySelectorAll('.mwnf-footer .mwnf-footer__social-link')].map((a) => a.getAttribute('href')))
+      .toEqual(mwnfSocialLinks.map((link) => link.href))
     app.unmount()
   }, 60000)
 
-  it('shows the cooperation band where legacy does, and only there', async () => {
+  it('shows the cooperation band where legacy does, and only there; the home page\'s holds the icons', async () => {
     for (const [hash, shown] of [['#/', true], ['#/about', true], ['#/database', false], ['#/sponsors', false]]) {
       const { app, host } = await mountSite(config, messages, hash)
-      await vi.waitFor(() => expect(host.querySelector('.sh-footer')).not.toBeNull(), { timeout: 15000 })
+      await vi.waitFor(() => expect(host.querySelector('.mwnf-footer__links')).not.toBeNull(), { timeout: 15000 })
       if (shown) {
         await vi.waitFor(() => expect(host.querySelector('.sh-band')).not.toBeNull(), { timeout: 15000 })
         const hrefs = [...host.querySelectorAll('.sh-band a')].map((a) => a.getAttribute('href'))
@@ -74,6 +78,7 @@ describe('legacy chrome', () => {
           'https://www.museumwnf.org/league-of-arab-states/', '#/partners', 'http://www.sharjahmuseums.ae/?lang=en-us',
           'http://www.yasar.edu.tr/en/', '#/sponsors', 'https://www.museumwnf.org/about/support',
         ]))
+        expect(host.querySelectorAll('.sh-band .mwnf-footer__social-link'), hash).toHaveLength(hash === '#/' ? mwnfSocialLinks.length : 0)
       } else {
         expect(host.querySelector('.sh-band'), hash).toBeNull()
       }
