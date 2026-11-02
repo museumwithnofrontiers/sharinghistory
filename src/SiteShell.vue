@@ -17,7 +17,10 @@ const route = useRoute()
 // pages that include `includes/inner_bottom.php` — the About pages, the
 // Historical Background and the Permanent Collection's entrance. Its
 // database, timeline, partner, profile, item and sponsors pages don't.
-const BAND_ROUTES = ['home', 'about', 'about-team', 'historical-background', 'permanent-collection']
+const BAND_ROUTES = [
+  'home', 'about', 'about-team', 'historical-background', 'historical-background-page', 'historical-background-read-more',
+  'historical-background-insight', 'permanent-collection',
+]
 const showBand = computed(() => BAND_ROUTES.includes(route.name))
 </script>
 

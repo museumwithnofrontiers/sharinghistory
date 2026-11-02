@@ -61,24 +61,27 @@ const partnersHref = router.resolve({ name: 'partners' }).href
 
 <style scoped>
 /* Legacy's `section.cooperation`, `.logos` and `.logs` (css/style.css). */
+/* Three thirds (col-md-4), each title a line of 24px 10px above its boxes;
+   the third column's boxes level with the others, under an empty line. */
 .sh-band {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 30px;
   color: #ffffff;
 }
 .sh-band__column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  min-width: 0;
 }
 .sh-band__column--links {
-  justify-content: flex-end;
+  padding-top: 34px;
 }
 .sh-band__title {
-  margin: 0;
-  font-size: 1rem;
+  margin: 0 0 10px;
+  font: 400 14px/24px Roboto, sans-serif;
+}
+@media (max-width: 48rem) {
+  .sh-band { grid-template-columns: 1fr; row-gap: 15px; }
+  .sh-band__column--links { padding-top: 0; }
 }
 .sh-band__boxes {
   display: flex;
@@ -108,6 +111,7 @@ const partnersHref = router.resolve({ name: 'partners' }).href
   display: inline-block;
   max-width: 60px;
   font-size: 12px;
+  line-height: normal;
   text-align: center;
   overflow-wrap: break-word;
 }
