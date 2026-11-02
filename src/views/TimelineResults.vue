@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
 import { StandaloneTimelineResults } from '@museumwnf/viewer-layout/standalone'
 import TimelinePictures from '../components/TimelinePictures.vue'
+import { bibliographyLink, hasBibliography } from '../composables/bibliography.js'
 import { DECADES } from '../composables/catalogue.js'
 import { useData } from '../composables/data.js'
 import { historicalProfileCountries, historicalProfileNodeRoute } from '../composables/history.js'
@@ -16,7 +17,8 @@ import {
 // words and its four lists, which search again as soon as one changes; the
 // events, ten a page, each its date with its pictures under it, then
 // "Country | Theme" and its description; and beside them the Related Content
-// column and the downloads. Every word is legacy's own
+// column (its bibliography on its own page, Bibliography.vue) and the
+// downloads. Every word is legacy's own
 // (sharinghistory.tlr.*, sharinghistory.tle.*); the alerts are the ones
 // legacy's page script wrote, in English.
 
@@ -109,6 +111,11 @@ const profile = computed(() => {
   const record = country.value ? historicalProfileCountries.value.find((candidate) => candidate.country_id === country.value) : null
   return record ? historicalProfileNodeRoute(record) : null
 })
+// A country's bibliography: its theme's timeline's, or, every theme or none
+// asked, all of its timelines' (legacy's "All Themes").
+const bibliography = computed(() =>
+  country.value ? { country: country.value, theme: query.value.theme === 'none' ? ALL : query.value.theme } : null,
+)
 const period = computed(() => ({ start: route.query.start, end: route.query.end }))
 const related = computed(() => ({
   heading: t('sharinghistory.tlr.related'),
@@ -122,6 +129,9 @@ const related = computed(() => ({
       target: '_blank',
       to: { name: 'timeline-gallery', query: { ...route.query, page: undefined } },
     },
+    ...(bibliography.value && hasBibliography(bibliography.value)
+      ? [{ label: t('sharinghistory.bib.title'), to: bibliographyLink(bibliography.value, route.query.lang) }]
+      : []),
     ...(profile.value ? [{ label: `${t('sharinghistory.tlr.historicalProfile')} ${labelOf('countries', country.value)}`, to: profile.value }] : []),
     { label: t('sharinghistory.tlr.aboutHb'), target: '_blank', to: { name: 'historical-background', query: { lang: route.query.lang } } },
   ],

@@ -26,7 +26,8 @@ const AFTER = DECADES[DECADES.length - 1]
 
 // Legacy's ORDER BY on a name, as MySQL's utf8_general_ci compares.
 const folded = (text) => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
-const byLabel = (a, b) => (folded(a.label) < folded(b.label) ? -1 : folded(a.label) > folded(b.label) ? 1 : 0)
+export const byLegacyText = (a, b) => (folded(a) < folded(b) ? -1 : folded(a) > folded(b) ? 1 : 0)
+const byLabel = (a, b) => byLegacyText(a.label, b.label)
 
 /** The countries of the timelines, by name. */
 export function timelineCountryOptions() {

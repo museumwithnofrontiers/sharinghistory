@@ -133,6 +133,7 @@ export default {
       partners: 'sharinghistory.section.partners',
       'historical-background': 'sharinghistory.nav.historicalBackground',
       'historical-profiles': 'sharinghistory.section.historicalBackground',
+      bibliography: 'sharinghistory.bib.title',
     },
     // The footer is legacy's own (SiteFooter.vue, in the shell's footer slot).
   },
@@ -381,6 +382,15 @@ export default {
       component: () => import('./views/ItemTimeline.vue'),
       props: (route) => ({ id: decodeURIComponent(route.params.id) }),
       meta: { ...meta('timeline', 'items', 'timeline_events', 'countries'), bare: true },
+    },
+    {
+      // Legacy's bibliography.php: an item's, a historical profile's or a
+      // country's timelines' bibliography, by the query
+      // (composables/bibliography.js).
+      path: '/bibliography',
+      name: 'bibliography',
+      component: () => import('./views/Bibliography.vue'),
+      meta: meta('bibliography', 'items', 'collections', 'timelines', 'countries', 'languages'),
     },
   ],
 

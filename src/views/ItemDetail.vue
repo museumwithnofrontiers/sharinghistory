@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
 import { OnDisplayIn, PartnerPanel, RelatedMedia, SpecialFeatures } from '@museumwnf/viewer-layout/content'
 import { StandaloneItemSheet } from '@museumwnf/viewer-layout/standalone'
+import { bibliographyLink, hasBibliography } from '../composables/bibliography.js'
 import { useData } from '../composables/data.js'
 import { minisiteHref } from '../composables/exhibitions.js'
 import { partnerViewOf } from '../composables/partner.js'
@@ -15,7 +16,8 @@ import { hasEvents } from '../composables/timeline.js'
 // italic notice before the name, the holding institution's partner line in
 // the sheet, a monument's special features and legacy's closing paragraph
 // (`notice_c`) under it, and, in the Related Content column, legacy's blocks
-// in legacy's order — the timeline for this item, the related videos, then
+// in legacy's order — the timeline for this item, its bibliography (its own
+// page, Bibliography.vue), the related videos, then
 // where the item is on display (the exhibitions and the galleries).
 
 defineProps({ id: { type: String, required: true } })
@@ -122,6 +124,9 @@ const thgGalleryGroups = (record) => [{
     <template #sidebar="{ record, language, dir }">
       <p v-if="hasEvents(record.country_id)" class="sharinghistory-timeline-link">
         <a :href="timelineHref(record)" :title="$t('sharinghistory.hcr.linkTooltip')" @click.prevent="openTimeline(record)">{{ $t('sharinghistory.hcr.link') }}</a>
+      </p>
+      <p v-if="hasBibliography({ item: record.id }, record.languages)" class="sharinghistory-timeline-link">
+        <RouterLink :to="bibliographyLink({ item: record.id }, locale)">{{ $t('sharinghistory.bib.title') }}</RouterLink>
       </p>
       <RelatedMedia :media="record.media ?? []" :language="language" heading="sharinghistory.item.relatedVideos" :dir="dir" />
       <div v-if="onDisplayInGroups(record)[0].links.length || thgGalleryGroups(record)[0].links.length" class="sharinghistory-on-display">

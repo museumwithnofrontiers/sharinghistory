@@ -412,7 +412,7 @@ describe('website smoke test', () => {
     const rows = host.querySelectorAll('.mwnf-standalone-tlr__row')
     expect(rows.length).toBe(10)
     expect(rows[0].querySelector('.mwnf-standalone-tlr__date span').textContent).toBe('1797')
-    expect(rows[0].querySelector('.mwnf-standalone-tlr__content span').textContent).toBe('Austria | Political Context')
+    expect(rows[0].querySelector('.mwnf-standalone-tlr__content span').textContent).toBe('Austria\u00a0|\u00a0Political Context')
     expect(rows[0].querySelector('.sharinghistory-tlp__words').textContent).toContain('Campo Formio')
     expect(rows[0].querySelector('.sharinghistory-tlp__see').textContent).toBe('See Database Entry')
     expect([...host.querySelectorAll('.mwnf-standalone-tlr__related a')].map((a) => a.textContent)).toEqual([
@@ -438,6 +438,58 @@ describe('website smoke test', () => {
     expect(host.querySelector('.mwnf-standalone-pages')).not.toBeNull()
     app.unmount()
   }, 60000)
+
+  // Legacy's bibliography.php, reached from a country's timeline: the
+  // languages it is in, Back, "All Themes | Portugal", then its timelines'
+  // entries, each once, by text, as legacy listed them.
+  it("renders a country's bibliography as legacy's bibliography.php, from its timeline results", async () => {
+    const results = await mountSite(config, messages, '#/timeline/results?start=Before%201800&end=After%201930&country=prt&lang=en')
+    await vi.waitFor(() => expect(results.host.querySelector('.mwnf-standalone-tlr__related a')).not.toBeNull(), { timeout: 20000 })
+    const link = [...results.host.querySelectorAll('.mwnf-standalone-tlr__related a')].find((a) => a.textContent === 'Bibliography')
+    expect(decodeURIComponent(link.getAttribute('href'))).toBe('#/bibliography?country=prt&theme=all&lang=en')
+    results.app.unmount()
+
+    const { app, host } = await mountSite(config, messages, '#/bibliography?country=prt&theme=all&lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.sharinghistory-bib__entries p')).not.toBeNull(), { timeout: 20000 })
+    expect([...host.querySelectorAll('.sharinghistory-bib__languages button')].map((b) => b.textContent)).toEqual(['English'])
+    expect(host.querySelector('.mwnf-standalone-item__back-link').textContent).toBe('Back')
+    expect(host.querySelector('.sharinghistory-bib__title').textContent).toBe('All Themes | Portugal')
+    expect([...host.querySelectorAll('.sharinghistory-bib__entries p')].map((p) => p.textContent.split(',')[0]))
+      .toEqual(['Costa', 'Ramos', 'Reis', 'Souto', 'Various authors'])
+    expect(host.querySelector('.sharinghistory-bib__entries em').textContent).toBe('História Económica de Portugal: 1143 – 2010')
+    app.unmount()
+  }, 60000)
+
+  // A historical profile's and an item's bibliography, from their pages; and
+  // legacy's "No data found" for a bibliography without entries.
+  it("renders a profile's and an item's bibliography, and legacy's words for none", async () => {
+    const [collections] = await loadEntities(['collections'])
+    const profile = collections.find((c) => collectionTexts[c.id]?.extra?.bibliography)
+    const profilePage = await mountSite(config, messages, `#/bibliography?profile=${profile.id}&lang=en`)
+    await vi.waitFor(() => expect(profilePage.host.querySelector('.sharinghistory-bib__entries p')).not.toBeNull(), { timeout: 20000 })
+    expect(profilePage.host.querySelector('.sharinghistory-bib__title').textContent).toBe('Historical Profiles | Austria')
+    expect(profilePage.host.querySelectorAll('.sharinghistory-bib__entries p').length).toBe(collectionTexts[profile.id].extra.bibliography.en.length)
+    profilePage.app.unmount()
+
+    const id = Object.keys(itemTexts).find((key) => itemTexts[key].structured_bibliography?.en?.length > 2)
+    const sheet = await mountSite(config, messages, `#/item/${id}?lang=en`)
+    await vi.waitFor(() => expect(sheet.host.querySelector('.mwnf-standalone-related__heading')).not.toBeNull(), { timeout: 20000 })
+    const link = [...sheet.host.querySelectorAll('a')].find((a) => a.textContent === 'Bibliography')
+    expect(decodeURIComponent(link.getAttribute('href'))).toBe(`#/bibliography?item=${id}&lang=en`)
+    sheet.app.unmount()
+
+    const itemPage = await mountSite(config, messages, `#/bibliography?item=${id}&lang=en`)
+    await vi.waitFor(() => expect(itemPage.host.querySelector('.sharinghistory-bib__entries p')).not.toBeNull(), { timeout: 20000 })
+    expect(itemPage.host.querySelector('.sharinghistory-bib__title').textContent).toBe('')
+    expect(itemPage.host.querySelectorAll('.sharinghistory-bib__entries p').length).toBe(itemTexts[id].structured_bibliography.en.length)
+    itemPage.app.unmount()
+
+    const empty = await mountSite(config, messages, '#/bibliography?country=prt&theme=pc&lang=en')
+    await vi.waitFor(() => expect(empty.host.querySelector('.sharinghistory-bib__empty')).not.toBeNull(), { timeout: 20000 })
+    expect(empty.host.querySelector('.sharinghistory-bib__empty').textContent).toBe('No data found')
+    expect(empty.host.querySelector('.sharinghistory-bib__languages')).toBeNull()
+    empty.app.unmount()
+  }, 90000)
 
   // Legacy's pm_partner_list.php: Back and Sponsors, then one row a country
   // by its name, its partners as "Name, City", and "See Associated Museums",
@@ -551,7 +603,7 @@ describe('website smoke test', () => {
     ['ottoman', 'keyword', 411],
   ])('finds legacy\'s count for "%s" in %s (%i)', async (q, field, count) => {
     const { app, host } = await mountSite(config, messages, `#/database/results?lang=en&q=${encodeURIComponent(q)}&field=${field}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pcr__heading')?.textContent).toContain(`| ${count} records`), { timeout: 30000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pcr__heading')?.textContent).toContain(`| ${count}\u00a0records`), { timeout: 30000 })
     app.unmount()
   }, 60000)
 
