@@ -353,6 +353,12 @@ a:hover {
 }
 @media (max-width: 767px) {
   .sharinghistory-bib__entries { margin-left: 0; width: auto; }
+  /* The partner profile's way back: its line alone, the heading 35px under. */
+  .mwnf-standalone-partner__back { min-height: 16px; }
+  /* The Collections results: "Navigation by Country" under the heading,
+     on a line of its own, the tiles 31px under it. */
+  .sharinghistory-pcr .mwnf-standalone-pcr__heading { margin-bottom: 5px; }
+  .sharinghistory-pcr__navigation { position: static; width: auto; margin: 19px 0 31px; }
 }
 
 /* The Chronology (about_chronology_list.php, about_chronology_txt.php):

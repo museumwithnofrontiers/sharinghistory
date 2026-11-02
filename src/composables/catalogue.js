@@ -166,7 +166,8 @@ export function inPeriod(item, start, end) {
 }
 
 // Legacy's tile (pclist_all.php): the name; the date and the free-text
-// dynasty; the holding museum; the location, the province and the country.
+// dynasty; an object's holding museum (a monument's tile has none); the
+// location, the province and the country.
 export function resultTile(item, { tr, renderInline }) {
   const text = tr('items', item.id)
   const plain = (value) => removeEndingPoint(String(value ?? '').replace(/[\r\n]/g, ''))
@@ -180,7 +181,7 @@ export function resultTile(item, { tr, renderInline }) {
     image: item.images?.[0]?.url ?? '',
     name: renderInline(plain(text.name ?? item.internal_name)),
     lines: dates ? [renderInline(dates)] : [],
-    holder: text.holder ? renderInline(plain(text.holder)) : '',
+    holder: item.type === 'object' && text.holder ? renderInline(plain(text.holder)) : '',
     location: renderInline(location),
   }
 }

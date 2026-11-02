@@ -72,7 +72,8 @@ describe('website smoke test', () => {
   // Legacy's pclist_all.php for a country: the heading with legacy's count
   // (Portugal: 49 objects and 17 monuments, measured on its page on
   // 2026-11-02), "Navigation by Country", twenty tiles, the lists and the
-  // Related Content beside them; its band titled "Collections".
+  // Related Content beside them; its band titled "Collections". A
+  // monument's tile names no holder (Palace of Monserrate, first).
   it("renders the Collections results as legacy's pclist_all.php", async () => {
     const { app, host } = await mountSite(config, messages, '#/permanent-collection/results?country=prt&lang=en')
     await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-results__tile')).not.toBeNull(), { timeout: 20000 })
@@ -80,6 +81,9 @@ describe('website smoke test', () => {
       .toBe('Collections | Portugal [49 Objects, 17 Monuments]')
     expect(host.querySelector('.sharinghistory-pcr__navigation').textContent).toBe('Navigation by Country')
     expect(host.querySelectorAll('.mwnf-standalone-results__tile').length).toBe(20)
+    const first = host.querySelector('.mwnf-standalone-results__tile')
+    expect(first.querySelector('.mwnf-standalone-results__name').textContent).toBe('Palace of Monserrate')
+    expect(first.querySelector('.mwnf-standalone-results__holder')).toBeNull()
     expect(host.querySelector('.mwnf-standalone-banner__title').textContent).toBe('Collections')
     const related = [...host.querySelectorAll('.mwnf-standalone-pcr__related a')].map((a) => a.textContent)
     expect(related).toEqual(['Historical Profile | Portugal', 'Timeline | Portugal'])
