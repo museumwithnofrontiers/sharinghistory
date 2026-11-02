@@ -235,6 +235,8 @@
      heading 14px down on a 34px line with its 16px line under it, the links
      13px down, legacy's spacing around the "|". */
   --mwnf-standalone-header-align: start;
+  /* 81px with the 3px rule under it (theme/overrides.css), as legacy's. */
+  --mwnf-standalone-header-height: 78px;
   --mwnf-standalone-header-inset: 65px;
   --mwnf-standalone-header-brand-offset: 15px;
   --mwnf-standalone-header-title-offset: 14px;
@@ -249,6 +251,36 @@
   --mwnf-standalone-home-banner-color: #ffffff;
   --mwnf-standalone-home-banner-title-size: 46px;
   --mwnf-standalone-home-banner-line-size: 18px;
+  /* The inner pages' banner: the title in white on its dark strip across the
+     picture (.banner-text), 41px a line. */
+  --mwnf-standalone-banner-title-color: #ffffff;
+  --mwnf-standalone-banner-title-background: rgba(0, 0, 0, 0.52);
+  --mwnf-standalone-banner-title-line-height: 41px;
+  /* The Collections' tiles (pclist_all.php's .pc_all): one after another,
+     250px apart, in a pale red frame. */
+  --mwnf-standalone-results-cell-width: auto;
+  --mwnf-standalone-results-cell-padding: 0;
+  --mwnf-standalone-results-border: rgba(153, 0, 0, 0.17);
+  /* The Database entrance (database.php, section.db_start_page): no line
+     break above it, its rows a little shorter than the other sites', the
+     keywords typed in brown, the red Go, the listing's arrow an image. */
+  --mwnf-standalone-db-padding-top: 16px;
+  --mwnf-standalone-db-rows: 38px 37px 49px 49px 49px 48px 43px 60px 22px;
+  --mwnf-standalone-db-keyword-color: rgb(80 72 25);
+  --mwnf-standalone-db-go-background: #990000;
+  --mwnf-standalone-db-go-border: #750101;
+  --mwnf-standalone-db-go-hover-background: #750101;
+  --mwnf-standalone-db-go-hover-border: #750101;
+  --mwnf-standalone-db-listing-indent: 12px;
+  /* The Database results' "Refine your search" band (database_results.php,
+     section.timeline_color): white words on the red band, the fields framed
+     in dark red, the dark red New Search. */
+  --mwnf-standalone-refine-background: #990000;
+  --mwnf-standalone-refine-color: #ffffff;
+  --mwnf-standalone-refine-input-border: #790d0d;
+  --mwnf-standalone-refine-search-color: #222222;
+  --mwnf-standalone-refine-new-background: #750101;
+  --mwnf-standalone-refine-shadow: #500101;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and

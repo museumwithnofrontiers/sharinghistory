@@ -195,7 +195,9 @@ export default {
       path: '/permanent-collection/results',
       name: 'permanent-collection-results',
       component: () => import('./views/PermanentCollectionResults.vue'),
-      meta: meta('permanent-collection', 'items', 'countries', 'partners', 'collections'),
+      // Legacy titled the results' band "Collections", the entrance's
+      // "Permanent Collection".
+      meta: { ...meta('permanent-collection', 'items', 'countries', 'partners', 'collections'), bannerTitle: 'sharinghistory.pcr.title' },
     },
     {
       path: '/database',

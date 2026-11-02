@@ -38,3 +38,64 @@ a:hover {
    its caption 10px over the tiles. */
 .mwnf-standalone--home .mwnf-standalone-home { margin-top: -7px; }
 .mwnf-standalone-tiles__caption { margin-bottom: 10px; }
+
+/* The Collections entrance (pc_entrance.php): the two periods side by side,
+   5px apart; the About text's blank lines a full line, as legacy's <br/>s. */
+.sharinghistory-pc__dates { display: flex; gap: 5px; }
+.sharinghistory-pc__dates select { width: 140px; }
+.sharinghistory-pc .mwnf-standalone-pc__about p { margin: 0 0 22px; }
+/* The Collections results (pclist_all.php): "Navigation by Country" in the
+   right column, level with the heading (#navigationTimeline). */
+.sharinghistory-pcr__head { position: relative; }
+.sharinghistory-pcr__navigation {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 181px;
+  margin: 0;
+  font: 400 14px/normal Roboto, sans-serif;
+  color: #000;
+}
+/* Legacy's bold in the About text is Roboto's 500. */
+.sharinghistory-pc .mwnf-standalone-pc__about strong { font-weight: 500; }
+
+/* The Database entrance (database.php): "About" in the last column, its
+   arrow first; the word to the visitor opens over a dark veil, on a red
+   panel to its left (#quick-view, .quick_search_close). */
+.sharinghistory-db .mwnf-standalone-db__aside { position: relative; }
+.sharinghistory-db .mwnf-standalone-db__aside .sharinghistory-db__about { padding-left: 0; }
+.sharinghistory-db__intro {
+  position: absolute;
+  top: 50%;
+  left: -60px;
+  z-index: 20;
+  width: 100%;
+  padding: 10px 20px;
+  font: 300 16px/22px Roboto, sans-serif;
+  color: #ffffff;
+  background: #990000;
+}
+.sharinghistory-db__intro::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(0, 0, 0, 0.5);
+}
+.sharinghistory-db__intro :where(p) { margin: 0 0 22px; color: #ffffff; }
+.sharinghistory-db__close {
+  position: absolute;
+  top: -18px;
+  right: -12px;
+  border: 0;
+  font-size: 24px;
+  color: #ffffff;
+  text-shadow: -2px 1px 7px #2d2500;
+  background: none;
+  cursor: pointer;
+}
+
+/* The Database results (database_results.php): the band 52px high, the way
+   back a line of 16px (.arrow_bakward), 5px above the heading's 15. */
+.sharinghistory-dbr .mwnf-standalone-refine { padding-bottom: 9px; }
+.sharinghistory-dbr .mwnf-standalone-pcr__back { align-items: flex-start; min-height: 21px; line-height: 16px; }

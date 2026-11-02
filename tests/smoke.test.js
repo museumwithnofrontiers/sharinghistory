@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { loadEntities, mergeMessages, projectLabel, useDataPackage } from '@museumwnf/viewer-core'
+import { loadEntities, mergeMessages, useDataPackage } from '@museumwnf/viewer-core'
 import {
   checkOfferedLanguages, checkRoutes, checkSectionMeta, checkTextsRendered, mountSite,
 } from '@museumwnf/viewer-core/testing'
@@ -10,7 +10,7 @@ import countryTexts from '@museumwnf/sharinghistory-data/translations/countries.
 import itemTexts from '@museumwnf/sharinghistory-data/translations/items.en.json'
 import partnerTexts from '@museumwnf/sharinghistory-data/translations/partners.en.json'
 import timelineEventTexts from '@museumwnf/sharinghistory-data/translations/timeline_events.en.json'
-import { collectionTitle, itemIdsUnder } from '../src/composables/catalogue.js'
+import { collectionTitle, inPeriod, itemIdsUnder } from '../src/composables/catalogue.js'
 import config from '../src/dataset.config.js'
 import { exhibitionsTree, minisiteHref } from '../src/composables/exhibitions.js'
 import minisites from '../src/minisites.json'
@@ -70,43 +70,52 @@ describe('website smoke test', () => {
     app.unmount()
   }, 20000)
 
-  // The Permanent Collection list runs on the platform's composed results
-  // view (metanull/viewer-core#50): the rows and the filter panel come from
-  // the catalogue spec in composables/catalogue.js, the exhibition cascade
-  // and the heading from PermanentCollectionResults.vue's slots.
-  it('renders the Permanent Collection on the composed results view', async () => {
-    const { app, host } = await mountSite(config, messages, '#/permanent-collection/results')
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
-    expect(host.querySelector('.mwnf-catalogue')).not.toBeNull()
-    expect(host.querySelector('.mwnf-filter')).not.toBeNull()
-    expect(host.querySelector('.mwnf-heading').textContent).toContain('Permanent Collection')
-    // Legacy's count, in its two halves ("N objects", "M monuments").
-    expect(host.querySelectorAll('.mwnf-summary__count').length).toBe(2)
+  // Legacy's pclist_all.php for a country: the heading with legacy's count
+  // (Portugal: 49 objects and 17 monuments, measured on its page on
+  // 2026-11-02), "Navigation by Country", twenty tiles, the lists and the
+  // Related Content beside them; its band titled "Collections".
+  it("renders the Collections results as legacy's pclist_all.php", async () => {
+    const { app, host } = await mountSite(config, messages, '#/permanent-collection/results?country=prt&lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-results__tile')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-pcr__heading').textContent.replace(/\s+/g, ' ').trim())
+      .toBe('Collections | Portugal [49 Objects, 17 Monuments]')
+    expect(host.querySelector('.sharinghistory-pcr__navigation').textContent).toBe('Navigation by Country')
+    expect(host.querySelectorAll('.mwnf-standalone-results__tile').length).toBe(20)
+    expect(host.querySelector('.mwnf-standalone-banner__title').textContent).toBe('Collections')
+    const related = [...host.querySelectorAll('.mwnf-standalone-pcr__related a')].map((a) => a.textContent)
+    expect(related).toEqual(['Historical Profile | Portugal', 'Timeline | Portugal'])
     app.unmount()
   }, 60000)
 
-  // The exhibition cascade in PermanentCollectionResults.vue's `filters` slot
-  // narrows the list the way the pre-adoption view did: an `exhibition` query
-  // narrows to that exhibition's subtree, which is `scope` in the spec rather
-  // than a facet (itemIdsUnder, composables/catalogue.js).
-  it('narrows the Permanent Collection to one exhibition', async () => {
+  // A theme (an exhibition) narrows the list to its subtree, the exhibition
+  // tree's own membership (itemIdsUnder, composables/catalogue.js); a period
+  // follows legacy's rule (inPeriod).
+  it('narrows the Collections to one theme and to a period', async () => {
     const [collections] = await loadEntities(['collections'])
     const marker = collections.find((c) => c.purpose === 'exhibitions-root')
     const exhibition = collections.find((c) => c.parent_id === marker.id)
     const scopedIds = itemIdsUnder(exhibition.id)
 
     const { app, host } = await mountSite(config, messages,
-      `#/permanent-collection/results?exhibition=${encodeURIComponent(exhibition.id)}`,
+      `#/permanent-collection/results?exhibition=${encodeURIComponent(exhibition.id)}&lang=en`,
     )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
-
-    const rowIds = Array.from(host.querySelectorAll('.mwnf-list__row .mwnf-list__link')).map((a) =>
-      decodeURIComponent(a.getAttribute('href').split('/').pop()),
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-results__tile')).not.toBeNull(), { timeout: 20000 })
+    const rowIds = Array.from(host.querySelectorAll('.mwnf-standalone-results__tile a[href*="/item/"]')).map((a) =>
+      decodeURIComponent(a.getAttribute('href').split('/').pop().split('?')[0]),
     )
     expect(rowIds.length).toBeGreaterThan(0)
     for (const id of rowIds) expect(scopedIds.has(id)).toBe(true)
-
+    expect(host.querySelector('.sharinghistory-pcr__navigation').textContent).toBe('Navigation by Theme')
     app.unmount()
+
+    const item = (start_date, end_date) => ({ start_date, end_date })
+    expect(inPeriod(item(1820, 1850), '1820', '1850')).toBe(true)
+    expect(inPeriod(item(1815, 1850), '1820', '1850')).toBe(false)
+    expect(inPeriod(item(1790, 1795), 'Before 1800', 'Before 1800')).toBe(true)
+    expect(inPeriod(item(1790, 1840), 'Before 1800', '1850')).toBe(true)
+    expect(inPeriod(item(1935, 1950), '1900', 'After 1930')).toBe(true)
+    expect(inPeriod(item(null, null), '1900', 'none')).toBe(false)
+    expect(inPeriod(item(null, null), 'none', 'none')).toBe(true)
   }, 60000)
 
   // Each exhibition is a website of its own (a mini-site, inventory-app#2359):
@@ -492,102 +501,115 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The search entrance runs on the platform's composed `SearchFormView`
-  // (composables/catalogue.js's `databaseSearchSpec`): the three keyword rows,
-  // the search-language select and the AND/OR fold are the shared
-  // component's; asserted here is this website's own field grammar and
-  // legacy database.php's fixed century boundaries (Decision D2).
-  it('renders the search entrance on the composed form view, with the field options and century dates', async () => {
-    const { app, host } = await mountSite(config, messages, '#/database')
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-search-form')).not.toBeNull(), { timeout: 20000 })
+  // Legacy's database.php on the standalone family's form: three keyword rows
+  // and their categories, the period before 1800 to after 1930, English or
+  // French; legacy's check before searching; Go writes the results' query.
+  it("renders the Database entrance as legacy's database.php", async () => {
+    const { app, host, router } = await mountSite(config, messages, '#/database?lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-db')).not.toBeNull(), { timeout: 20000 })
 
-    expect(host.querySelectorAll('.mwnf-search-form__row').length).toBe(3)
-    const fieldValues = Array.from(host.querySelector('.mwnf-search-form__field').querySelectorAll('option')).map((o) => o.value)
-    expect(fieldValues).toEqual(['keyword', 'name', 'location', 'provenance', 'patron', 'artist', 'material', 'other'])
+    expect(host.querySelector('.mwnf-standalone-db__criteria').textContent).toBe('Enter your criteria:')
+    const keywords = host.querySelectorAll('.mwnf-standalone-db__keyword')
+    expect(keywords.length).toBe(3)
+    const fields = host.querySelectorAll('.mwnf-standalone-db__field select')
+    expect([...fields[0].options].map((o) => o.value)).toEqual([
+      'keyword', 'name', 'location', 'provenance', 'dynasty', 'patron', 'artist', 'material', 'other',
+    ])
 
-    // 16 "from" years (a blank "any" option first) — legacy's own century boundaries.
-    const dateSelects = host.querySelectorAll('.mwnf-search-form__dates select')
-    expect(Array.from(dateSelects[0].querySelectorAll('option')).map((o) => o.textContent)).toContain('501')
-    expect(dateSelects[0].querySelectorAll('option').length).toBe(17)
+    const [from, to] = host.querySelectorAll('.mwnf-standalone-db__dates select')
+    const years = [...from.options].map((o) => o.textContent)
+    expect(years.slice(1, 3)).toEqual(['Before 1800', '1800'])
+    expect(years.at(-1)).toBe('After 1930')
+    expect(from.options.length).toBe(17)
+    expect(to.options.length).toBe(17)
+    await vi.waitFor(() => expect([...host.querySelector('.mwnf-standalone-db__language select').options].map((o) => o.value)).toEqual(['', 'en', 'fr']), { timeout: 20000 })
 
-    expect(host.querySelector('.mwnf-search-form__language')).not.toBeNull()
+    const alert = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    host.querySelector('.mwnf-standalone-db__go button').click()
+    expect(alert).toHaveBeenCalledWith('Please enter one Keyword /Select one Language/ Select From To Dates')
+    alert.mockRestore()
+
+    keywords[0].value = 'trade'
+    keywords[0].dispatchEvent(new window.Event('input'))
+    fields[0].value = 'name'
+    fields[0].dispatchEvent(new window.Event('change'))
+    from.value = '1800'
+    from.dispatchEvent(new window.Event('change'))
+    host.querySelector('.mwnf-standalone-db__go button').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('database-results'), { timeout: 20000 })
+    expect(router.currentRoute.value.query).toMatchObject({ q: 'trade', field: 'name', from: '1800' })
     app.unmount()
-  }, 20000)
+  }, 30000)
 
-  // The database results run on the platform's composed `CatalogueResultsView`
-  // (composables/catalogue.js's `databaseResultsSpec`); this website's own is the
-  // keyword index itself (DatabaseResults.vue) — Decision D3's `rank: 'hits'`
-  // and the country expansion, which lets a country's own name (not just its
-  // id) match the "Location" field (`SEARCH_FIELDS.location` carries
-  // `item.country_id` for exactly this).
+  // Legacy's database_results.php: a word naming a country, in Location,
+  // finds that country's records (legacy's country match); the heading
+  // counts them, as "Results of your search | N records"; twelve a page, each
+  // its name and its place with the country's name.
   it('renders database results for a country name typed into the Location field', async () => {
     const [items] = await loadEntities(['items'])
     const countryId = 'ita'
     const countryName = countryTexts[countryId]?.name
     expect(countryName, 'fixture: Italy has an English name').toBeTruthy()
     const visibleItalyItems = items.filter((i) => i.display_status !== 'N' && i.country_id === countryId)
-    expect(visibleItalyItems.length, 'fixture: Italy has visible items').toBeGreaterThan(0)
+    expect(visibleItalyItems.length, 'fixture: Italy has visible items').toBeGreaterThan(12)
 
     const { app, host } = await mountSite(config, messages,
-      `#/database/results?q=${encodeURIComponent(countryName)}&field=location`,
+      `#/database/results?lang=en&q=${encodeURIComponent(countryName)}&field=location`,
     )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-list__cell')).not.toBeNull(), { timeout: 30000 })
 
-    // The summary line names the field and the term, off the country
-    // expansion rather than a literal "Location" text match.
-    expect(host.querySelector('.mwnf-summary__value').textContent).toContain(`Location: "${countryName}"`)
-    // A country's own 3-letter id can turn up as a plain substring elsewhere
-    // (Lebanon's "Je'ita" carries "ita"), so the count is a floor, not exact.
-    expect(Number(host.querySelector('.mwnf-summary__count').textContent)).toBeGreaterThanOrEqual(visibleItalyItems.length)
+    const heading = host.querySelector('.mwnf-standalone-pcr__heading').textContent
+    expect(heading).toMatch(/^Results of your search \| \d+\u00a0records$/)
+    // A place named after the country ("Italy Street") counts too: a floor.
+    expect(Number(heading.match(/\| (\d+)/)[1])).toBeGreaterThanOrEqual(visibleItalyItems.length)
+    const cells = host.querySelectorAll('.mwnf-standalone-list__cell')
+    expect(cells.length).toBe(12)
+    // The country's records come first: the country match adds to their relevance.
+    expect(cells[0].textContent).toContain(`, ${countryName}`)
+    expect(host.querySelector('.mwnf-standalone-refine')).not.toBeNull()
 
     app.unmount()
   }, 60000)
 
-  // The refine row (`DatabaseResults.vue`'s `#filters` slot, over the
-  // platform's own `filters` reactive object) ANDs a fourth keyword onto the
-  // three the entrance form wrote — asserted here narrowing a country's 247
-  // items down to the one whose name carries a fixture word found nowhere
-  // else, rather than just checking the row count changed.
-  it('narrows the database results with the refine row\'s fourth keyword', async () => {
+  // The refine band ANDs a fourth keyword onto the three the entrance wrote —
+  // asserted here narrowing a country's items down to the one whose name
+  // carries a word found nowhere else.
+  it('narrows the database results with the refine band\'s fourth keyword', async () => {
     const [items] = await loadEntities(['items'])
     const fixture = items.find((i) => i.display_status !== 'N' && /worthy/i.test(itemTexts[i.id]?.name ?? ''))
     expect(fixture, 'fixture: a visible item with a distinctive name word').not.toBeNull()
     const expectedName = itemTexts[fixture.id].name.replace(/[*_]/g, '')
 
     const { app, host } = await mountSite(config, messages,
-      `#/database/results?q=${encodeURIComponent(countryTexts[fixture.country_id].name)}&field=location&q4=worthy&field4=name&op4=AND`,
+      `#/database/results?lang=en&q=${encodeURIComponent(countryTexts[fixture.country_id].name)}&field=location&q4=worthy&field4=name&op4=AND`,
     )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-list__cell')).not.toBeNull(), { timeout: 30000 })
 
-    expect(host.querySelector('.mwnf-summary__count').textContent).toBe('1')
-    expect(host.textContent).toContain(expectedName)
+    expect(host.querySelector('.mwnf-standalone-pcr__heading').textContent).toContain('| 1\u00a0records')
+    expect(host.querySelectorAll('.mwnf-standalone-list__cell').length).toBe(1)
+    expect(host.querySelector('.mwnf-standalone-list__records').textContent).toContain(expectedName)
 
     app.unmount()
   }, 60000)
 
-  // The Permanent Collection entrance runs on the platform's composed
-  // `SearchFormView` (`radio` mode, composables/catalogue.js): the country
-  // and holding-institution radios are `FACETS` — the same values, labelled
-  // and filtered, the results page itself offers — and the theme radio is
-  // this site's own, over the exhibition tree rather than a record facet.
-  it('renders the Permanent Collection entrance on the composed radio form, with real facet options', async () => {
-    const [countries] = await loadEntities(['countries'])
-    const { app, host } = await mountSite(config, messages, '#/permanent-collection')
-    await vi.waitFor(() => expect(host.querySelectorAll('.mwnf-search-form__radio-row').length).toBeGreaterThan(0), { timeout: 20000 })
-
-    const radioRows = host.querySelectorAll('.mwnf-search-form__radio-row')
-    expect(radioRows.length).toBe(5)
-
-    // The country radio's own select carries a real, labelled country — not
-    // a raw id, and not every country the package ships (only the ones a
-    // visible item actually carries).
-    const countrySelect = radioRows[0].querySelector('select')
-    const countryLabels = Array.from(countrySelect.querySelectorAll('option')).map((o) => o.textContent)
-    const anyCountryWithLabel = countries.find((c) => countryLabels.includes(countryTexts[c.id]?.name))
-    expect(anyCountryWithLabel, 'fixture: a country offered by the radio is labelled by name').toBeDefined()
-
+  // Legacy's pc_entrance.php: "Sort by" and its five lists (the countries the
+  // records carry, the themes, the partners, legacy's periods), "About" with
+  // legacy's text; a country opens the results.
+  it("renders the Collections entrance as legacy's pc_entrance.php", async () => {
+    const { app, host, router } = await mountSite(config, messages, '#/permanent-collection?lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-pc')).not.toBeNull(), { timeout: 20000 })
+    expect([...host.querySelectorAll('.mwnf-standalone-pc__heading')].map((h) => h.textContent)).toEqual(['Sort by', 'About'])
+    const selects = host.querySelectorAll('.mwnf-standalone-pc select')
+    expect([...selects].map((s) => s.options[0].textContent)).toEqual(['Country', 'Theme', 'Partners', 'Start Date', 'End Date'])
+    await vi.waitFor(() => expect([...selects[0].options].map((o) => o.textContent)).toContain('Portugal'), { timeout: 20000 })
+    expect([...selects[3].options].map((o) => o.textContent).slice(1, 3)).toEqual(['Before 1800', '1800'])
+    expect(host.querySelector('.mwnf-standalone-pc__about').textContent).toContain('offers two ways to explore the items')
+    selects[0].value = 'prt'
+    selects[0].dispatchEvent(new window.Event('change'))
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('permanent-collection-results'), { timeout: 20000 })
+    expect(router.currentRoute.value.query.country).toBe('prt')
     app.unmount()
-  }, 20000)
+  }, 30000)
 
   it('declares every route by name, and leaves the catch-all to the router', () => {
     expect(checkRoutes(config, {
