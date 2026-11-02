@@ -45,6 +45,17 @@
   display: none;
 }
 
+/* Legacy draws no rule over the band. */
+.mwnf-sponsors {
+  border-top: none;
+}
+
+/* On the home page the social icons sit in the band (CooperationBand.vue),
+ * not in the footer. */
+.mwnf-standalone--home .mwnf-footer .mwnf-footer__social {
+  display: none;
+}
+
 /*
  * The home page (viewer-layout's HomeView, `panels: true`): the welcome in
  * the site's panel under the accent rule, its title in the heading colour

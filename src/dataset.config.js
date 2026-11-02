@@ -1,4 +1,5 @@
 import { languageLabels, mwnfLinks, offeredLanguages, sectionMeta, useDataPackage } from '@museumwnf/viewer-core'
+import { mwnfSocialLinks } from '@museumwnf/viewer-layout'
 import SiteShell from './SiteShell.vue'
 import { OFFERED_LANGUAGES } from './languages.js'
 import { exhibitionTiles, historicalProfileLinks } from './composables/menu.js'
@@ -88,6 +89,8 @@ export default {
     },
     // libs/config.inc.php offers English only: no switcher.
     languages: false,
+    // The footer's copyright entry (includes/footer.php); the year follows.
+    copyright: 'sharinghistory.footer.copyright',
     // The home page: the exhibitions, each over its own picture, under
     // legacy's caption (shTemplates/exhibitionListImg.php).
     home: {
@@ -123,6 +126,18 @@ export default {
     // Legacy's red menu bar sits under the header on every page, the home
     // page's picture included (index.php: `links`, then `banner`).
     placement: 'before-banner',
+    // Legacy's footer icons: YouTube, X, Facebook, Instagram, Weibo, LinkedIn.
+    socialLinks: mwnfSocialLinks,
+    // The footer (includes/footer.php), in its order, each in the same
+    // window, as legacy's.
+    footerLinks: [
+      { label: 'sharinghistory.footer.aboutMwnf', href: mwnfLinks.about },
+      { label: 'sharinghistory.footer.contact', href: mwnfLinks.contact },
+      { label: 'sharinghistory.footer.legalNotice', href: mwnfLinks.legalNotice },
+      { label: 'sharinghistory.footer.credits', href: mwnfLinks.credits },
+      { label: 'sharinghistory.footer.languagePolicy', href: 'https://www.museumwnf.org/about/language-policy' },
+      { label: 'sharinghistory.footer.cookies', href: mwnfLinks.cookies },
+    ],
     // The title on each section's band (each page's <h2><span>).
     sectionTitles: {
       about: 'sharinghistory.about.bannerTitle',

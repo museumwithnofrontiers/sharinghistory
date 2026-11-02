@@ -70,10 +70,23 @@
   --mwnf-sponsors-logo-height: 2.5rem;
 
   /* ---------- Footer ---------- */
-  --mwnf-footer-padding: 0.625rem;
+  /* Legacy's footer.footer: 6px deep under a 5px rule in the band's red;
+     #social-media's 14px icons 16px down and 14px in from the right (6px
+     up from its foot on a phone: legacy's 16px line, 4px up). On
+     the home page the icons sit in the band instead (site.css), and 44px
+     of the page's own colour follow the footer. */
+  --mwnf-footer-padding: 6px;
   --mwnf-footer-background: #990000;
   --mwnf-footer-text-color: #ffffff;
   --mwnf-footer-text-size: 14px;
+  --mwnf-footer-social-size: 14px;
+  --mwnf-standalone-footer-border: 5px solid #750101;
+  --mwnf-standalone-footer-social-top: 16px;
+  --mwnf-standalone-footer-social-right: 14px;
+  --mwnf-standalone-phone-footer-social-bottom: 4px;
+  --mwnf-standalone-home-footer-room: 0px;
+  --mwnf-standalone-home-footer-margin: 44px;
+  --mwnf-standalone-phone-home-footer-room: 0px;
 
   /* ---------- Content: the record page ---------- */
   /* The sheet as the legacy site set it: a bordered table with warm

@@ -57,14 +57,14 @@ describe('website smoke test', () => {
     app.unmount()
   }, 20000)
 
-  // The footer is legacy's (SiteFooter.vue): its six links, then its
-  // copyright entry, a space and the current year — legacy's
-  // "© Museum With No Frontiers (MWNF) 2004 – <year>". The rights-holder
-  // line is not asserted either way (Pascal, 2026-10-20; #128).
+  // The footer is legacy's (`standalone.footerLinks` and `copyright`): its
+  // six links, then its copyright entry, a space and the current year —
+  // legacy's "© Museum With No Frontiers (MWNF) 2004 – <year>". The
+  // rights-holder line is not asserted either way (Pascal, 2026-10-20; #128).
   it('renders legacy\'s footer line', async () => {
     const { app, host } = await mountSite(config, messages)
-    await vi.waitFor(() => expect(host.querySelector('.sh-footer__copyright')).not.toBeNull(), { timeout: 15000 })
-    expect(host.querySelector('.sh-footer__copyright').textContent)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-footer__text')).not.toBeNull(), { timeout: 15000 })
+    expect(host.querySelector('.mwnf-footer__text').textContent)
       .toBe(`${ownTexts['sharinghistory.footer.copyright']} ${new Date().getFullYear()}`)
     app.unmount()
   }, 20000)
