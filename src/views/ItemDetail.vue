@@ -1,11 +1,13 @@
 <script setup>
-import { timelineLinkFor, useI18n } from '@museumwnf/viewer-core'
+import { useRouter } from 'vue-router'
+import { useI18n } from '@museumwnf/viewer-core'
 import { OnDisplayIn, PartnerPanel, RelatedMedia, SpecialFeatures } from '@museumwnf/viewer-layout/content'
 import { StandaloneItemSheet } from '@museumwnf/viewer-layout/standalone'
 import { useData } from '../composables/data.js'
 import { minisiteHref } from '../composables/exhibitions.js'
 import { partnerViewOf } from '../composables/partner.js'
 import { itemSheetSpec } from '../composables/sheet.js'
+import { hasEvents } from '../composables/timeline.js'
 
 // The item sheet: legacy database_item.php in its three columns, the
 // standalone family's `StandaloneItemSheet` over the spec in
@@ -21,7 +23,14 @@ defineProps({ id: { type: String, required: true } })
 const { exhibitionLinksForItem, mdInline, partnerById, tr } = useData()
 const { locale } = useI18n()
 
-const timelineLink = (record) => timelineLinkFor(record, { name: 'timeline-results' })
+// "Timeline for this item": legacy's openhcr(), the item's timeline in a
+// window of its own (ItemTimeline.vue, hcr.php) at legacy's 790 by 600,
+// offered when the item's country has events.
+const router = useRouter()
+const timelineHref = (record) => router.resolve({ name: 'item-timeline', params: { id: record.id }, query: { lang: locale.value } }).href
+function openTimeline(record) {
+  window.open(timelineHref(record), 'hcr', 'width=790,height=600,toolbar=0,resizable=0,directories=0,menubar=0,status=0,location=0,scrollbars=0')?.focus()
+}
 
 // The way back, as legacy's breadcrumbs: the previous page, then the
 // collections' start page.
@@ -111,8 +120,8 @@ const thgGalleryGroups = (record) => [{
     </template>
 
     <template #sidebar="{ record, language, dir }">
-      <p v-if="timelineLink(record)" class="sharinghistory-timeline-link">
-        <RouterLink :to="timelineLink(record)">{{ $t('sharinghistory.item.timeline') }}</RouterLink>
+      <p v-if="hasEvents(record.country_id)" class="sharinghistory-timeline-link">
+        <a :href="timelineHref(record)" :title="$t('sharinghistory.hcr.linkTooltip')" @click.prevent="openTimeline(record)">{{ $t('sharinghistory.hcr.link') }}</a>
       </p>
       <RelatedMedia :media="record.media ?? []" :language="language" heading="sharinghistory.item.relatedVideos" :dir="dir" />
       <div v-if="onDisplayInGroups(record)[0].links.length || thgGalleryGroups(record)[0].links.length" class="sharinghistory-on-display">

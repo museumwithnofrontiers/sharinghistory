@@ -90,6 +90,7 @@
   {"path":"theme/assets/icons/cursor.png","url":"https://sharinghistory.museumwnf.org/images/cursor.png","bytes":1394,"sha256":"b2ef24e5e09a4d62e19a9361f7eca1ba3d5598d4bb39429232de1812f5113d8d"},
   {"path":"theme/assets/icons/download_white.png","url":"https://sharinghistory.museumwnf.org/images/download_white.png","bytes":1099,"sha256":"83fc5164181bfaa66ff641f7fd05d6b1865c8f6d0e9801e8ac722090fd1533f7"},
   {"path":"theme/assets/icons/hcr_timeline_dash.gif","url":"https://sharinghistory.museumwnf.org/images/hcr_timeline_dash.gif","bytes":69,"sha256":"de1cd3bc40c794e870a23dd752537b981540b8604a816f4fd0a8a83a98d272ec"},
+  {"path":"theme/assets/icons/hcr_header.jpg","url":"https://sharinghistory.museumwnf.org/images/hcr_header.jpg","bytes":39498,"sha256":"d127e1915c2e5464fca9f68961731cb9cdb67f9536e0fe38c2b92ce74b03022d"},
   {"path":"theme/assets/sponsors/sh_sponsors/1.jpg","url":"https://images.museumwnf.org/full/sharing_history/sh_sponsors/1.jpg","bytes":11981,"sha256":"79f4449912012f248a444e0d30680c8632844d802c23e4fd22c64911ea128173"},
   {"path":"theme/assets/sponsors/sh_sponsors/2.jpg","url":"https://images.museumwnf.org/full/sharing_history/sh_sponsors/2.jpg","bytes":12291,"sha256":"26acff7396847cfb805d8a099b944439e751d8a89cabdd7ff5c7f54beea61b97"},
   {"path":"theme/assets/sponsors/sh_sponsors/3.jpg","url":"https://images.museumwnf.org/full/sharing_history/sh_sponsors/3.jpg","bytes":4792,"sha256":"50c36c18539cba7a1bfd89ac5db7856007a2ef44e072f1cd6183130e03f5168b"},

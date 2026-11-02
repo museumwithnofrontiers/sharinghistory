@@ -340,7 +340,17 @@ export default {
       // Reached from the permanent collection, the timeline and exhibitions as
       // well as the database, but the nav's own generic search over items is
       // Database, so a record opened from any of those still highlights it.
-      meta: meta('database', 'items', 'partners', 'countries', 'collections'),
+      // Its country's events decide "Timeline for this item".
+      meta: meta('database', 'items', 'partners', 'countries', 'collections', 'timeline_events'),
+    },
+    {
+      // Legacy's hcr.php: the item's timeline, in a window of its own (bare),
+      // as legacy's window was.
+      path: '/item/:id/timeline',
+      name: 'item-timeline',
+      component: () => import('./views/ItemTimeline.vue'),
+      props: (route) => ({ id: decodeURIComponent(route.params.id) }),
+      meta: { ...meta('timeline', 'items', 'timeline_events', 'countries'), bare: true },
     },
   ],
 

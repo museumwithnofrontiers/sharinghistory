@@ -194,3 +194,11 @@ a:hover {
 .sharinghistory-tlp__see:hover { text-decoration: underline; }
 .sharinghistory-tlp .sharinghistory-tlp__numbers { display: flow-root; margin: 0; }
 .sharinghistory-tlp__numbers a { float: left; margin: 0 10px 10px 0; color: #222; }
+
+/* The item's timeline window (hcr.php, #hcr_timeline .modal-content): 10px
+   wider and 12px taller than the other sites' windows; the left column's
+   words light (its item's name 400), the heading over the events light. */
+.mwnf-standalone-window__box { width: calc(126vh - 20px); height: 556px; }
+.mwnf-standalone-hcr__left p { font-weight: 300; }
+.mwnf-standalone-hcr__left strong { font-weight: 400; }
+.mwnf-standalone-hcr__main h3 { font-weight: 300; }

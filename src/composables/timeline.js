@@ -209,3 +209,59 @@ export function timelineGallerySpec(query) {
     empty: 'sharinghistory.tlr.empty',
   }
 }
+
+// ── The item's timeline window (hcr.php) ───────────────────────────────────
+
+/** Whether a country has events: legacy offered "Timeline for this item" then. */
+export function hasEvents(country) {
+  return Boolean(country) && (timelineEvents.value ?? []).some((event) => event.country_id === country)
+}
+
+/** "1850 - 1900 A.D.", legacy's AD term. */
+export const yearLabel = (t, years) => t('sharinghistory.hcr.ad').replace('[DATE]', String(years))
+
+// The window's search: the country and century it was changed to, else the
+// item's own country and dates; a chosen century runs a hundred years.
+export function itemTimelineSearch(item, query) {
+  const country = query.country || item?.country_id || ''
+  if (query.start !== undefined && query.start !== '') return { country, start: Number(query.start), end: Number(query.start) + 100 }
+  return { country, start: Number(item?.start_date) || 0, end: Number(item?.end_date) || 0 }
+}
+
+// Its time range, as legacy listed it: the centuries from the country's
+// earliest event end up to the period, the period itself, then on to its
+// latest event's start.
+export function rangeOptions(search, t) {
+  const events = (timelineEvents.value ?? []).filter((event) => event.country_id === search.country)
+  const min = events.length ? Math.min(...events.map((event) => Number(event.year_to ?? event.year_from) || 0)) : 0
+  const max = events.length ? Math.max(...events.map((event) => Number(event.year_from) || 0)) : 0
+  const option = (value, from, to) => ({ value, label: yearLabel(t, `${from} - ${to}`) })
+  const list = []
+  let year = Math.floor(min / 100) * 100
+  while (year + 100 < search.start) {
+    list.push(option(year, year, year + 100))
+    year += 100
+  }
+  list.push(option(year, year, search.start))
+  list.push(option(search.start, search.start, search.end))
+  for (year = search.end; year < max; year += 100) list.push(option(year, year, year + 100))
+  return list
+}
+
+// HCRList::getObjects(): of the country, an event with an end running into
+// the period, one without falling inside it, by its first year.
+export function hcrEvents(search, t) {
+  return (timelineEvents.value ?? [])
+    .filter((event) => {
+      if (event.country_id !== search.country) return false
+      const from = Number(event.year_from) || 0
+      const to = Number(event.year_to) || 0
+      return to ? to > search.start && from < search.end : from > search.start && from < search.end
+    })
+    .sort((a, b) => a.year_from - b.year_from)
+    .map((event) => {
+      const text = tr('timeline_events', event.id) ?? {}
+      const years = event.year_to ? `${event.year_from} - ${event.year_to}` : String(event.year_from)
+      return { id: event.id, date: yearLabel(t, years), country: '', html: text.description ? md(text.description) : '' }
+    })
+}
