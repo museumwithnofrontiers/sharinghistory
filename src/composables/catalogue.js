@@ -1,6 +1,6 @@
 import {
-  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, SEARCH_LANGUAGE_KEY, centuryPresets, objectsAndMonumentsSummary, searchFieldOptions,
-  searchFields, searchRowKeys, searchSummary, useFieldSearch,
+  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, SEARCH_LANGUAGE_KEY, centuryPresets, removeEndingPoint,
+  searchFieldOptions, searchFields, searchRowKeys, searchSummary, useFieldSearch,
 } from '@museumwnf/viewer-core'
 import { exhibitionsTree } from './exhibitions.js'
 import { useData } from './data.js'
@@ -146,41 +146,73 @@ function scopedItemIds(id) {
 // the timeline gallery and the partner sheet's held-items grid.
 export const itemSummary = (item) => itemRow(item, ['country', 'dates'])
 
+// Legacy's period lists (pc_entrance.php, pclist_all.php): before 1800, each
+// decade to 1930, after 1930, written as legacy wrote them.
+export const DECADES = ['Before 1800', ...Array.from({ length: 14 }, (_, i) => String(1800 + 10 * i)), 'After 1930']
+
+const BEFORE = 'Before 1800'
+const AFTER = 'After 1930'
+const chosen = (value) => Boolean(value) && value !== 'none'
+
+// pclist_all.php's rule for a period: both ends before 1800 or both after
+// 1930; a record spanning the whole period when it runs from before 1800 to
+// after 1930; from before 1800, a record dated to the end; to after 1930, a
+// record starting from the start; otherwise a record starting from the start
+// and ending by the end, each end only when chosen. A record without the
+// dates a chosen end needs is not in the period.
+export function inPeriod(item, start, end) {
+  if (!chosen(start) && !chosen(end)) return true
+  const from = Number.isFinite(item.start_date) ? item.start_date : null
+  const to = Number.isFinite(item.end_date) ? item.end_date : null
+  if (start === BEFORE && end === BEFORE) return from !== null && to !== null && from < 1800 && to < 1800
+  if (start === AFTER && end === AFTER) return from !== null && to !== null && from > 1930 && to > 1930
+  if (start === BEFORE && end === AFTER) return from !== null && to !== null && from < 1800 && to > 1930
+  if (start === BEFORE) return !chosen(end) || (from !== null && to !== null && from <= Number(end) && to <= Number(end))
+  if (end === AFTER) return !chosen(start) || (from !== null && from >= Number(start))
+  if (chosen(start) && (from === null || from < Number(start))) return false
+  if (chosen(end) && (to === null || to > Number(end))) return false
+  return true
+}
+
+// Legacy's tile (pclist_all.php): the name; the date and the free-text
+// dynasty; the holding museum; the location, the province and the country.
+export function resultTile(item, { tr, renderInline }) {
+  const text = tr('items', item.id)
+  const plain = (value) => removeEndingPoint(String(value ?? '').replace(/[\r\n]/g, ''))
+  const dates = [plain(text.dates), plain(text.dynasty)].filter(Boolean).join(', ')
+  const location = [plain(text.location), plain(text.province), item.country_id ? labelOf('countries', item.country_id) : '']
+    .filter(Boolean)
+    .join(', ')
+  return {
+    id: item.id,
+    to: { name: 'item', params: { id: item.id } },
+    image: item.images?.[0]?.url ?? '',
+    name: renderInline(plain(text.name ?? item.internal_name)),
+    lines: dates ? [renderInline(dates)] : [],
+    holder: text.holder ? renderInline(plain(text.holder)) : '',
+    location: renderInline(location),
+  }
+}
+
 export const permanentCollectionResultsSpec = {
   entity: 'items',
-  keys: ['country', 'exhibition', 'theme', 'chapter', 'partner', 'begin', 'end'],
+  keys: ['country', 'exhibition', 'theme', 'chapter', 'partner', 'start', 'end'],
   facets: FACETS,
   facetScope: 'all',
   scope: (item, filters) => {
     if (!inScope(item)) return false
+    if (filters.partner && item.partner_id !== filters.partner) return false
+    if (!inPeriod(item, filters.start, filters.end)) return false
     const scopeId = filters.chapter || filters.theme || filters.exhibition
     return !scopeId || scopedItemIds(scopeId).has(item.id)
   },
-  controls: [
-    { key: 'country', label: 'catalogue.facet.country', anyLabel: 'catalogue.facet.any' },
-    { key: 'partner', label: 'catalogue.facet.holdingInstitution', anyLabel: 'catalogue.facet.any' },
-    { key: 'begin', type: 'year', label: 'catalogue.facet.fromYear', placeholder: 'timeline.form.fromYearHint' },
-    { key: 'end', type: 'year', label: 'catalogue.facet.toYear', placeholder: 'timeline.form.toYearHint' },
-  ],
-  filterMode: 'apply',
-  filterTitle: 'catalogue.filter.heading',
-  dates: { mode: CATALOGUE_DATE_MODE },
   sort: 'chronological',
+  // Legacy's twenty a page.
   pageSize: CATALOGUE_PAGE_SIZE,
-  variant: 'list',
-  recordRoute: 'item',
-  empty: 'catalogue.results.noResultsFilter',
-  pagination: { window: 7 },
-
-  // The row: the thumbnail, the name, the country, the date and the holder,
-  // the holder only when the package carries the partner, so a label is
-  // never an id.
-  record: (item) => itemRow(item, ['country', 'dates', 'holder']),
-
-  summary: objectsAndMonumentsSummary,
-
-  // In the site's content box, as every section's page is.
-  boxed: true,
+  record: resultTile,
+  // The count is in the heading, as legacy's "[49 Objects, 17 Monuments]".
+  summary: () => [],
+  empty: 'sharinghistory.pcr.empty',
 }
 
 // ── The search entrance and the keyword results ────────────────────────────
