@@ -220,13 +220,15 @@ a:hover {
 .sharinghistory-hbb a { display: block; padding: 5px 8px; color: #fff; text-decoration: none; }
 .sharinghistory-hbb a:hover { text-decoration: underline; }
 .sharinghistory-hbb__tab--active { background-color: #990000; }
-.sharinghistory-hbb i { font-style: normal; }
+/* Legacy's fa-angle-double-right before "About the Project", drawn, not
+   written. */
+.sharinghistory-hbb__project::before { content: "»\00a0"; }
 
 /* The About page (historical_background.php): the twenty portraits in ten
    columns of two, 123 by 144 each; 30px under them its word to the visitor
    in the middle 750px, the perspectives, then Related Content, centred. */
 .sharinghistory-hb__mosaic { display: grid; grid-template-columns: repeat(10, 1fr); }
-.sharinghistory-hb__column img { display: block; width: 100%; height: 144px; object-fit: cover; }
+.sharinghistory-hb__column img { display: block; width: 100%; height: auto; aspect-ratio: 123 / 144; object-fit: cover; }
 .sharinghistory-hb__text { margin-top: 30px; text-align: center; color: #222; }
 .sharinghistory-hb__text h3 { max-width: 750px; margin: 0 auto; font: 400 16px/normal Roboto, sans-serif; }
 .sharinghistory-hb__text h3 p { margin: 0; }
@@ -350,4 +352,54 @@ a:hover {
 }
 @media (max-width: 767px) {
   .sharinghistory-bib__entries { margin-left: 0; width: auto; }
+}
+
+/* Phone (below 768px): legacy's MWNF phone frame is the family's
+   (viewer-layout's standalone phone mode); what is Sharing History's own:
+   no rule under the header, the header links at the column's edge (the
+   desktop's offsets above are the wide header's), the content 24px from
+   the edges, and the bands' words 9px up to 390px, 11px above
+   (css/responsive_style.css). */
+@media (max-width: 767px) {
+  .mwnf-header { border-bottom: 0; }
+  .mwnf-standalone .mwnf-header__tools,
+  .mwnf-standalone--home .mwnf-header__tools { margin-right: 0; }
+  .mwnf-standalone .mwnf-header__subtitle { margin-top: -7px; line-height: 24px; }
+  .mwnf-standalone {
+    --mwnf-standalone-phone-content-padding: 24px;
+    /* The home picture's words 18px and 12px on a 3px band; the
+       exhibitions one a row, 350px wide (20px from the edges), 38px apart. */
+    --mwnf-standalone-home-banner-title-size: 18px;
+    --mwnf-standalone-home-banner-line-size: 12px;
+    --mwnf-standalone-phone-tiles-columns: 1;
+    --mwnf-standalone-tiles-reach: -4px;
+    --mwnf-standalone-tiles-gap: 38px;
+    /* The item sheet's Related Content under it, 15px past the text on
+       each side, its heading 20px from the top. */
+    --mwnf-standalone-phone-related-margin: 0 -15px;
+    --mwnf-standalone-related-padding: 20px 20px 30px;
+    --mwnf-standalone-related-heading-offset: 0;
+  }
+  .mwnf-standalone--home .mwnf-header__links { font-size: 8px; }
+  .mwnf-standalone-home-banner__text { padding: 3px 0 3px 18px; }
+  .mwnf-standalone-home-banner__title { line-height: 19px; }
+  .mwnf-standalone-home-banner__line { line-height: 12px; }
+  .mwnf-standalone-tiles__caption-text { line-height: 24px; }
+  .sharinghistory-bib__title { margin-bottom: 20px; }
+  .mwnf-standalone .mwnf-content { margin-bottom: 24px; }
+  .mwnf-standalone .mwnf-sponsors { padding-inline: 24px; }
+  .sharinghistory-tlp__picture img { max-width: 100%; }
+  .sharinghistory-pl { margin-right: 10px; }
+  .sharinghistory-pl .mwnf-standalone-pl__toggle { margin-left: 0; }
+  .sharinghistory-pl .mwnf-standalone-pl__back { margin-bottom: 35px; }
+  .sharinghistory-pl .mwnf-standalone-pl__main,
+  .sharinghistory-pl .mwnf-standalone-pl__head h3:last-child { margin-bottom: 10px; }
+  .sharinghistory-bib__languages .mwnf-languages__button,
+  .mwnf-standalone-item__top .mwnf-languages__button,
+  .sharinghistory-hbb a { font-size: 11px; line-height: normal; }
+}
+@media (max-width: 390px) {
+  .sharinghistory-bib__languages .mwnf-languages__button,
+  .mwnf-standalone-item__top .mwnf-languages__button,
+  .sharinghistory-hbb a { font-size: 9px; line-height: normal; }
 }

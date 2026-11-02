@@ -393,6 +393,7 @@
   --mwnf-standalone-related-reach-top: 20px;
   --mwnf-standalone-related-reach-right: 167%;
   --mwnf-standalone-related-heading-weight: 500;
+  --mwnf-standalone-related-heading-transform: none;
   --mwnf-standalone-download-weight: 400;
   --mwnf-standalone-sheet-label-color: #000000;
   --mwnf-standalone-sheet-value-color: #222222;

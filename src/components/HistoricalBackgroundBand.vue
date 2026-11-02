@@ -31,6 +31,6 @@ const tabs = computed(() =>
         <RouterLink :to="{ name: tab.name, query: { lang: locale } }">{{ tab.label }}</RouterLink>
       </li>
     </ul>
-    <RouterLink class="sharinghistory-hbb__project" :to="{ name: 'about', query: { lang: locale } }"><i aria-hidden="true">»</i>&nbsp;{{ t('sharinghistory.hb.aboutProject') }}</RouterLink>
+    <RouterLink class="sharinghistory-hbb__project" :to="{ name: 'about', query: { lang: locale } }">{{ t('sharinghistory.hb.aboutProject') }}</RouterLink>
   </nav>
 </template>
