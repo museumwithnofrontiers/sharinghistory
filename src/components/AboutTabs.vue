@@ -73,9 +73,10 @@ const tabs = computed(() => [
   content: '»\00a0';
 }
 /* On a phone legacy's words are 11px, 9px up to 390px
-   (css/responsive_style.css), the strip on one line. */
+   (css/responsive_style.css), the strip on one line, in legacy's 90.3%
+   container rather than the content's gutter. */
 @media (max-width: 767px) {
-  .sh-about-tabs { flex-wrap: nowrap; }
+  .sh-about-tabs { flex-wrap: nowrap; padding-inline: 4.85cqw; }
   .sh-about-tabs a { font-size: 11px; line-height: normal; }
 }
 @media (max-width: 390px) {

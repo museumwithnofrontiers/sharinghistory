@@ -73,7 +73,11 @@ const groups = computed(() => (local.value
 
 <style scoped>
 /* Legacy's `.inner_left`, `.time_line_con_title` and `.country_head`
-   (css/style_inside.css). */
+   (css/style_inside.css); its section's 30px under them (20 are the
+   content area's). */
+.sh-sponsors {
+  padding-bottom: 10px;
+}
 .sh-sponsors__back {
   display: flex;
   flex-wrap: wrap;

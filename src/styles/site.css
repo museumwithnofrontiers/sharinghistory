@@ -266,7 +266,7 @@ a:hover {
 /* Read more (historical_background_readmore.php): "Select a topic", then
    the topics in col-md-6, each after its ». */
 .sharinghistory-hbr__heading { margin: 0 0 15px; font: 400 19px Roboto, sans-serif; color: #222; }
-.sharinghistory-hbr__topics { width: calc(50% - 30px); padding: 0 15px; font: 400 16px/22px Roboto, sans-serif; color: #222; }
+.sharinghistory-hbr__topics { width: calc(50% - 30px); padding: 0 15px 10px; font: 400 16px/22px Roboto, sans-serif; color: #222; }
 .sharinghistory-hbr__topics p { margin: 0 0 10px; }
 
 /* A topic's window (about_hb_topics.php): its title in white light words. */
@@ -305,7 +305,7 @@ a:hover {
   color: #222;
   background-color: rgb(239 239 239);
 }
-.sharinghistory-hbi__maps { padding: 0 15px; }
+.sharinghistory-hbi__maps { padding: 0 15px 13px; }
 .sharinghistory-hbi__maps h3 { margin: 10px 0; font: 300 18px Roboto, sans-serif; color: #000; }
 .sharinghistory-hbi__map img { display: block; max-width: 100%; max-height: 435px; }
 .sharinghistory-hbi__maps p { margin: 0 0 10px; }
@@ -355,6 +355,20 @@ a:hover {
   .sharinghistory-bib__entries { margin-left: 0; width: auto; }
   /* The partner profile's way back: its line alone, the heading 35px under. */
   .mwnf-standalone-partner__back { min-height: 16px; }
+  /* The Database results' band: legacy's 13px under the buttons, stacked. */
+  .sharinghistory-dbr .mwnf-standalone-refine { padding-bottom: 13px; }
+  /* The Collections entrance: the two periods half the row each. */
+  .sharinghistory-pc__dates select { width: calc(50% - 2.5px); }
+  /* The Timeline gallery: the tiles 5px under the heading. */
+  .sharinghistory-tlg { --mwnf-standalone-phone-pcr-heading-gap: 5px; }
+  /* A perspective (historical_background_pages.php): the portraits across
+     the column, four 66px a row, 10px apart; the other perspectives 15px
+     under them, the title 25px under those, the text 5px under it. */
+  .sharinghistory-hbp__body { grid-template-columns: 1fr; row-gap: 15px; }
+  .sharinghistory-hbp__portraits { grid-template-columns: repeat(4, 66px); padding: 10px 10px 10px; }
+  .sharinghistory-hbp__others { margin: 0 15px 25px; }
+  .sharinghistory-hbp__text { width: auto; }
+  .sharinghistory-hbp__text h2 { margin: 0 0 5px; }
   /* The Collections results: "Navigation by Country" under the heading,
      on a line of its own, the tiles 31px under it. */
   .sharinghistory-pcr .mwnf-standalone-pcr__heading { margin-bottom: 5px; }
@@ -469,6 +483,18 @@ a:hover {
   .sharinghistory-bib__languages .mwnf-languages__button,
   .mwnf-standalone-item__top .mwnf-languages__button,
   .sharinghistory-hbb a { font-size: 11px; line-height: normal; }
+  /* Legacy's strip sits in its 90.3% container, not the content's gutter. */
+  .sharinghistory-hbb { padding-inline: 4.85cqw; }
+  /* Read more: the topics across the column, 5px under the heading. */
+  .sharinghistory-hbr__heading { margin-bottom: 5px; }
+  /* 15px in, and 1px less wide than the column: legacy's arrow is 1px wider. */
+  .sharinghistory-hbr__topics { width: auto; padding: 0 16px 25px 15px; }
+  /* Country Insight: the text across the column, the three lists one under
+     another, the maps 20px in. */
+  .sharinghistory-hbi__back { margin: 0 15px 32px 10px; }
+  .sharinghistory-hbi__body { width: auto; margin-left: 0; }
+  .sharinghistory-hbi__lists { grid-template-columns: 1fr; }
+  .sharinghistory-hbi__maps { padding: 0 5px 43px 20px; }
 }
 @media (max-width: 390px) {
   .sharinghistory-bib__languages .mwnf-languages__button,
