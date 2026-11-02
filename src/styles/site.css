@@ -123,3 +123,74 @@ a:hover {
 .mwnf-standalone-partner__tabs,
 .mwnf-standalone-partner__items { line-height: 16px; }
 .mwnf-standalone-partner__bar { padding-bottom: 3px; }
+
+/* The Timeline entrance (hcr_home.php): in the middle eight of twelve
+   columns, below two blank lines, the word to the visitor justified, a blank
+   line, then the two forms side by side, each its title, its list across,
+   its two periods in halves and its round red Go centred under them. */
+.sharinghistory-tle {
+  width: calc((100% + 30px) * 8 / 12 - 30px);
+  margin: 32px auto 22px;
+  font: 400 16px/22px Roboto, sans-serif;
+  color: #222;
+}
+.sharinghistory-tle p { margin: 0 0 10px; }
+.sharinghistory-tle .sharinghistory-tle__intro { margin-bottom: 42px; text-align: justify; }
+.sharinghistory-tle__forms { display: grid; grid-template-columns: 1fr 1fr; }
+.sharinghistory-tle__form { padding-right: 15px; }
+.sharinghistory-tle__title strong { font-weight: 500; }
+.sharinghistory-tle select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 30px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border: 1px solid rgb(118 118 118);
+  border-radius: 20px;
+  font: 500 14px Roboto, sans-serif;
+  color: #222;
+  background-color: rgb(239 239 239);
+}
+.sharinghistory-tle__dates { display: grid; grid-template-columns: 1fr 1fr; }
+.sharinghistory-tle__dates select:first-child { width: calc(100% - 5px); }
+.sharinghistory-tle__dates select:last-child { width: calc(100% - 5px); margin-left: 5px; }
+.sharinghistory-tle__go { text-align: center; }
+.sharinghistory-tle__go button {
+  margin-top: 20px;
+  padding: 6px 20px;
+  border: 1px solid #750101;
+  border-radius: 20px;
+  font: 400 16px Roboto, sans-serif;
+  color: #fff;
+  background-color: #990000;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+}
+.sharinghistory-tle__go button:hover { background-color: #750101; }
+@media (max-width: 62rem) {
+  .sharinghistory-tle { width: auto; }
+  .sharinghistory-tle__forms { grid-template-columns: 1fr; }
+}
+
+/* The Timeline results (hcr_result.php): the headings on the content's
+   edge, the rows across the whole col-md-9, the way back a line of 16px;
+   under each date its picture at most half the column wide and 135px high,
+   10px below the strip, then a line, its words and, for an item's picture,
+   "See Database Entry" with its arrow; with more pictures, their numbers. */
+.sharinghistory-tlr .mwnf-standalone-tlr__heads { margin-left: 0; }
+.sharinghistory-tlr .mwnf-standalone-tlr__row { margin-right: -15px; }
+.sharinghistory-tlr .mwnf-standalone-tlr__back { align-items: flex-start; min-height: 21px; line-height: 16px; }
+.sharinghistory-tlp { margin-top: 10px; font: 400 14px Roboto, sans-serif; color: #000; }
+.sharinghistory-tlp__picture { display: block; }
+.sharinghistory-tlp__picture img { display: block; max-width: 50%; max-height: 135px; cursor: url('../../theme/assets/icons/cursor.png'), auto; }
+.sharinghistory-tlp .sharinghistory-tlp__words { margin: 0; padding-top: 16px; line-height: normal; }
+.sharinghistory-tlp__see {
+  display: block;
+  padding-left: 12px;
+  color: #222;
+  text-decoration: none;
+  background: url('../../theme/assets/icons/next_arrow.png') no-repeat 0 4px;
+}
+.sharinghistory-tlp__see:hover { text-decoration: underline; }
+.sharinghistory-tlp .sharinghistory-tlp__numbers { display: flow-root; margin: 0; }
+.sharinghistory-tlp__numbers a { float: left; margin: 0 10px 10px 0; color: #222; }

@@ -9,7 +9,6 @@ import collectionTexts from '@museumwnf/sharinghistory-data/translations/collect
 import countryTexts from '@museumwnf/sharinghistory-data/translations/countries.en.json'
 import itemTexts from '@museumwnf/sharinghistory-data/translations/items.en.json'
 import partnerTexts from '@museumwnf/sharinghistory-data/translations/partners.en.json'
-import timelineEventTexts from '@museumwnf/sharinghistory-data/translations/timeline_events.en.json'
 import { collectionTitle, inPeriod, itemIdsUnder } from '../src/composables/catalogue.js'
 import config from '../src/dataset.config.js'
 import { exhibitionsTree, minisiteHref } from '../src/composables/exhibitions.js'
@@ -326,95 +325,70 @@ describe('website smoke test', () => {
     app.unmount()
   }, 60000)
 
-  // The timeline results run on the platform's composed `TimelineResultsView`
-  // (composables/timeline.js): the merge, the overlap rule and the era label
-  // are viewer-core's `useTimelineEvents`; what is asserted here is this
-  // website's own — the "Country | Theme" row caption (Decision, #40), the
-  // linked item's media strip, and the "See gallery" cross-link (D1) — all
-  // against real fixture text, not just element presence.
-  it('renders the timeline results on the composed view, with the "Country | Theme" caption and the media strip', async () => {
-    const [timelines, timelineEvents] = await loadEntities(['timelines', 'timeline_events'])
-    let fixture = null
-    for (const timeline of timelines.filter((t) => t.collection_id)) {
-      const event = timelineEvents.find((e) => e.timeline_id === timeline.id && e.item_ids?.length)
-      if (event) { fixture = { timeline, event }; break }
-    }
-    expect(fixture, 'fixture: a thematic timeline event with a linked item').not.toBeNull()
-    const { timeline, event } = fixture
+  // Legacy's hcr_home.php: its word to the visitor, the Political Context
+  // Timeline of a country and the Thematic Timelines of a theme, each with
+  // legacy's periods and Go, refused without a country or a theme.
+  it("renders the Timeline entrance as legacy's hcr_home.php", async () => {
+    const { app, host, router } = await mountSite(config, messages, '#/timeline?lang=en')
+    await vi.waitFor(() => expect(host.querySelectorAll('.sharinghistory-tle__form').length).toBe(2), { timeout: 20000 })
+    expect(host.querySelector('.sharinghistory-tle__intro').textContent).toContain('The purpose of this Timeline is to contextualise')
+    expect([...host.querySelectorAll('.sharinghistory-tle__title')].map((p) => p.textContent)).toEqual(['Political Context Timeline', 'Thematic Timelines'])
+    const [countries, , , themes] = host.querySelectorAll('.sharinghistory-tle select')
+    await vi.waitFor(() => expect([...countries.options].map((o) => o.textContent)).toContain('Austria'), { timeout: 20000 })
+    expect([...countries.options].slice(0, 2).map((o) => o.textContent)).toEqual(['Select a Country', 'All Countries'])
+    expect([...themes.options].slice(0, 3).map((o) => o.textContent)).toEqual(['Select a Theme', 'All Themes', 'Cities and Urban Spaces'])
 
-    const countryName = countryTexts[timeline.country_id]?.name
-    const themeTitle = collectionTexts[timeline.collection_id]?.title
-    expect(countryName, 'fixture: the timeline\'s country has an English name').toBeTruthy()
-    expect(themeTitle, 'fixture: the timeline\'s exhibition has an English title').toBeTruthy()
+    const alert = vi.spyOn(window, 'alert').mockImplementation(() => {})
+    host.querySelector('.sharinghistory-tle__go button').click()
+    expect(alert).toHaveBeenCalledWith('Please select Country')
+    alert.mockRestore()
 
-    const { app, host } = await mountSite(config, messages,
-      `#/timeline/results?country=${encodeURIComponent(timeline.country_id)}&collection=${encodeURIComponent(timeline.collection_id)}`,
-    )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-timeline__row')).not.toBeNull(), { timeout: 20000 })
-
-    // The heading names the filtered country.
-    expect(host.querySelector('.mwnf-heading').textContent).toContain(countryName)
-
-    // The row's own caption: "Country | Theme".
-    const captions = Array.from(host.querySelectorAll('.mwnf-timeline__caption')).map((el) => el.textContent)
-    expect(captions.some((c) => c.includes(countryName) && c.includes(themeTitle))).toBe(true)
-
-    // The event's own date cell and description, read straight off the fixture.
-    const text = timelineEventTexts[event.id]
-    const expectedDate = text.date_from_description && (text.date_to_description && text.date_to_description !== text.date_from_description ? `${text.date_from_description} – ${text.date_to_description}` : text.date_from_description)
-    if (expectedDate) {
-      const dateCells = Array.from(host.querySelectorAll('.mwnf-timeline__date'))
-      expect(dateCells.some((el) => el.textContent.trim() === expectedDate)).toBe(true)
-      expect(dateCells.some((el) => el.textContent.includes(text.name))).toBe(false)
-    }
-    const description = timelineEventTexts[event.id]?.description
-    if (description) {
-      const snippet = description.slice(0, 30)
-      expect(Array.from(host.querySelectorAll('.mwnf-timeline__description')).some((el) => el.textContent.includes(snippet))).toBe(true)
-    }
-
-    // The linked item's media strip, with the "See Database Entry" line.
-    expect(host.querySelector('.mwnf-timeline__media-item')).not.toBeNull()
-    expect(host.textContent).toContain('See Database Entry')
-
-    // The "View items from this period" action, into the Permanent Collection results.
-    const actionLink = host.querySelector('.mwnf-timeline__action')
-    expect(actionLink).not.toBeNull()
-    expect(actionLink.textContent).toContain('View items from this period')
-
-    // Decision D1: the "See gallery" cross-link, offered because this country has objects.
-    const galleryLink = host.querySelector('.mwnf-timeline__gallery')
-    expect(galleryLink).not.toBeNull()
-    expect(galleryLink.textContent).toContain('See Gallery')
-
+    countries.value = 'aut'
+    countries.dispatchEvent(new window.Event('change'))
+    host.querySelector('.sharinghistory-tle__go button').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('timeline-results'), { timeout: 20000 })
+    expect(router.currentRoute.value.query).toMatchObject({ country: 'aut', theme: 'pc' })
     app.unmount()
   }, 60000)
 
-  // Decision D1: the legacy `hcr_gallery.php` gallery of Permanent Collection
-  // objects, regained as `/timeline/gallery` on the composed
-  // `CatalogueResultsView` (composables/timeline.js), scoped to a country.
-  it('renders the timeline gallery on the composed results view, scoped to a country', async () => {
-    const [items] = await loadEntities(['items'])
-    const visible = items.filter((i) => i.display_status !== 'N')
-    const countryId = visible[0].country_id
-    const countryName = countryTexts[countryId]?.name
-    expect(countryName, 'fixture: the item\'s country has an English name').toBeTruthy()
+  // Legacy's hcr_result.php for Austria's Political Context: the band with
+  // the search in words and its four lists, the Theme list shut; the events
+  // by date, ten a page, each its date, its pictures and "Country | Theme";
+  // the Related Content column and the downloads.
+  it("renders the Timeline results as legacy's hcr_result.php", async () => {
+    const { app, host } = await mountSite(config, messages, '#/timeline/results?country=aut&theme=pc&lang=en')
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-tlr__row')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.mwnf-standalone-tlr__summary').textContent).toBe('Timeline | Before 1800 to After 1930 | AUSTRIA | POLITICAL CONTEXT')
+    expect([...host.querySelectorAll('.mwnf-standalone-tlr__selects label')].map((l) => l.textContent)).toEqual(['Start Date', 'End Date', 'Country', 'Theme'])
+    expect(host.querySelectorAll('.mwnf-standalone-tlr__selects select')[3].disabled).toBe(true)
+    expect([...host.querySelectorAll('.mwnf-standalone-tlr__heads h3')].map((h) => h.textContent)).toEqual(['Date', 'Country | Theme | Description'])
+    const rows = host.querySelectorAll('.mwnf-standalone-tlr__row')
+    expect(rows.length).toBe(10)
+    expect(rows[0].querySelector('.mwnf-standalone-tlr__date span').textContent).toBe('1797')
+    expect(rows[0].querySelector('.mwnf-standalone-tlr__content span').textContent).toBe('Austria | Political Context')
+    expect(rows[0].querySelector('.sharinghistory-tlp__words').textContent).toContain('Campo Formio')
+    expect(rows[0].querySelector('.sharinghistory-tlp__see').textContent).toBe('See Database Entry')
+    expect([...host.querySelectorAll('.mwnf-standalone-tlr__related a')].map((a) => a.textContent)).toEqual([
+      'Add dates from Thematic Timelines', 'See Gallery', 'Historical Profile Austria', 'Historical Background',
+      'As PDF (including images)', 'As Word (text only)',
+    ])
+    expect(host.querySelector('.mwnf-standalone-pages')).not.toBeNull()
+    app.unmount()
+  }, 60000)
 
-    const { app, host } = await mountSite(config, messages, `#/timeline/gallery?country=${encodeURIComponent(countryId)}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
-
-    expect(host.querySelector('.mwnf-heading').textContent).toContain(countryName)
-    // Legacy's count, in its two halves ("N objects", "M monuments").
-    expect(host.querySelectorAll('.mwnf-summary__count').length).toBe(2)
-
-    // Every row rendered belongs to the filtered country's own items.
-    const rowIds = Array.from(host.querySelectorAll('.mwnf-list__row .mwnf-list__link')).map((a) =>
-      decodeURIComponent(a.getAttribute('href').split('/').pop()),
-    )
-    expect(rowIds.length).toBeGreaterThan(0)
-    const visibleIds = new Set(visible.filter((i) => i.country_id === countryId).map((i) => i.id))
-    for (const id of rowIds) expect(visibleIds.has(id)).toBe(true)
-
+  // Legacy's hcr_gallery.php: Close and the Timeline start page, the search
+  // in words with "Gallery", the records of the theme's exhibition of the
+  // period by date, twenty a page, beside "See Timeline".
+  it("renders the timeline gallery as legacy's hcr_gallery.php", async () => {
+    const collections = await loadEntities(['collections']).then(([rows]) => rows)
+    const economy = collections.find((c) => /sh_exhibitions:6$/.test(c.backward_compatibility ?? ''))
+    const { app, host } = await mountSite(config, messages, `#/timeline/gallery?start=1850&end=1900&country=all&theme=${economy.id}&lang=en`)
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-results__cell')).not.toBeNull(), { timeout: 20000 })
+    expect([...host.querySelectorAll('.mwnf-standalone-item__back-link')].map((a) => a.textContent.trim())).toEqual(['Close', 'Timeline start page'])
+    expect(host.querySelector('.mwnf-standalone-pcr__heading').textContent).toBe('Timeline | 1850 to 1900 | Economy and Trade | Gallery')
+    expect(host.querySelectorAll('.mwnf-standalone-results__cell').length).toBe(20)
+    expect(host.querySelector('.mwnf-standalone-pcr__related a').textContent.trim()).toBe('See Timeline')
+    expect(host.querySelector('.mwnf-standalone-pages')).not.toBeNull()
     app.unmount()
   }, 60000)
 

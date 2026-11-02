@@ -305,6 +305,24 @@
   --mwnf-standalone-pill-muted: rgb(255 255 255 / 0.62);
   --mwnf-standalone-pill-weight: 400;
   --mwnf-standalone-pill-separator: #ffffff;
+  /* The Timeline results (hcr_result.php, section.timeline_color): white
+     words on the red band, its lists framed in dark red; the dates and
+     "Country | Theme" on red strips in white light words; the red Related
+     Content column with white words and white arrows. */
+  --mwnf-standalone-tlr-band: #990000;
+  --mwnf-standalone-tlr-band-color: #ffffff;
+  --mwnf-standalone-tlr-band-weight: 300;
+  --mwnf-standalone-tlr-label-weight: 400;
+  --mwnf-standalone-tlr-select-border: #790d0d;
+  --mwnf-standalone-tlr-strip: #990000;
+  --mwnf-standalone-tlr-strip-color: #ffffff;
+  --mwnf-standalone-tlr-strip-weight: 300;
+  --mwnf-standalone-tlr-related: #990000;
+  --mwnf-standalone-tlr-related-color: #ffffff;
+  --mwnf-standalone-tlr-related-heading-weight: 400;
+  --mwnf-standalone-tlr-link-weight: 300;
+  --mwnf-standalone-tlr-download-weight: 400;
+  --mwnf-standalone-tlr-bullet: url('./assets/icons/white_next_arrow.png');
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and
