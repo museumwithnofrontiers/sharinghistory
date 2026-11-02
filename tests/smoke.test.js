@@ -541,53 +541,53 @@ describe('website smoke test', () => {
     app.unmount()
   }, 30000)
 
-  // The database results run on the platform's composed `CatalogueResultsView`
-  // (composables/catalogue.js's `databaseResultsSpec`); this website's own is the
-  // keyword index itself (DatabaseResults.vue) — Decision D3's `rank: 'hits'`
-  // and the country expansion, which lets a country's own name (not just its
-  // id) match the "Location" field (`SEARCH_FIELDS.location` carries
-  // `item.country_id` for exactly this).
+  // Legacy's database_results.php: a word naming a country, in Location,
+  // finds that country's records (legacy's country match); the heading
+  // counts them, as "Results of your search | N records"; twelve a page, each
+  // its name and its place with the country's name.
   it('renders database results for a country name typed into the Location field', async () => {
     const [items] = await loadEntities(['items'])
     const countryId = 'ita'
     const countryName = countryTexts[countryId]?.name
     expect(countryName, 'fixture: Italy has an English name').toBeTruthy()
     const visibleItalyItems = items.filter((i) => i.display_status !== 'N' && i.country_id === countryId)
-    expect(visibleItalyItems.length, 'fixture: Italy has visible items').toBeGreaterThan(0)
+    expect(visibleItalyItems.length, 'fixture: Italy has visible items').toBeGreaterThan(12)
 
     const { app, host } = await mountSite(config, messages,
-      `#/database/results?q=${encodeURIComponent(countryName)}&field=location`,
+      `#/database/results?lang=en&q=${encodeURIComponent(countryName)}&field=location`,
     )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-list__cell')).not.toBeNull(), { timeout: 30000 })
 
-    // The summary line names the field and the term, off the country
-    // expansion rather than a literal "Location" text match.
-    expect(host.querySelector('.mwnf-summary__value').textContent).toContain(`Location: "${countryName}"`)
-    // A country's own 3-letter id can turn up as a plain substring elsewhere
-    // (Lebanon's "Je'ita" carries "ita"), so the count is a floor, not exact.
-    expect(Number(host.querySelector('.mwnf-summary__count').textContent)).toBeGreaterThanOrEqual(visibleItalyItems.length)
+    const heading = host.querySelector('.mwnf-standalone-pcr__heading').textContent
+    expect(heading).toMatch(/^Results of your search \| \d+\u00a0records$/)
+    // A place named after the country ("Italy Street") counts too: a floor.
+    expect(Number(heading.match(/\| (\d+)/)[1])).toBeGreaterThanOrEqual(visibleItalyItems.length)
+    const cells = host.querySelectorAll('.mwnf-standalone-list__cell')
+    expect(cells.length).toBe(12)
+    // The country's records come first: the country match adds to their relevance.
+    expect(cells[0].textContent).toContain(`, ${countryName}`)
+    expect(host.querySelector('.mwnf-standalone-refine')).not.toBeNull()
 
     app.unmount()
   }, 60000)
 
-  // The refine row (`DatabaseResults.vue`'s `#filters` slot, over the
-  // platform's own `filters` reactive object) ANDs a fourth keyword onto the
-  // three the entrance form wrote — asserted here narrowing a country's 247
-  // items down to the one whose name carries a fixture word found nowhere
-  // else, rather than just checking the row count changed.
-  it('narrows the database results with the refine row\'s fourth keyword', async () => {
+  // The refine band ANDs a fourth keyword onto the three the entrance wrote —
+  // asserted here narrowing a country's items down to the one whose name
+  // carries a word found nowhere else.
+  it('narrows the database results with the refine band\'s fourth keyword', async () => {
     const [items] = await loadEntities(['items'])
     const fixture = items.find((i) => i.display_status !== 'N' && /worthy/i.test(itemTexts[i.id]?.name ?? ''))
     expect(fixture, 'fixture: a visible item with a distinctive name word').not.toBeNull()
     const expectedName = itemTexts[fixture.id].name.replace(/[*_]/g, '')
 
     const { app, host } = await mountSite(config, messages,
-      `#/database/results?q=${encodeURIComponent(countryTexts[fixture.country_id].name)}&field=location&q4=worthy&field4=name&op4=AND`,
+      `#/database/results?lang=en&q=${encodeURIComponent(countryTexts[fixture.country_id].name)}&field=location&q4=worthy&field4=name&op4=AND`,
     )
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-list__row')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.mwnf-standalone-list__cell')).not.toBeNull(), { timeout: 30000 })
 
-    expect(host.querySelector('.mwnf-summary__count').textContent).toBe('1')
-    expect(host.textContent).toContain(expectedName)
+    expect(host.querySelector('.mwnf-standalone-pcr__heading').textContent).toContain('| 1\u00a0records')
+    expect(host.querySelectorAll('.mwnf-standalone-list__cell').length).toBe(1)
+    expect(host.querySelector('.mwnf-standalone-list__records').textContent).toContain(expectedName)
 
     app.unmount()
   }, 60000)

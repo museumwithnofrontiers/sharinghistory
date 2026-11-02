@@ -272,6 +272,15 @@
   --mwnf-standalone-db-go-hover-background: #750101;
   --mwnf-standalone-db-go-hover-border: #750101;
   --mwnf-standalone-db-listing-indent: 12px;
+  /* The Database results' "Refine your search" band (database_results.php,
+     section.timeline_color): white words on the red band, the fields framed
+     in dark red, the dark red New Search. */
+  --mwnf-standalone-refine-background: #990000;
+  --mwnf-standalone-refine-color: #ffffff;
+  --mwnf-standalone-refine-input-border: #790d0d;
+  --mwnf-standalone-refine-search-color: #222222;
+  --mwnf-standalone-refine-new-background: #750101;
+  --mwnf-standalone-refine-shadow: #500101;
   --mwnf-standalone-sponsors-background: #750101;
   --mwnf-standalone-sponsors-padding: 10px;
   /* The home page's exhibitions (index.php's .top_exhibtion_title and

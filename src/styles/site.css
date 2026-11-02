@@ -94,3 +94,8 @@ a:hover {
   background: none;
   cursor: pointer;
 }
+
+/* The Database results (database_results.php): the band 52px high, the way
+   back a line of 16px (.arrow_bakward), 5px above the heading's 15. */
+.sharinghistory-dbr .mwnf-standalone-refine { padding-bottom: 9px; }
+.sharinghistory-dbr .mwnf-standalone-pcr__back { align-items: flex-start; min-height: 21px; line-height: 16px; }

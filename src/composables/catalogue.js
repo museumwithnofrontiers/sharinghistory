@@ -1,6 +1,6 @@
 import {
-  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, SEARCH_LANGUAGE_KEY, centuryPresets, removeEndingPoint,
-  searchFieldOptions, searchFields, searchRowKeys, searchSummary, useFieldSearch,
+  CATALOGUE_DATE_MODE, CATALOGUE_PAGE_SIZE, SEARCH_LANGUAGE_KEY, removeEndingPoint, searchFields, searchRowKeys,
+  useLegacySearch,
 } from '@museumwnf/viewer-core'
 import { exhibitionsTree } from './exhibitions.js'
 import { useData } from './data.js'
@@ -13,8 +13,9 @@ import { useData } from './data.js'
 // website's: the scope rule, the two record facets of the Permanent
 // Collection, and the exhibition scope legacy's pclist_all.php offered as
 // "Theme / Subtheme / Chapter", folded into the `permanentCollectionResultsSpec`
-// below that viewer-layout's `CatalogueResultsView` renders directly. Two
-// entrances and one results page read this one declaration.
+// below that viewer-layout's `CatalogueResultsView` renders directly, and
+// the Database's search as legacy ran it. Two entrances and two results pages
+// read this one declaration.
 
 const {
   collections, countries, exhibitions, exhibitionThemes, itemRow, itemVisible, labelOf, mdStrip, partners, tr,
@@ -27,16 +28,6 @@ const {
 // rule of its own, so each of those needs the rule directly rather than
 // through the composable's already-filtered `items`.
 export const inScope = itemVisible
-
-// The eight fields of database.php: Sharing History's form is the one with
-// no period/dynasty field (Islamic Art's has one). `text` is the record's
-// translation in the search language, with English behind it; `keyword` and
-// `location` also carry `item.country_id` — legacy's own rule for these two
-// fields (`database_results.php`'s keyword/location country match) —
-// Decision D3's `countryExpansion` turns a typed country name into its id,
-// and a field only benefits from that when its own haystack has the id to
-// match against.
-export const SEARCH_FIELDS = searchFields()
 
 // ── The facets of the Permanent Collection ─────────────────────────────────
 //
@@ -215,44 +206,108 @@ export const permanentCollectionResultsSpec = {
   empty: 'sharinghistory.pcr.empty',
 }
 
-// ── The search entrance and the keyword results ────────────────────────────
+// ── The keyword results ────────────────────────────────────────────────────
 //
-// `DatabaseSearch.vue`'s `SearchFormView` spec (legacy database.php's shape,
-// decision D2: three keyword rows, the century date boundaries, the search
-// language) and `DatabaseResults.vue`'s `CatalogueResultsView` spec. The
-// index behind the results page — a live composable tied to the results
-// page's own search language, decision D3's `rank: 'hits'` and the glossary/
-// country expansions — is `useFieldSearch`'s, kept here so the module holds
-// one instance for the site's life rather than one per mount.
+// What `CatalogueResultsView` renders on `/database/results`, from the query
+// legacy's form writes on `/database` (DatabaseSearch.vue). The search is
+// legacy's (decision D3, viewer-core's `useLegacySearch`): every language
+// unless one is chosen, the columns database_results.php searched, a
+// country's records for a word naming it in Keywords and Location, a
+// glossary term's spellings in Keywords, legacy's relevance and then the
+// start date.
 
-export const databaseSearchSpec = {
-  mode: 'rows',
-  entity: 'items',
-  fields: searchFieldOptions(SEARCH_FIELDS),
-  dates: { presets: centuryPresets },
-  language: 'items',
-  target: 'database-results',
+// The columns database_results.php searched for Keywords, in the package's
+// fields: the object's and the monument's.
+const LEGACY_COLUMNS = (item, text) => [
+  text.name, text.alternate_name, text.second_name, text.third_name, text.location, text.province, text.dates,
+  text.dynasty, text.initial_owner, text.artist, text.keywords, text.materials, text.description,
+  text.description2, item.mwnf_reference, text.method_for_datation, text.datation_method, text.type,
+  item.start_date, item.end_date, text.owner, text.provenance, text.dimensions, text.artist_birthdate,
+  text.artist_birthplace, text.artist_deathdate, text.artist_deathplace, text.period_activity,
+  text.place_of_production, text.production_place, text.workshop, text.method_for_provenance,
+  text.provenance_method, text.obtention, text.obtention_method, text.archival, text.bibliography, text.author,
+  text.holder, item.owner_reference,
+  text.architects, text.patrons, text.monument_contact?.address, text.history,
+]
+
+// The nine fields of database.php, each searching what database_results.php
+// searched: Keywords the columns above, the other fields theirs. Legacy's
+// Patron search read a column the monuments' table did not have, and found
+// nothing; it searches the patrons here. Other had no condition at all, so it
+// listed everything; it searches the descriptive fields here.
+export const SEARCH_FIELDS = {
+  keyword: LEGACY_COLUMNS,
+  name: (item, text) => [text.name, text.alternate_name, text.second_name, text.third_name],
+  location: (item, text) => [text.location, text.province],
+  provenance: (item, text) => (item.type === 'monument' ? null : text.provenance),
+  dynasty: (item, text) => text.dynasty,
+  patron: (item, text) => (item.type === 'monument' ? text.patrons : null),
+  artist: (item, text) => (item.type === 'monument' ? text.architects : text.artist),
+  material: (item, text) => (item.type === 'monument' ? null : text.materials),
+  other: searchFields().other,
 }
 
-const { narrow } = useFieldSearch({ fields: SEARCH_FIELDS })
+// Legacy's relevance (`nn`): the word in the keywords or the working number
+// counts twice, in each of the names once, and so does the record's country
+// when the word names it; a Name search counts the name, a Location search
+// the country.
+export const SEARCH_SCORE = {
+  keyword: (like, item, text, inCountry) => 2 * like(text.keywords) + 2 * like(item.mwnf_reference)
+    + like(text.name) + like(text.alternate_name) + like(text.second_name) + like(text.third_name)
+    + (inCountry ? 1 : 0),
+  name: (like, item, text) => Number(like(text.name)),
+  location: (like, item, text, inCountry) => (inCountry ? 1 : 0),
+}
+
+// `narrow` searches what `scope` let through; the results page waits for
+// `prepare()`, which loads every language searched.
+export const databaseSearch = useLegacySearch({
+  fields: SEARCH_FIELDS,
+  score: SEARCH_SCORE,
+  countryFields: ['keyword', 'location'],
+  glossaryFields: ['keyword'],
+})
+
+// Legacy's search result: the name and the location with the country's
+// name; the date, cut at 145 characters past 150, and the free-text dynasty.
+// Its preview: the date line uncut, an object's holding museum, and the
+// location, the province and the country.
+export function databaseRow(item, { tr, renderInline }) {
+  const text = tr('items', item.id)
+  const plain = (value) => removeEndingPoint(String(value ?? '').replace(/[\r\n]/g, ''))
+  const date = plain(text.dates)
+  const listed = String(text.dates ?? '').length > 150 ? `${date.slice(0, 145)}...` : date
+  const dynasty = plain(text.dynasty)
+  const country = item.country_id ? labelOf('countries', item.country_id) : ''
+  const line = (...parts) => renderInline(parts.filter(Boolean).join(', '))
+  return {
+    id: item.id,
+    to: { name: 'item', params: { id: item.id } },
+    image: item.images?.[0]?.url ?? '',
+    name: renderInline(plain(text.name ?? item.internal_name)),
+    place: line(plain(text.location), country),
+    dates: line(listed, dynasty),
+    preview: {
+      lines: [line(date, dynasty)],
+      holder: item.type === 'object' && text.holder ? renderInline(plain(text.holder)) : '',
+      location: line(plain(text.location), plain(text.province), country),
+    },
+  }
+}
 
 export const databaseResultsSpec = {
   entity: 'items',
   keys: [...searchRowKeys(), 'from', 'to', SEARCH_LANGUAGE_KEY],
   scope: (item) => inScope(item),
-  narrow,
+  narrow: databaseSearch.narrow,
   dates: { mode: CATALOGUE_DATE_MODE, begin: 'from', end: 'to' },
-  // `rank: 'hits'` already ordered the matches (or the entity order stood,
-  // on an empty query); resorting here would discard that order.
+  // The search already put the matches in legacy's order; resorting here
+  // would discard it.
   sort: false,
-  pageSize: CATALOGUE_PAGE_SIZE,
-  variant: 'list',
-  recordRoute: 'item',
-  empty: 'catalogue.results.noResultsSearch',
-  filterTitle: 'catalogue.search.refineHint',
-  pagination: { window: 7 },
-  // Legacy database_results.php's own row: the country, the date and the
-  // location, distinct from the Permanent Collection's.
-  record: (item) => itemRow(item, ['country', 'dates', 'location']),
-  summary: searchSummary,
+  // Legacy's twelve a page.
+  pageSize: 12,
+  record: databaseRow,
+  // The count is in the heading, as legacy's "| 180 results".
+  summary: () => [],
+  empty: 'sharinghistory.dbr.empty',
 }
