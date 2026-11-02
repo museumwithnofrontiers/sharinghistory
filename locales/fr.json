@@ -1,4 +1,10 @@
 {
+  "sharinghistory.bib.back": "Retour",
+  "sharinghistory.bib.empty": "No data found",
+  "sharinghistory.bib.next": "Suivant",
+  "sharinghistory.bib.previous": "Précédent",
+  "sharinghistory.bib.profiles": "Historical Profiles",
+  "sharinghistory.bib.title": "Bibliography",
   "sharinghistory.db.and": "and",
   "sharinghistory.db.category": "Category",
   "sharinghistory.db.criteria": "Enter your criteria:",

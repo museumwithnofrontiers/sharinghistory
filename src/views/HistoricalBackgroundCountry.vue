@@ -4,13 +4,15 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@museumwnf/viewer-core'
 import { SourceCredit } from '@museumwnf/viewer-layout/content'
 import { EssayView } from '@museumwnf/viewer-layout/views'
+import { bibliographyLink, hasBibliography } from '../composables/bibliography.js'
 import { historicalProfilesTree } from '../composables/history.js'
 import { historicalBackgroundCountrySpec } from '../composables/historySpecs.js'
 import { useData } from '../composables/data.js'
+import { POLITICAL } from '../composables/timeline.js'
 
 // The essay is a page's own narrative (composables/historySpecs.js,
 // decision #39). What is the record's, not the page's — its own intro, the
-// bibliography, the historical maps — is not a field of the page's
+// link to its bibliography, the historical maps — is not a field of the page's
 // translation at all, so it is this wrapper's own `before-body`/`after`
 // slot content, read off `record` directly rather than off the essay's
 // current node. Overriding `after` drops EssayView's own default content
@@ -23,7 +25,7 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { labelOf, md } = useData()
 
 const record = computed(() => historicalProfilesTree.byId.value.get(props.recordId) ?? null)
@@ -45,16 +47,14 @@ watchEffect(() => {
 
 const activePageId = computed(() => props.pageId ?? pages.value[0]?.id ?? null)
 
-// The importer injects the same language-keyed bibliography map into every
-// translation's own extra.
-function bibliographyMarkdown(tr, language) {
-  const bib = tr('collections', record.value.id).extra?.bibliography
-  if (!bib) return ''
-  const raw = bib[language] ?? bib.en ?? Object.values(bib)[0] ?? null
-  if (raw == null) return ''
-  if (Array.isArray(raw)) return raw.filter((entry) => typeof entry === 'string').join('\n\n')
-  return typeof raw === 'string' ? raw : ''
-}
+// The record's bibliography is on its own page (Bibliography.vue), as
+// legacy's bibliography.php; the political context's timeline over the whole
+// period, as legacy linked it.
+const bibliography = computed(() => ({ profile: props.recordId }))
+const politicalTimeline = computed(() => ({
+  name: 'timeline-results',
+  query: { start: 'Before 1800', end: 'After 1930', country: record.value?.country_id, theme: POLITICAL, lang: locale.value },
+}))
 </script>
 
 <template>
@@ -78,7 +78,7 @@ function bibliographyMarkdown(tr, language) {
         </div>
       </template>
 
-      <template #after="{ tr, language }">
+      <template #after>
         <SourceCredit />
 
         <div class="hb-related">
@@ -86,11 +86,11 @@ function bibliographyMarkdown(tr, language) {
           <ul class="hb-related-list">
             <li><router-link to="/historical-background">{{ t('sharinghistory.nav.historicalBackground') }}</router-link></li>
             <li v-if="record.country_id">
-              <router-link :to="{ path: '/timeline/results', query: { country: record.country_id, collection: 'pc' } }">
+              <router-link :to="politicalTimeline">
                 {{ t('sharinghistory.related.politicalContextTimeline') }} {{ labelOf('countries', record.country_id) }}
               </router-link>
             </li>
-            <li v-if="bibliographyMarkdown(tr, language)"><a href="#hb-bibliography">{{ t('sharinghistory.history.bibliography') }}</a></li>
+            <li v-if="hasBibliography(bibliography)"><router-link :to="bibliographyLink(bibliography, locale)">{{ t('sharinghistory.history.bibliography') }}</router-link></li>
             <li v-if="record.images?.length"><a href="#hb-maps">{{ t('sharinghistory.history.viewMaps') }}</a></li>
           </ul>
         </div>
@@ -100,11 +100,6 @@ function bibliographyMarkdown(tr, language) {
           <div class="hb-image-strip">
             <img v-for="(img, idx) in record.images" :key="idx" :src="img.url" :alt="img.alt_text ?? ''" loading="lazy" />
           </div>
-        </div>
-
-        <div v-if="bibliographyMarkdown(tr, language)" id="hb-bibliography" class="hb-bibliography">
-          <h3 class="hb-item-heading">{{ t('sharinghistory.history.bibliography') }}</h3>
-          <div class="mwnf-prose" v-html="md(bibliographyMarkdown(tr, language))" />
         </div>
       </template>
     </EssayView>
@@ -153,7 +148,6 @@ function bibliographyMarkdown(tr, language) {
   font-family: 'Roboto', sans-serif;
 }
 
-.hb-bibliography { margin-top: 18px; }
 .hb-maps { margin-top: 18px; }
 .hb-related { margin-top: 18px; }
 .hb-related-list {

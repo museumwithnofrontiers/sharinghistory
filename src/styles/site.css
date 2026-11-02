@@ -310,3 +310,44 @@ a:hover {
 .sharinghistory-hbi__thumbs { display: flex; flex-wrap: wrap; }
 .sharinghistory-hbi__thumbs a { margin: 0 10px 10px 0; }
 .sharinghistory-hbi__thumbs img { display: block; max-width: 107px; max-height: 80px; }
+
+/* The bibliography (bibliography.php): the languages on the dark red band
+   under the banner across the page (section.language_option), on its right
+   and 26px high, the one shown on red; then the way back, 15px over the line
+   naming the bibliography (19px), and the entries 16px/22px, 10px apart, in
+   legacy's middle eight columns of twelve (nine from 768px, all of them on a
+   phone); "No data found" in their middle, six lines over the pages. */
+:has(> .mwnf-content .sharinghistory-bib) { container-type: inline-size; }
+.sharinghistory-bib__languages.mwnf-languages {
+  justify-content: flex-end;
+  gap: 0;
+  margin: calc(-1 * var(--mwnf-content-padding-block, 20px)) calc(50% - 50cqw) var(--mwnf-content-padding-block, 20px);
+  padding: 0 15px;
+  background-color: #750101;
+}
+.sharinghistory-bib__languages .mwnf-languages__button {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 0;
+  font: 400 14px/16px Roboto, sans-serif;
+  color: #fff;
+  background-color: transparent;
+}
+.sharinghistory-bib__languages .mwnf-languages__button:hover { text-decoration: underline; }
+.sharinghistory-bib__languages .mwnf-languages__button--active { background-color: #990000; }
+.sharinghistory-bib__back { min-height: 21px; margin: 0 0 15px; }
+.sharinghistory-bib__title { min-height: 23px; margin: 0 0 15px; font: 400 19px Roboto, sans-serif; color: #222; }
+.sharinghistory-bib__entries {
+  margin-left: calc((100% + 30px) / 6);
+  width: calc((100% + 30px) * 2 / 3 - 30px);
+  font: 400 16px/22px Roboto, sans-serif;
+  color: #222;
+}
+.sharinghistory-bib__entries p { margin: 0 0 10px; }
+.sharinghistory-bib__empty { padding-bottom: calc(6 * 22px); text-align: center; }
+@media (max-width: 991px) {
+  .sharinghistory-bib__entries { margin-left: calc((100% + 30px) / 12); width: calc((100% + 30px) * 3 / 4 - 30px); }
+}
+@media (max-width: 767px) {
+  .sharinghistory-bib__entries { margin-left: 0; width: auto; }
+}
