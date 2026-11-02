@@ -311,6 +311,36 @@ export default {
       meta: meta('historical-background', 'collections', 'countries'),
     },
     {
+      // Legacy's historical_background_pages.php?page=N: one perspective.
+      path: '/historical-background/perspective/:page',
+      name: 'historical-background-page',
+      component: () => import('./views/HistoricalBackgroundPage.vue'),
+      props: (route) => ({ page: Number(route.params.page) || 1 }),
+      meta: meta('historical-background', 'collections', 'countries', 'timelines'),
+    },
+    {
+      // Legacy's historical_background_insight.php (`?mapcountry=` its maps).
+      path: '/historical-background/insight',
+      name: 'historical-background-insight',
+      component: () => import('./views/HistoricalBackgroundInsight.vue'),
+      meta: meta('historical-background', 'collections', 'countries', 'timelines'),
+    },
+    {
+      // Legacy's historical_background_readmore.php.
+      path: '/historical-background/read-more',
+      name: 'historical-background-read-more',
+      component: () => import('./views/HistoricalBackgroundReadMore.vue'),
+      meta: meta('historical-background', 'collections'),
+    },
+    {
+      // Legacy's about_hb_topics.php: a topic in a window of its own (bare).
+      path: '/historical-background/topic/:id',
+      name: 'historical-background-topic',
+      component: () => import('./views/HistoricalBackgroundTopic.vue'),
+      props: (route) => ({ id: decodeURIComponent(route.params.id) }),
+      meta: { ...meta('historical-background', 'collections'), bare: true },
+    },
+    {
       path: '/historical-profiles',
       name: 'historical-profiles',
       component: () => import('./views/HistoricalProfiles.vue'),

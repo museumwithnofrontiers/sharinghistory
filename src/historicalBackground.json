@@ -1,0 +1,39 @@
+{
+  "_comment": "Legacy's Historical Background portraits (hb_slider/images, theme/assets/hb) with the names its pages wrote; the mosaic's ten columns, each an `a` portrait over its `b`; each perspective page's portraits and countries (modules/historical_background_pages.php, by country code).",
+  "portraits": {
+    "a1": "Muhammad ´Ali Pasha",
+    "b1": "Sheikh Abdullah ibn Jassim",
+    "a2": "Emir ´Abd al-Qadir",
+    "b2": "Tudor Vladimirescu",
+    "a3": "Petar I Karađorđević",
+    "b3": "General O´Donnell",
+    "a4": "Emperor Franz Joseph",
+    "b4": "Manuel de Arriaga",
+    "a5": "General Khayr al-Din",
+    "b5": "Mustafa Kemal Atatürk",
+    "a6": "Napoleon Bonaparte",
+    "b6": "Saqr ibn Khalid ibn Sultan Al Qasimi",
+    "a7": "Eleftherios Venizelos",
+    "b7": "Queen Victoria",
+    "a8": "Giuseppe Garibaldi",
+    "b8": "King ´Abd al-´Aziz ibn ´Abd al-Rahman Saud",
+    "a9": "Gjorche Petrov",
+    "b9": "Sharif Husayn ibn ´Ali",
+    "a10": "Mulay ´Abd al-Rahman",
+    "b10": "Otto von Bismarck"
+  },
+  "perspectives": [
+    {
+      "portraits": ["a2", "a1", "b9", "a10", "b1", "b8", "a5", "b6"],
+      "countries": ["dza", "egy", "jor", "lbn", "mar", "qat", "sau", "tun", "are"]
+    },
+    {
+      "portraits": ["a2", "a1", "b9", "a10", "b1", "a9", "b2", "b8", "a3", "a5", "b5", "b6"],
+      "countries": ["dza", "egy", "jor", "lbn", "mar", "qat", "mkd", "rou", "sau", "srb", "tun", "tur", "are"]
+    },
+    {
+      "portraits": ["a4", "a6", "b10", "a8", "b4", "a9", "b2", "a3", "b3", "b7"],
+      "countries": ["aut", "fra", "deu", "hun", "ita", "prt", "mkd", "rou", "srb", "esp", "gbr"]
+    }
+  ]
+}

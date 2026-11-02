@@ -202,3 +202,111 @@ a:hover {
 .mwnf-standalone-hcr__left p { font-weight: 300; }
 .mwnf-standalone-hcr__left strong { font-weight: 400; }
 .mwnf-standalone-hcr__main h3 { font-weight: 300; }
+
+/* The Historical Background pages (historical_background*.php): the dark
+   red band under the banner across the page (section.language_option
+   .hstr_bg), its tabs 26px high, the page's own on red, "About the Project"
+   on the right, then 23px to the content. */
+:has(> .mwnf-content .sharinghistory-hbb) { container-type: inline-size; }
+.sharinghistory-hbb {
+  display: flex;
+  justify-content: space-between;
+  margin: calc(-1 * var(--mwnf-content-padding-block, 20px)) calc(50% - 50cqw) 23px;
+  padding: 0 calc(50cqw - 50%);
+  font: 400 14px/16px Roboto, sans-serif;
+  background-color: #750101;
+}
+.sharinghistory-hbb__tabs { display: flex; margin: 0; padding: 0; list-style: none; }
+.sharinghistory-hbb a { display: block; padding: 5px 8px; color: #fff; text-decoration: none; }
+.sharinghistory-hbb a:hover { text-decoration: underline; }
+.sharinghistory-hbb__tab--active { background-color: #990000; }
+.sharinghistory-hbb i { font-style: normal; }
+
+/* The About page (historical_background.php): the twenty portraits in ten
+   columns of two, 123 by 144 each; 30px under them its word to the visitor
+   in the middle 750px, the perspectives, then Related Content, centred. */
+.sharinghistory-hb__mosaic { display: grid; grid-template-columns: repeat(10, 1fr); }
+.sharinghistory-hb__column img { display: block; width: 100%; height: 144px; object-fit: cover; }
+.sharinghistory-hb__text { margin-top: 30px; text-align: center; color: #222; }
+.sharinghistory-hb__text h3 { max-width: 750px; margin: 0 auto; font: 400 16px/normal Roboto, sans-serif; }
+.sharinghistory-hb__text h3 p { margin: 0; }
+.sharinghistory-hb__pages { margin: 33px 0 0; font: 500 18px/24px Roboto, sans-serif; }
+.sharinghistory-hb__related { margin: 54px 0 10px; font: 400 16px/22px Roboto, sans-serif; }
+.sharinghistory-hb__text a, .sharinghistory-hbp__main a, .sharinghistory-hbr__topics a { color: #222; text-decoration: none; }
+.sharinghistory-hb__text a:hover, .sharinghistory-hbp__main a:hover, .sharinghistory-hbr__topics a:hover { text-decoration: underline; }
+.sharinghistory-hb__related b { font-weight: 500; }
+
+/* A perspective (historical_background_pages.php): its portraits two by two
+   on dark red in col-md-4, 168 by 196, 10px apart; in col-md-8 the other
+   perspectives on the right, then in its col-md-9 the title in red, the
+   text, the grey box of countries and "As Word". */
+.sharinghistory-hbp__body { display: grid; grid-template-columns: calc((100% + 30px) / 3 - 30px) 1fr; column-gap: 30px; align-items: start; }
+.sharinghistory-hbp__portraits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  background-color: #750101;
+}
+.sharinghistory-hbp__portraits img { display: block; width: 100%; aspect-ratio: 168 / 196; object-fit: cover; }
+.sharinghistory-hbp__main { min-width: 0; font: 400 16px/22px Roboto, sans-serif; color: #222; }
+.sharinghistory-hbp__others { margin: 0 15px 10px; text-align: right; }
+.sharinghistory-hbp__text { width: calc(75% - 30px); margin: 0 15px; }
+.sharinghistory-hbp__text h2 { margin: 10px 0 15px; font: 400 22px Roboto, sans-serif; color: #900000; }
+.sharinghistory-hbp__description p { margin: 0 0 22px; }
+.sharinghistory-hbp__description p:last-child { margin-bottom: 32px; }
+.sharinghistory-hbp__main b, .sharinghistory-hbp__main strong { font-weight: 500; }
+.sharinghistory-hbp__countries { margin: 0 0 15px; padding: 5px 10px; background-color: #eee; }
+.sharinghistory-hbp__countries p { margin: 0 0 10px; }
+.sharinghistory-hbp__download a { padding-left: 12px; background: url('../../theme/assets/icons/flip_black.png') no-repeat 0 4px; }
+
+/* Read more (historical_background_readmore.php): "Select a topic", then
+   the topics in col-md-6, each after its ». */
+.sharinghistory-hbr__heading { margin: 0 0 15px; font: 400 19px Roboto, sans-serif; color: #222; }
+.sharinghistory-hbr__topics { width: calc(50% - 30px); padding: 0 15px; font: 400 16px/22px Roboto, sans-serif; color: #222; }
+.sharinghistory-hbr__topics p { margin: 0 0 10px; }
+
+/* A topic's window (about_hb_topics.php): its title in white light words. */
+.sharinghistory-hbt__body { padding: 15px; color: #fff; }
+.sharinghistory-hbt__body h3 { margin: 0 0 10px; font: 400 24px Roboto, sans-serif; color: #fff; }
+.sharinghistory-hbt__text { font: 300 16px/22px Roboto, sans-serif; }
+
+/* Country Insight (historical_background_insight.php): the way back 15px
+   in; in the col-md-9 after two empty columns the word to the visitor
+   justified, the three lists side by side, each 15px into its third, then
+   the chosen country's maps: the first at most 435px high, the download
+   and its words, the thumbnails at most 107 by 80, 10px apart. */
+.sharinghistory-hbi__back { margin: 0 15px 16px; min-height: 16px; font-weight: 400; line-height: 16px; }
+.sharinghistory-hbi__body {
+  width: calc((100% + 30px) * 9 / 12 - 30px);
+  margin-left: calc((100% + 30px) * 2 / 12);
+  font: 400 16px/22px Roboto, sans-serif;
+  color: #222;
+}
+.sharinghistory-hbi__intro { margin: 0 0 10px; text-align: justify; }
+.sharinghistory-hbi__intro p { margin: 0; }
+.sharinghistory-hbi__intro p::after { content: ''; display: block; height: 22px; }
+.sharinghistory-hbi__lists { display: grid; grid-template-columns: repeat(3, 1fr); }
+.sharinghistory-hbi__lists > div { padding: 0 15px 26px; }
+.sharinghistory-hbi__lists p { margin: 0; }
+.sharinghistory-hbi__lists strong { font-weight: 500; }
+.sharinghistory-hbi__lists select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 30px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border: 1px solid rgb(118 118 118);
+  border-radius: 20px;
+  font: 500 14px Roboto, sans-serif;
+  color: #222;
+  background-color: rgb(239 239 239);
+}
+.sharinghistory-hbi__maps { padding: 0 15px; }
+.sharinghistory-hbi__maps h3 { margin: 10px 0; font: 300 18px Roboto, sans-serif; color: #000; }
+.sharinghistory-hbi__map img { display: block; max-width: 100%; max-height: 435px; }
+.sharinghistory-hbi__maps p { margin: 0 0 10px; }
+.sharinghistory-hbi__print { vertical-align: baseline; }
+.sharinghistory-hbi__thumbs { display: flex; flex-wrap: wrap; }
+.sharinghistory-hbi__thumbs a { margin: 0 10px 10px 0; }
+.sharinghistory-hbi__thumbs img { display: block; max-width: 107px; max-height: 80px; }
