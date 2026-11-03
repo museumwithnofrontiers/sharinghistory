@@ -35,8 +35,12 @@ a:hover {
    right edge. */
 .mwnf-standalone--home .mwnf-header__tools { margin-right: 20px; }
 /* The exhibitions' band starts 20px under the banner (section.partnet_galery),
-   its caption 10px over the tiles. */
-.mwnf-standalone--home .mwnf-standalone-home { margin-top: -7px; }
+   its caption 10px over the tiles; it ends 45px under them (the last row's
+   30px margin and the band's 15px), on a phone where legacy's does. */
+.mwnf-standalone--home .mwnf-standalone-home { margin-top: -7px; margin-bottom: 25px; }
+@media (max-width: 767px) {
+  .mwnf-standalone--home .mwnf-standalone-home { margin-bottom: 10px; }
+}
 .mwnf-standalone-tiles__caption { margin-bottom: 10px; }
 
 /* The Collections entrance (pc_entrance.php): the two periods side by side,
@@ -127,10 +131,11 @@ a:hover {
 /* The Timeline entrance (hcr_home.php): in the middle eight of twelve
    columns, below two blank lines, the word to the visitor justified, a blank
    line, then the two forms side by side, each its title, its list across,
-   its two periods in halves and its round red Go centred under them. */
+   its two periods in halves and its round red Go centred under them; 30px
+   and two blank lines under them (legacy's <br/><br/> over the footer). */
 .sharinghistory-tle {
   width: calc((100% + 30px) * 8 / 12 - 30px);
-  margin: 32px auto 22px;
+  margin: 32px auto 42px;
   font: 400 16px/22px Roboto, sans-serif;
   color: #222;
 }
@@ -170,6 +175,10 @@ a:hover {
 @media (max-width: 62rem) {
   .sharinghistory-tle { width: auto; }
   .sharinghistory-tle__forms { grid-template-columns: 1fr; }
+}
+/* Up to 750px legacy's columns keep 15px under them, twice. */
+@media (max-width: 750px) {
+  .sharinghistory-tle { margin-bottom: 72px; }
 }
 
 /* The Timeline results (hcr_result.php): the headings on the content's
@@ -238,6 +247,13 @@ a:hover {
 .sharinghistory-hb__text a, .sharinghistory-hbp__main a, .sharinghistory-hbr__topics a { color: #222; text-decoration: none; }
 .sharinghistory-hb__text a:hover, .sharinghistory-hbp__main a:hover, .sharinghistory-hbr__topics a:hover { text-decoration: underline; }
 .sharinghistory-hb__related b { font-weight: 500; }
+/* Up to 750px the related content 47px under the perspectives (legacy's
+   blank lines are 16px there), and the column's 15px margin and 30px under
+   it. */
+@media (max-width: 750px) {
+  .sharinghistory-hb__related { margin-top: 47px; }
+  .sharinghistory-hb { padding-bottom: 25px; }
+}
 
 /* A perspective (historical_background_pages.php): its portraits two by two
    on dark red in col-md-4, 168 by 196, 10px apart; in col-md-8 the other
@@ -347,6 +363,13 @@ a:hover {
   color: #222;
 }
 .sharinghistory-bib__entries p { margin: 0 0 10px; }
+/* Under the entries legacy's two empty page listings (30px), 30px and two
+   blank lines (its <br/><br/> over the footer); up to 750px the column's
+   15px margin too. */
+.sharinghistory-bib { padding-bottom: 72px; }
+@media (max-width: 750px) {
+  .sharinghistory-bib { padding-bottom: 87px; }
+}
 .sharinghistory-bib__empty { padding-bottom: calc(6 * 22px); text-align: center; }
 @media (max-width: 991px) {
   .sharinghistory-bib__entries { margin-left: calc((100% + 30px) / 12); width: calc((100% + 30px) * 3 / 4 - 30px); }
@@ -423,6 +446,8 @@ a:hover {
    lighter, each its years and place and its title in halves, the words
    11px and white (css/responsive_style.css). */
 @media (max-width: 750px) {
+  /* The column's 15px margin under the list. */
+  .sh-chronology { padding-bottom: 25px; }
   .sh-chronology__body { margin: 21px -5px 0; padding-top: 15px; }
   .sh-chronology__row {
     grid-template-columns: 1fr 1fr;

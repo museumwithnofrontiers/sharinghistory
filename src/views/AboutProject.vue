@@ -58,10 +58,18 @@ const pictures = computed(() => {
 </template>
 
 <style scoped>
+/* 30px under the content (legacy's `inner_contents`); on a phone 45px, the
+   column's 15px margin with it. */
 .sh-about {
   display: flex;
   flex-direction: column;
   gap: 23px;
+  padding-bottom: 10px;
+}
+@media (max-width: 750px) {
+  .sh-about {
+    padding-bottom: 25px;
+  }
 }
 .sh-about__columns {
   display: grid;
@@ -97,6 +105,33 @@ const pictures = computed(() => {
   display: block;
   width: 100%;
   height: 100%;
+}
+/* On a phone legacy's pictures span the column: three across at 31% of it
+   (30% up to 335px), five at 17% from 391px to 620px, 10px apart, their
+   height their own; the words 15px under them. */
+@media (max-width: 620px) {
+  .sh-about__columns {
+    row-gap: 15px;
+  }
+  .sh-about__pictures {
+    grid-template-columns: repeat(5, min(17%, 108px));
+    grid-auto-rows: auto;
+    justify-self: stretch;
+  }
+  .sh-about__picture img {
+    height: auto;
+    aspect-ratio: 108 / 83;
+  }
+}
+@media (max-width: 390px) {
+  .sh-about__pictures {
+    grid-template-columns: repeat(3, 31%);
+  }
+}
+@media (max-width: 335px) {
+  .sh-about__pictures {
+    grid-template-columns: repeat(3, 30%);
+  }
 }
 /* Legacy's `h3.big_text` and `p.big_p` (css/style_inside.css). */
 .sh-about__title {
@@ -134,7 +169,7 @@ const pictures = computed(() => {
   margin-bottom: 10px;
 }
 .sh-about__text :deep(.mwnf-prose ul) {
-  margin: 0 0 16px;
+  margin: 0 0 10px;
   padding-left: 20px;
 }
 .sh-about__text :deep(.mwnf-prose li) {
@@ -146,8 +181,19 @@ const pictures = computed(() => {
 .sh-about__heading {
   margin-bottom: 15px;
 }
+@media (max-width: 750px) {
+  .sh-about__heading {
+    margin-bottom: 10px;
+  }
+}
+/* The related content's paragraphs 10px apart. */
+.sh-about__text > p {
+  margin: 0 0 10px;
+}
+/* The arrow (12 by 10) right against its link, as legacy's. */
 .sh-about__text img {
-  margin-right: 4px;
+  width: 12px;
+  height: 10px;
   vertical-align: middle;
 }
 </style>
