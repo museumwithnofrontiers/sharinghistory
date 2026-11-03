@@ -270,4 +270,29 @@ function asWord() {
   .sh-hp__band { grid-template-columns: 1fr 2fr; }
   .sh-hp__body { grid-template-columns: 1fr; }
 }
+/* Up to 750px legacy's stacked columns keep their col-xs 15px: under the
+   back link and under the country list. */
+@media (max-width: 750px) {
+  .sh-hp__back,
+  .sh-hp__countries { margin-bottom: 15px; }
+  /* Stacked: the picture's block 15px deeper under the thumbnails, the
+     picture column 10px over the text, the text's column its 15px, and the
+     Related Content box 20px of padding over its heading. */
+  .sh-hp__thumbs { margin-bottom: 15px; }
+  .sh-hp__pictures { margin-bottom: 10px; }
+  .sh-hp__text { margin-bottom: 15px; }
+  .sh-hp__related { padding-top: 20px; }
+  /* The pager's span (responsive_style.css, .hb_result_next_prev span):
+     80% wide to the right, then the full width, centred and smaller. */
+  .sh-hp__pages > span { width: 80%; text-align: right; }
+}
+@media (max-width: 620px) {
+  .sh-hp__pages > span { width: 100%; font-size: 13px; text-align: center; }
+}
+@media (max-width: 390px) {
+  .sh-hp__pages > span { font-size: 12px; }
+}
+@media (max-width: 335px) {
+  .sh-hp__pages > span { font-size: 11px; }
+}
 </style>
