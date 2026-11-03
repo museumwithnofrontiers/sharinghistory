@@ -363,12 +363,12 @@ a:hover {
   color: #222;
 }
 .sharinghistory-bib__entries p { margin: 0 0 10px; }
-/* Under the entries legacy's two empty page listings (30px), 30px and two
-   blank lines (its <br/><br/> over the footer); up to 750px the column's
-   15px margin too. */
-.sharinghistory-bib { padding-bottom: 72px; }
+/* Under the entries legacy's empty page listing (StandalonePagination's
+   30px), then 30px and two blank lines (its <br/><br/> over the footer); up
+   to 750px the column's 15px margin too. */
+.sharinghistory-bib { padding-bottom: 42px; }
 @media (max-width: 750px) {
-  .sharinghistory-bib { padding-bottom: 87px; }
+  .sharinghistory-bib { padding-bottom: 57px; }
 }
 .sharinghistory-bib__empty { padding-bottom: calc(6 * 22px); text-align: center; }
 @media (max-width: 991px) {

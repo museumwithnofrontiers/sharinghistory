@@ -418,5 +418,9 @@
   --mwnf-standalone-download-weight: 400;
   --mwnf-standalone-sheet-label-color: #000000;
   --mwnf-standalone-sheet-value-color: #222222;
+  /* A monument's special features (.specials): a red heading, the pictures'
+     box as wide as the column. */
+  --mwnf-standalone-specials-heading-background: #990000;
+  --mwnf-standalone-specials-pictures-width: 100%;
   --mwnf-standalone-sheet-link-color: rgb(1 141 206);
 }
