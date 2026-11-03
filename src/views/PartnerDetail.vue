@@ -1,6 +1,8 @@
 <script setup>
+import { watch } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import { StandalonePartnerPage } from '@museumwnf/viewer-layout/standalone'
+import { useData } from '../composables/data.js'
 import { partnerItemsLink, partnerProfileView } from '../composables/partner.js'
 
 // The partner profile as legacy's pm_partner.php: the standalone family's
@@ -9,9 +11,20 @@ import { partnerItemsLink, partnerProfileView } from '../composables/partner.js'
 // its languages and its map for every partner that has them, and every word
 // legacy's own (sharinghistory.pp.*, its translation table).
 
-defineProps({ id: { type: String, required: true } })
+const props = defineProps({ id: { type: String, required: true } })
 
 const { locale } = useI18n()
+const { loadTranslations, partnerById, translations } = useData()
+
+// Legacy's band offered the languages whose text has a description
+// (class.partners.inc.php: `description<>''`): every one the partner carries
+// is loaded to tell.
+watch(
+  () => partnerById.value.get(props.id)?.languages,
+  (codes) => (codes ?? []).forEach((code) => loadTranslations('partners', code)),
+  { immediate: true },
+)
+const described = (record, code) => Boolean(translations('partners', code)?.[record.id]?.description)
 
 const back = () => [
   { label: 'sharinghistory.pcr.back', history: true },
@@ -42,6 +55,7 @@ const everyPartner = () => true
     :items="partnerItemsLink"
     :map="hasMap"
     :bands="everyPartner"
+    :languages="described"
     :labels="labels"
   />
 </template>
