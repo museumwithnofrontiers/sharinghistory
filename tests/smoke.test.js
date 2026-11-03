@@ -247,41 +247,36 @@ describe('website smoke test', () => {
     return null
   }
 
-  it('renders the country page on EssayView, canonicalising the bare record address onto its first page', async () => {
+  // A country's profile as legacy's hb_result.php: the bare record address
+  // canonicalised onto its first page, the countries, "Page 1 of N" with
+  // Next, the page's title and text, and the Related Content column.
+  it("renders a country's profile as legacy's hb_result.php, the bare record address on its first page", async () => {
     await loadEntities(['collections'])
     const fixture = findProfileWithPages()
     expect(fixture, 'fixture: a country record with more than one page').not.toBeNull()
 
     const { app, host } = await mountSite(config, messages, `#/historical-profiles/${encodeURIComponent(fixture.record.id)}`)
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-essay')).not.toBeNull(), { timeout: 20000 })
+    await vi.waitFor(() => expect(host.querySelector('.sh-hp')).not.toBeNull(), { timeout: 20000 })
 
-    // The redirect (`router.replace`) lands on the record's own first page,
-    // not a bare address — asserted once it settles, separately from the
-    // essay itself, which renders off the same fallback immediately.
+    // The redirect (`router.replace`) lands on the record's own first page.
     await vi.waitFor(
       () => expect(decodeURIComponent(window.location.hash)).toContain(fixture.pages[0].id),
       { timeout: 20000 },
     )
     expect(decodeURIComponent(window.location.hash)).toContain(fixture.record.id)
-    expect(host.querySelector('.mwnf-essay__breadcrumb-link')).not.toBeNull()
-    expect(host.querySelector('.mwnf-essay__breadcrumb-link').textContent).not.toBe('')
-    expect(host.querySelector('.mwnf-essay__nav-link--next')).not.toBeNull()
+    expect(host.querySelector('.sh-hp__country')).not.toBeNull()
+    expect(host.querySelector('.sh-hp__pages').textContent).toContain(`${messages.en['sharinghistory.hp.page']} 1 ${messages.en['sharinghistory.hp.of']} ${fixture.pages.length}`)
+    expect(host.querySelector('.sh-hp__pages a')).not.toBeNull()
 
-    // The view reads the collection's title through the tree's own entity,
-    // not through a fallback to the spec's entity. A wrong entity renders
-    // the internal_name instead of the translated title.
-    const titleEl = host.querySelector('.mwnf-essay__title')
-    expect(titleEl).not.toBeNull()
-    const expectedTitle = collectionTexts[fixture.pages[0].id]?.title
-    expect(titleEl.textContent.trim()).toContain(expectedTitle)
+    // The page's own title, read through the tree's entity (a wrong entity
+    // renders the internal_name instead), then its text.
+    const titleEl = host.querySelector('.sh-hp__text h3')
+    expect(titleEl.textContent.trim()).toContain(collectionTexts[fixture.pages[0].id]?.title)
     expect(titleEl.textContent).not.toContain(fixture.pages[0].internal_name)
-
-    // When the collection carries a description, the body must render it.
     if (collectionTexts[fixture.pages[0].id]?.description) {
-      const bodyEl = host.querySelector('.mwnf-essay__body, .mwnf-essay__prose')
-      expect(bodyEl).not.toBeNull()
-      expect(bodyEl.textContent).toBeTruthy()
+      expect(host.querySelector('.sh-hp__text div').textContent).toBeTruthy()
     }
+    expect(host.querySelector('.sh-hp__related').textContent).toContain(messages.en['sharinghistory.item.relatedContent'])
 
     app.unmount()
   }, 60000)
