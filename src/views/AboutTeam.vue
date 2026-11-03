@@ -158,9 +158,35 @@ const toggleCountry = (id) => { openCountry.value = openCountry.value === id ? n
   line-height: 22px;
   color: #222222;
 }
+/* Legacy's `.about_left_bg` on white: 10px at the sides and under the
+   picture, and a 22px white border on the right above 990px, the picture
+   against it. 30px under the content (legacy's `inner_contents`). */
+.sh-team__picture {
+  padding: 0 10px 10px;
+}
 .sh-team__picture img {
   display: block;
   max-width: 100%;
   height: auto;
+  margin-left: auto;
+}
+.sh-team {
+  padding-bottom: 10px;
+}
+@media (min-width: 62rem) {
+  .sh-team__picture {
+    border-right: 22px solid #ffffff;
+  }
+}
+/* Up to 750px the heading 20px over the categories, the picture 31px under
+   them and 45px over the band (legacy's column margins). */
+@media (max-width: 750px) {
+  .sh-team__columns {
+    row-gap: 31px;
+    margin-top: 5px;
+  }
+  .sh-team {
+    padding-bottom: 25px;
+  }
 }
 </style>
