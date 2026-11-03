@@ -285,9 +285,16 @@ a:hover {
 .sharinghistory-hbr__topics { width: calc(50% - 30px); padding: 0 15px 10px; font: 400 16px/22px Roboto, sans-serif; color: #222; }
 .sharinghistory-hbr__topics p { margin: 0 0 10px; }
 
-/* A topic's window (about_hb_topics.php): its title in white light words. */
-.sharinghistory-hbt__body { padding: 15px; color: #fff; }
-.sharinghistory-hbt__body h3 { margin: 0 0 10px; font: 400 24px Roboto, sans-serif; color: #fff; }
+/* A topic's window (about_hb_topics.php, legacy's
+   `historical_background_readmore_pop`): 20px from the top, the band plain
+   #750101 with 15px around the heading, the article #900 with 10px over the
+   text; the title 18px (h3.exIntro), the text in white light words. */
+.sharinghistory-hbt { padding-top: 20px; }
+.sharinghistory-hbt .mwnf-standalone-window__header { padding-bottom: 0; background-image: none; }
+.sharinghistory-hbt .mwnf-standalone-window__heading { padding: 15px 0 15px 15px; }
+.sharinghistory-hbt .mwnf-standalone-window__article { padding-top: 10px; background-color: #990000; }
+.sharinghistory-hbt__body { padding: 0 15px 15px; color: #fff; }
+.sharinghistory-hbt__body h3 { margin: 0 0 10px; font: 400 18px Roboto, sans-serif; color: #fff; }
 .sharinghistory-hbt__text { font: 300 16px/22px Roboto, sans-serif; }
 
 /* Country Insight (historical_background_insight.php): the way back 15px
@@ -356,6 +363,13 @@ a:hover {
 .sharinghistory-bib__languages .mwnf-languages__button--active { background-color: #990000; }
 .sharinghistory-bib__back { min-height: 21px; margin: 0 0 15px; }
 .sharinghistory-bib__title { min-height: 23px; margin: 0 0 15px; font: 400 19px Roboto, sans-serif; color: #222; }
+/* An item's bibliography has no title: legacy's empty heading row keeps only
+   its 15px; on a phone its row's 6px, then the empty column (1px and its
+   15px) stacked over the entries. */
+.sharinghistory-bib__title:empty { min-height: 0; margin-bottom: 0; padding-top: 15px; }
+@media (max-width: 750px) {
+  .sharinghistory-bib__title:empty { padding-top: 21px; }
+}
 .sharinghistory-bib__entries {
   margin-left: calc((100% + 30px) / 6);
   width: calc((100% + 30px) * 2 / 3 - 30px);
