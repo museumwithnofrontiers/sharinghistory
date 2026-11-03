@@ -430,8 +430,9 @@ a:hover {
   column-gap: 30px;
 }
 .sh-chronology__row a { color: #222; text-decoration: underline; }
-.sh-chronology__title { margin: 0 0 11px; font: 500 16px/22px Roboto, sans-serif; color: #750101; }
-.sh-chronology__nav { display: flex; justify-content: space-between; }
+.sh-chronology__title { margin: 0 0 10px; font: 500 16px/22px Roboto, sans-serif; color: #750101; }
+/* Legacy's Back and Next row, 32px high. */
+.sh-chronology__nav { display: flex; align-items: flex-start; justify-content: space-between; min-height: 32px; }
 .sh-chronology__nav p { margin: 0; }
 .sh-chronology__nav .mwnf-standalone-item__back-link { font: 400 16px/19px Roboto, sans-serif; }
 .sh-chronology__next a {
@@ -447,14 +448,29 @@ a:hover {
   align-items: start;
 }
 .sh-chronology__picture img { display: block; width: 100%; height: auto; }
-.sh-chronology__credit { padding-left: 10px; font-size: 14px; line-height: normal; }
+.sh-chronology .sh-chronology__credit { margin: 0; padding-left: 10px; font-size: 14px; line-height: normal; }
 .sh-chronology__thumbs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+.sh-chronology__thumbs a { display: block; }
 .sh-chronology__thumbs img { display: block; width: auto; max-width: 107px; max-height: 80px; }
+/* Packed (freetile.js): each thumbnail where legacy's Freetile put it, the box
+   as high as the packing with the tiles' 10px margins, then the descent of
+   the line legacy's inline-block box sat on. */
+.sh-chronology__thumbs--packed { position: relative; display: block; margin-bottom: 4px; }
+/* Legacy's smallest thumbnails, up to 360px. */
+@media (max-width: 360px) {
+  .sh-chronology__thumbs img { max-width: 60px; max-height: 40px; }
+}
 .sh-chronology__description p { margin: 0 0 10px; }
 @media (max-width: 767px) {
   .sh-chronology__body { margin-left: 0; }
   .sh-chronology__blank { display: none; }
   .sh-chronology__columns { grid-template-columns: 1fr; }
+}
+/* An activity's page up to 750px: the heading's row 5px over the path, the
+   text in legacy's column 5px further in. */
+@media (max-width: 750px) {
+  .sh-chronology--event { padding-inline: 5px; }
+  .sh-chronology--event .sh-chronology__heading { margin-bottom: 5px; }
 }
 /* Up to 750px legacy draws the list as dark red rows, every other one
    lighter, each its years and place and its title in halves, the words
