@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from '@museumwnf/viewer-core'
 import AboutTabs from '../components/AboutTabs.vue'
 import { activityText, activityWhereWhen, chronology, chronologyEvents } from '../composables/chronology.js'
 import { useData } from '../composables/data.js'
+import { freetileLayout } from '../composables/freetile.js'
 
 // An activity of the Chronology as legacy's about_chronology_txt.php: the
 // About strip (Chronology), "Project Chronology", the project's activity in
@@ -28,6 +29,40 @@ const pictures = computed(() => [...(event.value?.images ?? [])].sort((a, b) => 
 const shown = ref(0)
 watch(() => props.id, () => { shown.value = 0 })
 const picture = computed(() => pictures.value[shown.value] ?? pictures.value[0] ?? null)
+
+// The thumbnails packed as legacy's Freetile packed them, once every one has
+// loaded and again when the column's width changes; in plain rows until then.
+const thumbs = ref(null)
+const tiles = ref(null)
+function packThumbs() {
+  const box = thumbs.value
+  const links = box ? [...box.children] : []
+  if (!links.length || links.some((link) => !link.querySelector('img')?.complete)) return
+  // Each tile's outer size: the thumbnail and its 10px right and bottom margins.
+  const sizes = links.map((link) => ({ width: link.offsetWidth + 10, height: link.offsetHeight + 10 }))
+  tiles.value = freetileLayout(sizes, box.clientWidth)
+}
+// Legacy's Freetile packed again when the window's size changed; a browser
+// without ResizeObserver does the same.
+let observer
+onMounted(() => {
+  const Observer = globalThis.ResizeObserver
+  if (!Observer) {
+    window.addEventListener('resize', packThumbs)
+    return
+  }
+  observer = new Observer(() => packThumbs())
+  watch(thumbs, (box, old) => {
+    if (old) observer.unobserve(old)
+    if (box) observer.observe(box)
+  }, { immediate: true })
+})
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  window.removeEventListener('resize', packThumbs)
+})
+watch(pictures, () => { tiles.value = null })
+const tileStyle = (i) => (tiles.value ? { position: 'absolute', left: `${tiles.value.positions[i].left}px`, top: `${tiles.value.positions[i].top}px` } : null)
 
 const whereWhen = computed(() => (event.value ? activityWhereWhen(event.value, text.value, { from: t('sharinghistory.chr.from'), to: t('sharinghistory.chr.to') }) : ''))
 // Legacy listed its people a blank line apart, each list's ";" as ",".
@@ -65,8 +100,14 @@ const people = computed(() =>
           </template>
         </div>
         <div class="sh-chronology__text">
-          <div v-if="pictures.length" class="sh-chronology__thumbs">
-            <a v-for="(p, i) in pictures" :key="p.url" :href="p.url" target="_blank" rel="noopener" @mouseover="shown = i"><img :src="p.url" :alt="p.alt_text ?? ''"></a>
+          <div
+            v-if="pictures.length"
+            ref="thumbs"
+            class="sh-chronology__thumbs"
+            :class="{ 'sh-chronology__thumbs--packed': tiles }"
+            :style="tiles ? { height: `${tiles.height}px` } : null"
+          >
+            <a v-for="(p, i) in pictures" :key="p.url" :href="p.url" target="_blank" rel="noopener" :style="tileStyle(i)" @mouseover="shown = i"><img :src="p.url" :alt="p.alt_text ?? ''" @load="packThumbs"></a>
           </div>
           <p><b>{{ text.name }}<template v-if="text.subtitle"><br>{{ text.subtitle }}</template></b><br>{{ whereWhen }}</p>
           <!-- eslint-disable vue/no-v-html -- the package's own Markdown, rendered and escaped by viewer-core -->
