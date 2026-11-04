@@ -401,6 +401,9 @@
      right; the sheet's black labels over dark grey values, its links blue. */
   --mwnf-standalone-bullet: url('./assets/icons/next_arrow.png');
   --mwnf-standalone-back-arrow: url('./assets/icons/back_arrow.png');
+  /* The space between two ways back, after each one's 15px: legacy's column
+     sets it in 14px Roboto, where the other sites' set it in 16px Times. */
+  --mwnf-standalone-back-space: 3px;
   --mwnf-standalone-related-bullet: url('./assets/icons/white_next_arrow.png');
   --mwnf-standalone-download-icon: url('./assets/icons/download_white.png');
   --mwnf-standalone-language-bar: #750101;
