@@ -269,6 +269,9 @@
   --mwnf-standalone-banner-title-color: #ffffff;
   --mwnf-standalone-banner-title-background: rgba(0, 0, 0, 0.52);
   --mwnf-standalone-banner-title-line-height: 41px;
+  /* Legacy's `.banner-image` sets its picture with the `background`
+     shorthand: it sits at its top left. */
+  --mwnf-standalone-banner-position: 0 0;
   /* The Collections' tiles (pclist_all.php's .pc_all): one after another,
      250px apart, in a pale red frame. */
   --mwnf-standalone-results-cell-width: auto;
