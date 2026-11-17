@@ -131,11 +131,20 @@ describe('website smoke test', () => {
     expect(exhibitions.length).toBeGreaterThan(0)
     for (const exhibition of exhibitions) expect(minisites[exhibition.id], exhibition.internal_name).toMatch(/^https:\/\//)
 
+    // Legacy's landing page (exhibitions/AWE/index.php): its picture with the
+    // title, and the exhibitions in legacy's order, by name.
     const { app, host } = await mountSite(config, messages, '#/exhibitions?lang=en')
-    await vi.waitFor(() => expect(host.querySelector('.mwnf-cards')).not.toBeNull(), { timeout: 20000 })
-    const hrefs = Array.from(host.querySelectorAll('.mwnf-cards__link')).map((a) => a.getAttribute('href'))
+    await vi.waitFor(() => expect(host.querySelector('.sh-exh__list a')).not.toBeNull(), { timeout: 20000 })
+    expect(host.querySelector('.sh-exh__title').textContent).toBe('Sharing History')
+    expect(host.querySelector('.sh-exh__welcome').textContent).toBe('Welcome to the Virtual Exhibitions')
+    const links = Array.from(host.querySelectorAll('.sh-exh__list a'))
+    const titles = links.map((a) => a.textContent)
+    expect(titles).toEqual([...titles].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })))
+    const hrefs = links.map((a) => a.getAttribute('href'))
     expect(hrefs).toHaveLength(exhibitions.length)
     for (const href of hrefs) expect(Object.values(minisites).some((base) => href.startsWith(base))).toBe(true)
+    // The first exhibition's picture stands in the middle.
+    expect(host.querySelector('.sh-exh__picture img')).not.toBeNull()
     app.unmount()
   }, 60000)
 
