@@ -87,6 +87,9 @@ export default {
       homeTitle: 'sharinghistory.identity.heading',
       homeText: 'sharinghistory.identity.subheading',
     },
+    // The Virtual Exhibitions' landing page has no band: its own picture
+    // stands under the menu (views/ExhibitionsEntrance.vue).
+    areas: { exhibitions: { banner: { inner: '' } } },
     // libs/config.inc.php offers English only: no switcher.
     languages: false,
     // The footer's copyright entry (includes/footer.php); the year follows.
